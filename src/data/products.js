@@ -105,6 +105,73 @@ export const CHAKRAS = [
   { id: 'root', name: 'Root (Muladhara)', stone: 'Black Tourmaline / Garnet', color: '#0d9488' }
 ];
 
+export const CUSTOM_BEADS = [
+  { 
+    id: 'bead-pyrite', 
+    name: 'Pyrite (Wealth)', 
+    color: '#d97706', 
+    pricePerBead: 40, 
+    energy: 'Abundance & Wealth',
+    image: '/images/pyrite_cluster.png'
+  },
+  { 
+    id: 'bead-amethyst', 
+    name: 'Amethyst (Calm)', 
+    color: '#a855f7', 
+    pricePerBead: 45, 
+    energy: 'Intuition & Peace',
+    image: '/images/amethyst_geode_slice.png'
+  },
+  { 
+    id: 'bead-rosequartz', 
+    name: 'Rose Quartz (Love)', 
+    color: '#ec4899', 
+    pricePerBead: 35, 
+    energy: 'Love & Compassion',
+    image: '/images/rose_quartz_chunk.png'
+  },
+  { 
+    id: 'bead-aventurine', 
+    name: 'Green Aventurine (Luck)', 
+    color: '#10b981', 
+    pricePerBead: 35, 
+    energy: 'Opportunity & Health',
+    image: '/images/seven_chakra_bracelet.png'
+  },
+  { 
+    id: 'bead-lapis', 
+    name: 'Lapis Lazuli (Wisdom)', 
+    color: '#3b82f6', 
+    pricePerBead: 50, 
+    energy: 'Communication & Truth',
+    image: '/images/shree_yantra_pendant.png'
+  },
+  { 
+    id: 'bead-citrine', 
+    name: 'Citrine (Joy)', 
+    color: '#eab308', 
+    pricePerBead: 45, 
+    energy: 'Solar Energy & Success',
+    image: '/images/citrine_ring.png'
+  },
+  { 
+    id: 'bead-tigereye', 
+    name: 'Tiger Eye (Courage)', 
+    color: '#b45309', 
+    pricePerBead: 40, 
+    energy: 'Focus & Protection',
+    image: '/images/black_tourmaline_bracelet.png'
+  },
+  { 
+    id: 'bead-clearquartz', 
+    name: 'Clear Quartz (Amplifier)', 
+    color: '#06b6d4', 
+    pricePerBead: 30, 
+    energy: 'Clarity & Energy',
+    image: '/images/quartz_pyramid.png'
+  }
+];
+
 export const PRODUCTS = [
   // Live Scraped Products from https://shubhanjalistore.com/shop/
   {
@@ -374,11 +441,9 @@ export const PRODUCTS = [
     image: '/images/rose_quartz_chunk.png',
     images: ['/images/rose_quartz_chunk.png'],
     certificate: 'Natural Pink Beryl Morganite',
-    description: 'Exquisite statement necklace strung with large raw polished Morganite tumbles. The stone of divine unconditional love.',
+    description: 'Exquisite statement necklace strung with large raw polished Morganite tumbles.',
     specifications: { gemstone: 'Natural Morganite', weight: '280g' }
   },
-
-  // Existing Signature Shubhanjali Items
   {
     id: 'shubh-1',
     name: 'Aquamarine Chips Sterling Silver Chain Bracelet',
@@ -430,7 +495,7 @@ export const PRODUCTS = [
     image: '/images/seven_chakra_bracelet.png',
     images: ['/images/seven_chakra_bracelet.png'],
     certificate: 'Pyrite, Citrine & Green Aventurine',
-    description: 'Traditional Dhanyog combination worn by entrepreneurs and professionals.',
+    description: 'Traditional Dhanyog combination worn by entrepreneurs.',
     specifications: { beadSize: '8mm', wristSize: 'Elastic Stretch' }
   },
   {
@@ -466,7 +531,7 @@ export const PRODUCTS = [
     image: '/images/seven_chakra_bracelet.png',
     images: ['/images/seven_chakra_bracelet.png'],
     certificate: 'Pyrite, Citrine & Green Aventurine',
-    description: 'Combines 3 powerful wealth crystals for unexpected cash flow and business luck.',
+    description: 'Combines 3 powerful wealth crystals for unexpected cash flow.',
     specifications: { beadSize: '8mm', wristSize: '7.0 - 7.5 Inches' }
   },
   {
@@ -484,7 +549,7 @@ export const PRODUCTS = [
     image: '/images/pyrite_cluster.png',
     images: ['/images/pyrite_cluster.png'],
     certificate: 'ISO 9001 Certified Pyrite',
-    description: 'Raw metallic golden Peruvian Pyrite cluster. Placed in cash boxes for money attraction.',
+    description: 'Raw metallic golden Peruvian Pyrite cluster.',
     specifications: { weight: '250g', origin: 'Peru' }
   },
   {
@@ -502,7 +567,7 @@ export const PRODUCTS = [
     image: '/images/selenite_tower.png',
     images: ['/images/selenite_tower.png'],
     certificate: '100% Pure Moroccan Selenite',
-    description: 'Fibrous white selenite tower wand. Cleanses negative vibrations and recharges stones.',
+    description: 'Fibrous white selenite tower wand.',
     specifications: { height: '6 Inches', origin: 'Morocco' }
   },
   {
@@ -520,7 +585,7 @@ export const PRODUCTS = [
     image: '/images/black_tourmaline_bracelet.png',
     images: ['/images/black_tourmaline_bracelet.png'],
     certificate: 'Black Tourmaline, Hematite & Tiger Eye',
-    description: 'World-famous 3-in-1 protection bracelet combining Black Tourmaline, Hematite, and Tiger Eye.',
+    description: 'World-famous 3-in-1 protection bracelet.',
     specifications: { beadSize: '8mm', wristSize: '7.0 - 7.5 Inches' }
   },
   {
@@ -538,7 +603,7 @@ export const PRODUCTS = [
     image: '/images/selenite_tower.png',
     images: ['/images/selenite_tower.png'],
     certificate: '100% Genuine Himalayan Pink Salt',
-    description: 'Emits negative ions to purify air and reduce stress. Hand-carved from solid salt blocks.',
+    description: 'Emits negative ions to purify air.',
     specifications: { weight: '2kg - 3kg', includes: 'Dimmer Switch' }
   }
 ];
@@ -574,17 +639,6 @@ export const BLOG_POSTS = [
     image: '/images/seven_chakra_bracelet.png',
     summary: 'From Root to Crown, learn how specific crystal frequencies resonate with body chakras to relieve stress, enhance focus, and restore natural vitality.'
   }
-];
-
-export const CUSTOM_BEADS = [
-  { id: 'bead-pyrite', name: 'Pyrite (Wealth)', color: '#d97706', pricePerBead: 40, energy: 'Abundance & Wealth' },
-  { id: 'bead-amethyst', name: 'Amethyst (Calm)', color: '#a855f7', pricePerBead: 45, energy: 'Intuition & Peace' },
-  { id: 'bead-rosequartz', name: 'Rose Quartz (Love)', color: '#ec4899', pricePerBead: 35, energy: 'Love & Compassion' },
-  { id: 'bead-aventurine', name: 'Green Aventurine (Luck)', color: '#10b981', pricePerBead: 35, energy: 'Opportunity & Health' },
-  { id: 'bead-lapis', name: 'Lapis Lazuli (Wisdom)', color: '#3b82f6', pricePerBead: 50, energy: 'Communication & Truth' },
-  { id: 'bead-citrine', name: 'Citrine (Joy)', color: '#eab308', pricePerBead: 45, energy: 'Solar Energy & Success' },
-  { id: 'bead-tigereye', name: 'Tiger Eye (Courage)', color: '#b45309', pricePerBead: 40, energy: 'Focus & Protection' },
-  { id: 'bead-clearquartz', name: 'Clear Quartz (Amplifier)', color: '#06b6d4', pricePerBead: 30, energy: 'Clarity & Energy' }
 ];
 
 export const REVIEWS = [
