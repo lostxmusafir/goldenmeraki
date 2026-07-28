@@ -14,6 +14,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { MASTER_TAXONOMY, PRODUCTS } from '../data/products';
+import { GoldenMerakiLogo } from './GoldenMerakiLogo';
 
 export const Header = ({ 
   cartCount, 
@@ -44,19 +45,17 @@ export const Header = ({
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-violet-100 shadow-sm">
       
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-violet-700 via-purple-700 to-indigo-800 text-white text-[11px] font-semibold py-2 px-4">
+      {/* Top Utility Bar */}
+      <div className="bg-slate-900 text-slate-200 text-[11px] font-semibold py-1.5 px-4 border-b border-slate-800">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="px-2 py-0.5 bg-amber-400 text-indigo-950 rounded-full text-[9px] font-black uppercase tracking-wider">
-              LIMITED OFFER
-            </span>
-            <span>✨ Extra 20% OFF | Code: <strong className="text-amber-300">GOLDEN20</strong></span>
+          <div className="flex items-center space-x-2 text-emerald-400 font-bold text-[11px]">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>100% Certified Natural Healing Gemstones</span>
           </div>
 
-          <div className="hidden md:flex items-center space-x-6 text-[11px]">
+          <div className="flex items-center space-x-6 text-[11px]">
             <div className="flex items-center space-x-1">
-              <MapPin className="w-3.5 h-3.5 text-cyan-300" />
+              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
               <span>Deliver to: </span>
               {editingPincode ? (
                 <input
@@ -71,17 +70,17 @@ export const Header = ({
               ) : (
                 <button
                   onClick={() => setEditingPincode(true)}
-                  className="font-bold underline text-amber-200 hover:text-white"
+                  className="font-bold underline text-amber-300 hover:text-white"
                 >
                   {pincode} (Mumbai)
                 </button>
               )}
             </div>
 
-            <div className="flex items-center space-x-1">
-              <Phone className="w-3.5 h-3.5 text-emerald-300" />
-              <span>Support: <strong>+91 99300 00944</strong></span>
-            </div>
+            <a href="tel:+919930000944" className="flex items-center space-x-1 hover:text-amber-300 transition-colors">
+              <Phone className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Support: <strong className="text-white">+91 99300 00944</strong></span>
+            </a>
           </div>
         </div>
       </div>
@@ -105,19 +104,9 @@ export const Header = ({
                 setSelectedCategory('all');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }} 
-              className="cursor-pointer group flex items-center space-x-2.5"
+              className="cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-violet-200 group-hover:scale-105 transition-transform">
-                <Sparkles className="w-5.5 h-5.5 text-amber-300" />
-              </div>
-              <div>
-                <span className="font-luxury text-xl sm:text-2xl font-extrabold tracking-wider text-indigo-950 group-hover:text-violet-700 transition-colors block leading-none">
-                  GOLDEN MERAKI
-                </span>
-                <span className="text-[9px] tracking-widest uppercase font-extrabold text-emerald-600 block mt-0.5">
-                  Natural Healing Crystals • Mumbai
-                </span>
-              </div>
+              <GoldenMerakiLogo className="h-12 sm:h-16 md:h-20 lg:h-24 max-h-24" />
             </div>
           </div>
 
@@ -176,28 +165,28 @@ export const Header = ({
             
             <button
               onClick={onOpenBuilder}
-              className="hidden xl:flex items-center space-x-1.5 px-3.5 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold hover:bg-amber-100 transition-colors"
+              className="hidden xl:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs shadow-sm hover:shadow-md transition-all border border-amber-600/30 active:scale-95"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <Sparkles className="w-3.5 h-3.5 text-slate-950" />
               <span>Design Bracelet</span>
             </button>
 
             <button
               onClick={onOpenQuiz}
-              className="hidden lg:flex items-center space-x-1.5 px-3.5 py-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold hover:bg-emerald-100 transition-colors"
+              className="hidden lg:flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all border border-slate-800 active:scale-95"
             >
-              <Compass className="w-3.5 h-3.5 text-emerald-600" />
+              <Compass className="w-3.5 h-3.5 text-emerald-400" />
               <span>Crystal Finder</span>
             </button>
 
             <button
               onClick={onOpenWishlist}
-              className="p-2.5 rounded-full bg-violet-50 text-indigo-950 hover:bg-violet-100 hover:text-pink-600 transition-colors relative"
+              className="p-2.5 rounded-xl bg-violet-50 text-indigo-950 hover:bg-violet-100 hover:text-pink-600 transition-all relative border border-violet-100"
               title="Saved Wishlist"
             >
               <Heart className="w-5 h-5" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                <span className="absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
                   {wishlistCount}
                 </span>
               )}
@@ -205,11 +194,11 @@ export const Header = ({
 
             <button
               onClick={onOpenCart}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-full gradient-btn-primary text-white shadow-md shadow-violet-200 group"
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-700 via-indigo-700 to-purple-800 hover:from-violet-600 hover:to-indigo-600 text-white font-extrabold text-xs shadow-md shadow-violet-200 transition-all border border-violet-600 group active:scale-95"
             >
               <ShoppingBag className="w-4 h-4 text-amber-300 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-extrabold hidden sm:inline">Bag</span>
-              <span className="bg-amber-400 text-indigo-950 text-xs font-black px-2 py-0.5 rounded-full">
+              <span className="text-xs font-black hidden sm:inline">Bag</span>
+              <span className="bg-amber-400 text-slate-950 text-xs font-black px-2 py-0.5 rounded-lg shadow-sm">
                 {cartCount}
               </span>
             </button>
@@ -346,7 +335,7 @@ export const Header = ({
 
           <div className="flex items-center space-x-2 text-emerald-800 text-xs font-extrabold">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>56+ Shubhanjali Subcategories Certified</span>
+            <span>100% Certified Natural Gemstones</span>
           </div>
         </div>
       </nav>
@@ -354,7 +343,7 @@ export const Header = ({
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-violet-100 p-4 space-y-4 animate-in slide-in-from-top-4">
-          <div className="font-bold text-xs text-slate-400 uppercase tracking-wider">Shubhanjali Master Taxonomy</div>
+          <div className="font-bold text-xs text-slate-400 uppercase tracking-wider">Golden Meraki Categories</div>
           
           <div className="space-y-2 max-h-[60vh] overflow-y-auto">
             {MASTER_TAXONOMY.map(cat => (

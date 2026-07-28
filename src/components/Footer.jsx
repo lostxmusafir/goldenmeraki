@@ -33,7 +33,7 @@ export const Footer = ({ onOpenQuiz, onOpenBuilder, onOpenCanvas }) => {
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                <span>info@shubhanjali.com</span>
+                <span>info@goldenmeraki.com</span>
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@ export const Footer = ({ onOpenQuiz, onOpenBuilder, onOpenCanvas }) => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-violet-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-violet-300/70 gap-4">
           <div>
-            © 2026 Golden Meraki (Shubhanjali Crystal Store). All Rights Reserved.
+            © 2026 Golden Meraki Gemstones Store. All Rights Reserved.
           </div>
           <div className="flex space-x-4">
             <span className="hover:underline cursor-pointer">Privacy Policy</span>

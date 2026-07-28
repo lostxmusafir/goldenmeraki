@@ -31,23 +31,23 @@ export const Hero = ({ onExploreClick, onOpenQuiz, onOpenBuilder, onOpenCanvas }
             <div className="pt-2 flex flex-wrap gap-3">
               <button
                 onClick={onExploreClick}
-                className="px-7 py-3.5 rounded-full gradient-btn-primary text-xs font-extrabold shadow-lg shadow-violet-200 flex items-center space-x-2"
+                className="px-7 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black shadow-lg hover:shadow-xl transition-all flex items-center space-x-2 border border-slate-800 active:scale-95"
               >
                 <span>Shop Collections</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-amber-400" />
               </button>
 
               <button
                 onClick={onOpenBuilder}
-                className="px-6 py-3.5 rounded-full bg-white text-indigo-950 border-2 border-amber-300 hover:bg-amber-50 text-xs font-extrabold shadow-sm flex items-center space-x-1.5"
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center space-x-2 border border-amber-600/30 active:scale-95"
               >
-                <Sparkles className="w-4 h-4 text-amber-500" />
+                <Sparkles className="w-4 h-4 text-slate-950" />
                 <span>Custom Bracelet Studio</span>
               </button>
 
               <button
                 onClick={onOpenQuiz}
-                className="px-5 py-3.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 text-xs font-extrabold flex items-center space-x-1.5"
+                className="px-5 py-3.5 rounded-xl bg-white text-indigo-950 border border-violet-200 hover:bg-violet-50 text-xs font-extrabold shadow-sm hover:shadow transition-all flex items-center space-x-2 active:scale-95"
               >
                 <Compass className="w-4 h-4 text-emerald-600" />
                 <span>Crystal Quiz</span>

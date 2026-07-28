@@ -120,9 +120,9 @@ export const ProductCatalog = ({
               <span className="font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Intention:</span>
               <button
                 onClick={() => setSelectedIntention('all')}
-                className={`px-3 py-1 rounded-full font-bold transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl font-bold transition-all ${
                   selectedIntention === 'all'
-                    ? 'bg-indigo-950 text-white'
+                    ? 'bg-slate-900 text-white shadow-sm'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -132,10 +132,10 @@ export const ProductCatalog = ({
                 <button
                   key={int.id}
                   onClick={() => setSelectedIntention(int.id)}
-                  className={`px-3 py-1 rounded-full font-bold transition-all border ${
+                  className={`px-3.5 py-1.5 rounded-xl font-bold transition-all border ${
                     selectedIntention === int.id
-                      ? `${int.color} ring-1 ring-violet-400`
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      ? `${int.color} ring-2 ring-violet-500 shadow-sm`
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   {int.label}
@@ -256,27 +256,32 @@ export const ProductCatalog = ({
 
                     {/* Pricing & High Conversion E-Commerce Action Buttons */}
                     <div className="pt-2 border-t border-violet-100 space-y-2">
-                      <div className="flex items-baseline space-x-2">
-                        <span className="text-lg font-black text-indigo-950">
+                      <div className="flex items-center space-x-2 flex-wrap">
+                        <span className="text-lg font-black text-slate-900">
                           ₹{product.price.toLocaleString()}
                         </span>
                         <span className="text-xs text-slate-400 line-through">
-                          ₹{product.originalPrice.toLocaleString()}
+                          MRP: ₹{product.originalPrice.toLocaleString()}
                         </span>
+                        {product.originalPrice > product.price && (
+                          <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded-md border border-emerald-200">
+                            {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                          </span>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => onAddToCart(product)}
-                          className="py-2 px-3 rounded-xl bg-violet-100 text-violet-900 font-bold text-xs hover:bg-violet-200 transition-colors flex items-center justify-center space-x-1"
+                          className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-xs transition-all flex items-center justify-center space-x-1.5 border border-slate-200 active:scale-95"
                         >
-                          <ShoppingBag className="w-3.5 h-3.5" />
+                          <ShoppingBag className="w-3.5 h-3.5 text-slate-700" />
                           <span>Add Bag</span>
                         </button>
 
                         <button
                           onClick={() => onBuyNow(product)}
-                          className="py-2 px-3 rounded-xl gradient-btn-emerald text-white font-extrabold text-xs shadow-sm flex items-center justify-center space-x-1"
+                          className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-md transition-all flex items-center justify-center space-x-1 border border-amber-600/30 active:scale-95"
                         >
                           <span>Buy Now</span>
                         </button>
