@@ -1,56 +1,84 @@
-import { Compass, Heart, ShoppingBag, Sparkles } from 'lucide-react';
-import type { HeaderActionsProps } from './types';
+import { memo } from 'react';
+import { Bell, Heart, User, ShoppingBag } from 'lucide-react';
 
-export function HeaderActions({
-  cartCount,
+export interface HeaderActionsProps {
+  wishlistCount: number;
+  cartCount: number;
+  notificationCount?: number;
+  onOpenWishlist: () => void;
+  onOpenCart: () => void;
+  onOpenAccount?: () => void;
+  onOpenBuilder?: () => void;
+}
+
+export const HeaderActions = memo(function HeaderActions({
   wishlistCount,
-  onOpenCart,
+  cartCount,
+  notificationCount = 0,
   onOpenWishlist,
-  onOpenQuiz,
+  onOpenCart,
+  onOpenAccount,
   onOpenBuilder
 }: HeaderActionsProps) {
   return (
-    <div className="flex items-center space-x-2 sm:space-x-3">
+    <div className="flex items-center gap-2 sm:gap-3">
       <button
+        type="button"
         onClick={onOpenBuilder}
-        className="hidden xl:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs shadow-sm hover:shadow-md transition-all border border-amber-600/30 active:scale-95"
+        className="hidden rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 xl:inline-flex"
       >
-        <Sparkles className="w-3.5 h-3.5 text-slate-950" />
-        <span>Design Bracelet</span>
+        Studio
       </button>
 
       <button
-        onClick={onOpenQuiz}
-        className="hidden lg:flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm hover:shadow-md transition-all border border-slate-800 active:scale-95"
-      >
-        <Compass className="w-3.5 h-3.5 text-emerald-400" />
-        <span>Crystal Finder</span>
-      </button>
-
-      <button
+        type="button"
         onClick={onOpenWishlist}
-        className="p-2.5 rounded-xl bg-violet-50 text-indigo-950 hover:bg-violet-100 hover:text-pink-600 transition-all relative border border-violet-100"
-        title="Saved Wishlist"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-rose-600 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+        aria-label={`Wishlist, ${wishlistCount} items`}
       >
-        <Heart className="w-5 h-5" />
+        <Heart className="h-4.5 w-4.5" />
         {wishlistCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 bg-pink-600 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+          <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-950 px-1 text-[10px] font-semibold text-white">
             {wishlistCount}
           </span>
         )}
       </button>
 
       <button
-        onClick={onOpenCart}
-        className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-700 via-indigo-700 to-purple-800 hover:from-violet-600 hover:to-indigo-600 text-white font-extrabold text-xs shadow-md shadow-violet-200 transition-all border border-violet-600 group active:scale-95"
+        type="button"
+        onClick={onOpenAccount}
+        className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 md:inline-flex"
+        aria-label="Account"
       >
-        <ShoppingBag className="w-4 h-4 text-amber-300 group-hover:scale-110 transition-transform" />
-        <span className="text-xs font-black hidden sm:inline">Bag</span>
-        <span className="bg-amber-400 text-slate-950 text-xs font-black px-2 py-0.5 rounded-lg shadow-sm">
+        <User className="h-4.5 w-4.5" />
+        {notificationCount > 0 && (
+          <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1 text-[10px] font-semibold text-slate-950">
+            {notificationCount}
+          </span>
+        )}
+      </button>
+
+      <button
+        type="button"
+        onClick={onOpenCart}
+        className="relative inline-flex h-11 items-center gap-2 rounded-full bg-slate-950 px-4 text-sm font-medium text-white shadow-[0_12px_24px_rgba(15,23,42,0.14)] transition-all hover:bg-slate-800 hover:shadow-[0_16px_32px_rgba(15,23,42,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+        aria-label={`Cart, ${cartCount} items`}
+      >
+        <ShoppingBag className="h-4.5 w-4.5" />
+        <span className="hidden sm:inline">Cart</span>
+        <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-white px-1.5 text-xs font-semibold text-slate-950">
           {cartCount}
         </span>
       </button>
+
+      <button
+        type="button"
+        onClick={onOpenAccount}
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 md:hidden"
+        aria-label="Account"
+      >
+        <Bell className="h-4.5 w-4.5" />
+      </button>
     </div>
   );
-}
-
+});

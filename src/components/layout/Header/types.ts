@@ -14,6 +14,7 @@ export interface HeaderProps {
   onOpenQuiz: () => void;
   onOpenBuilder: () => void;
   onOpenCanvas: () => void;
+  onOpenAccount?: () => void;
   onSelectProduct: (product: Product) => void;
 }
 
@@ -53,4 +54,3 @@ export interface MegaMenuProps {
   setSelectedCategory: Dispatch<SetStateAction<string>>;
   onClose: () => void;
 }
-

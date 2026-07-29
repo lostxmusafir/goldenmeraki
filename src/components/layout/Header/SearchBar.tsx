@@ -1,65 +1,114 @@
-import { useState } from 'react';
-import { Search } from 'lucide-react';
-import type { HeaderSearchBarProps } from './types';
+import { memo, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { Search, X } from 'lucide-react';
+import type { Product } from '../../../types/product';
 
-export function SearchBar({ searchTerm, setSearchTerm, products, onSelectProduct }: HeaderSearchBarProps) {
-  const [searchFocused, setSearchFocused] = useState(false);
+export interface SearchBarProps {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  products: Product[];
+  onSelectProduct: (product: Product) => void;
+  className?: string;
+}
 
-  const searchResults = searchTerm.trim()
-    ? products
-        .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.category.toLowerCase().includes(searchTerm.toLowerCase()))
-        .slice(0, 4)
-    : [];
+export const SearchBar = memo(function SearchBar({
+  searchTerm,
+  setSearchTerm,
+  products,
+  onSelectProduct,
+  className = ''
+}: SearchBarProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const deferredSearch = useDeferredValue(searchTerm);
+
+  const suggestions = useMemo(() => {
+    const query = deferredSearch.trim().toLowerCase();
+    if (!query) return [] as Product[];
+
+    return products
+      .filter((product) => {
+        const haystacks = [product.name, product.category, product.stone, product.tags.join(' ')];
+        return haystacks.some((value) => value.toLowerCase().includes(query));
+      })
+      .slice(0, 5);
+  }, [deferredSearch, products]);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setIsOpen(false);
+    }
+  }, [searchTerm]);
 
   return (
-    <div className="hidden sm:block flex-1 max-w-lg mx-4 relative">
+    <div className={`relative ${className}`}>
       <div className="relative">
         <input
-          type="text"
-          placeholder="Search Pyrite, 7 Chakra Bracelet, Amethyst..."
+          type="search"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-          className="w-full pl-10 pr-10 py-2.5 rounded-full bg-violet-50/70 border border-violet-200 text-xs text-indigo-950 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:bg-white transition-all shadow-inner"
+          onChange={(event) => {
+            setSearchTerm(event.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          onBlur={() => {
+            window.setTimeout(() => setIsOpen(false), 180);
+          }}
+          placeholder="Search crystals, bracelets, journals..."
+          aria-label="Search products"
+          aria-expanded={isOpen}
+          aria-controls="header-search-suggestions"
+          className="w-full rounded-full border border-slate-200 bg-white/90 py-3 pl-11 pr-11 text-sm text-slate-950 shadow-sm outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-slate-300 focus:bg-white focus:shadow-md lg:w-[22rem] lg:focus:w-[28rem]"
         />
-        <Search className="w-4 h-4 text-violet-500 absolute left-3.5 top-3" />
-        {searchTerm && (
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-slate-500" />
+        {searchTerm ? (
           <button
-            onClick={() => setSearchTerm('')}
-            className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-indigo-950 bg-violet-100 rounded-full w-4 h-4 flex items-center justify-center"
+            type="button"
+            onClick={() => {
+              setSearchTerm('');
+              setIsOpen(false);
+            }}
+            className="absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+            aria-label="Clear search"
           >
-            ×
+            <X className="h-4 w-4" />
           </button>
-        )}
+        ) : null}
       </div>
 
-      {searchFocused && searchResults.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-violet-100 overflow-hidden z-50 p-2 space-y-1 animate-in fade-in">
-          <div className="px-3 py-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-wider">
-            Matching Products ({searchResults.length})
+      {isOpen && suggestions.length > 0 ? (
+        <div
+          id="header-search-suggestions"
+          role="listbox"
+          className="absolute left-0 right-0 top-[calc(100%+0.75rem)] z-50 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.14)]"
+        >
+          <div className="border-b border-slate-100 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Quick matches
           </div>
-          {searchResults.map((prod) => (
-            <button
-              key={prod.id}
-              type="button"
-              onClick={() => {
-                onSelectProduct(prod);
-                setSearchTerm('');
-              }}
-              className="w-full p-2 rounded-xl hover:bg-violet-50 cursor-pointer flex items-center space-x-3 transition-colors text-left"
-            >
-              <img src={prod.image} alt={prod.name} className="w-10 h-10 rounded-lg object-cover border border-violet-100" />
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-xs text-indigo-950 truncate">{prod.name}</div>
-                <div className="text-[10px] text-emerald-700 font-semibold">{prod.certificate}</div>
-              </div>
-              <div className="font-extrabold text-xs text-indigo-950">₹{prod.price.toLocaleString()}</div>
-            </button>
-          ))}
+          <div className="max-h-80 overflow-auto p-2">
+            {suggestions.map((product) => (
+              <button
+                key={product.id}
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onSelectProduct(product);
+                  setSearchTerm('');
+                  setIsOpen(false);
+                }}
+                className="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+                role="option"
+              >
+                <img src={product.image} alt={product.name} className="h-12 w-12 rounded-xl object-cover" />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium text-slate-950">{product.name}</div>
+                  <div className="truncate text-xs text-slate-500">{product.certificate}</div>
+                </div>
+                <div className="text-sm font-semibold text-slate-950">₹{product.price.toLocaleString()}</div>
+              </button>
+            ))}
+          </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
-}
+});
 

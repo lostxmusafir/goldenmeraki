@@ -1,115 +1,148 @@
-import { MapPin, Phone, ShieldCheck } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { PRODUCTS } from './data';
-import { DesktopNav } from './DesktopNav';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { AnnouncementBar } from './AnnouncementBar';
+import { DesktopNavigation } from './DesktopNavigation';
 import { HeaderActions } from './HeaderActions';
 import { Logo } from './Logo';
-import { MobileNav } from './MobileNav';
+import { MobileNavigation } from './MobileNavigation';
 import { SearchBar } from './SearchBar';
+import { PRODUCTS } from './data';
 import type { HeaderProps } from './types';
+import type { Product } from '../../../types/product';
 
-export function Header(props: HeaderProps) {
-  const {
-    cartCount,
-    wishlistCount,
-    onOpenCart,
-    onOpenWishlist,
-    searchTerm,
-    setSearchTerm,
-    selectedCategory,
-    setSelectedCategory,
-    onOpenQuiz,
-    onOpenBuilder,
-    onOpenCanvas,
-    onSelectProduct
-  } = props;
+function scrollToCatalog() {
+  const element = document.getElementById('catalog-section');
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
 
-  const [pincode, setPincode] = useState('400054');
-  const [editingPincode, setEditingPincode] = useState(false);
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  const products = useMemo(() => PRODUCTS, []);
+export const Header = memo(function Header({
+  cartCount,
+  wishlistCount,
+  onOpenCart,
+  onOpenWishlist,
+  searchTerm,
+  setSearchTerm,
+  selectedCategory,
+  setSelectedCategory,
+  onOpenQuiz,
+  onOpenBuilder,
+  onOpenCanvas,
+  onOpenAccount,
+  onSelectProduct
+}: HeaderProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [products] = useState<Product[]>(() => PRODUCTS as Product[]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 12);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const headerClassName = useMemo(
+    () =>
+      [
+        'sticky top-0 z-50 transition-all duration-300',
+        isScrolled
+          ? 'backdrop-blur-xl bg-white/88 shadow-[0_12px_32px_rgba(15,23,42,0.08)] border-b border-white/60'
+          : 'bg-white/95 border-b border-slate-200/70'
+      ].join(' '),
+    [isScrolled]
+  );
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-violet-100 shadow-sm">
-      <div className="bg-slate-900 text-slate-200 text-[11px] font-semibold py-1.5 px-4 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-emerald-400 font-bold text-[11px]">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>100% Certified Natural Healing Gemstones</span>
-          </div>
+    <header className={headerClassName}>
+      <AnnouncementBar />
 
-          <div className="flex items-center space-x-6 text-[11px]">
-            <div className="flex items-center space-x-1">
-              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Deliver to: </span>
-              {editingPincode ? (
-                <input
-                  type="text"
-                  value={pincode}
-                  maxLength={6}
-                  onChange={(e) => setPincode(e.target.value)}
-                  onBlur={() => setEditingPincode(false)}
-                  className="w-16 px-1 py-0 bg-white text-indigo-950 rounded text-center font-bold text-xs"
-                  autoFocus
-                />
-              ) : (
-                <button onClick={() => setEditingPincode(true)} className="font-bold underline text-amber-300 hover:text-white">
-                  {pincode} (Mumbai)
-                </button>
-              )}
-            </div>
-
-            <a href="tel:+919930000944" className="flex items-center space-x-1 hover:text-amber-300 transition-colors">
-              <Phone className="w-3.5 h-3.5 text-emerald-400" />
-              <span>
-                Support: <strong className="text-white">+91 99300 00944</strong>
-              </span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <MobileNav
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3 py-3 lg:py-4">
+          <div className="flex items-center gap-2 lg:gap-4">
+            <MobileNavigation
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
-              onOpenQuiz={onOpenQuiz}
+              wishlistCount={wishlistCount}
+              cartCount={cartCount}
+              onOpenWishlist={onOpenWishlist}
+              onOpenCart={onOpenCart}
               onOpenBuilder={onOpenBuilder}
+              onSelectProduct={onSelectProduct}
+              products={products}
             />
 
-            <div
+            <button
+              type="button"
               onClick={() => {
                 setSelectedCategory('all');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                scrollToTop();
               }}
-              className="cursor-pointer"
+              className="group flex items-center gap-3 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+              aria-label="Go to home"
             >
-              <Logo />
-            </div>
+              <Logo className="h-10 sm:h-11 lg:h-12" />
+            </button>
           </div>
 
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} products={products} onSelectProduct={onSelectProduct} />
+          <div className="hidden flex-1 items-center justify-center lg:flex">
+            <SearchBar
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              products={products}
+              onSelectProduct={onSelectProduct}
+              className="w-full max-w-[34rem]"
+            />
+          </div>
 
-          <HeaderActions
-            cartCount={cartCount}
-            wishlistCount={wishlistCount}
-            onOpenCart={onOpenCart}
-            onOpenWishlist={onOpenWishlist}
-            onOpenQuiz={onOpenQuiz}
-            onOpenBuilder={onOpenBuilder}
-          />
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                onOpenQuiz();
+              }}
+              className="hidden rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 md:inline-flex"
+            >
+              Crystal Finder
+            </button>
+
+            <button
+              type="button"
+              onClick={onOpenBuilder}
+              className="hidden rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 xl:inline-flex"
+            >
+              Studio
+            </button>
+
+            <HeaderActions
+              wishlistCount={wishlistCount}
+              cartCount={cartCount}
+              notificationCount={0}
+              onOpenWishlist={onOpenWishlist}
+              onOpenCart={onOpenCart}
+              onOpenAccount={onOpenAccount}
+              onOpenBuilder={onOpenBuilder}
+            />
+          </div>
         </div>
       </div>
 
-      <DesktopNav
+      <DesktopNavigation
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
-        onOpenBuilder={onOpenBuilder}
-        onOpenQuiz={onOpenQuiz}
+        onSelectProduct={onSelectProduct}
       />
-
     </header>
   );
-}
+});
