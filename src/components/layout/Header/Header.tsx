@@ -1,12 +1,12 @@
 import { memo, useEffect, useMemo, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AnnouncementBar } from './AnnouncementBar';
-import { DesktopNavigation } from './DesktopNavigation';
 import { HeaderActions } from './HeaderActions';
 import { Logo } from './Logo';
 import { MobileNavigation } from './MobileNavigation';
 import { SearchBar } from './SearchBar';
-import { PRODUCTS } from './data';
+import { CATEGORIES, INTENTIONS, PRODUCTS } from './data';
 import type { HeaderProps } from './types';
 import type { Product } from '../../../types/product';
 
@@ -109,6 +109,58 @@ export const Header = memo(function Header({
             />
           </div>
 
+          <div className="hidden items-center gap-2 xl:flex">
+            <div className="relative group">
+              <button
+                type="button"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+              >
+                Category
+                <ChevronDown className="h-4 w-4 text-slate-500" />
+              </button>
+              <div className="invisible absolute left-0 top-full z-30 mt-0 min-w-[18rem] overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.12)] opacity-0 transition duration-200 group-hover:visible group-hover:opacity-100">
+                {CATEGORIES.filter((category) => category.id !== 'all').map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory(category.id);
+                      navigate(`/category/${category.id}`);
+                    }}
+                    className="w-full cursor-pointer rounded-full px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative group">
+              <button
+                type="button"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+              >
+                Intention
+                <ChevronDown className="h-4 w-4 text-slate-500" />
+              </button>
+              <div className="invisible absolute left-0 top-full z-30 -mt-px min-w-[18rem] overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.12)] opacity-0 transition duration-200 group-hover:visible group-hover:opacity-100">
+                {INTENTIONS.map((intention) => (
+                  <button
+                    key={intention.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      navigate(`/category/all?intent=${encodeURIComponent(intention.id)}`);
+                    }}
+                    className="w-full cursor-pointer rounded-full px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  >
+                    {intention.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <HeaderActions
               wishlistCount={wishlistCount}
@@ -123,12 +175,6 @@ export const Header = memo(function Header({
         </div>
       </div>
 
-      <DesktopNavigation
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        onSelectProduct={onSelectProduct}
-        onOpenBuilder={onOpenBuilder}
-      />
     </header>
   );
 });

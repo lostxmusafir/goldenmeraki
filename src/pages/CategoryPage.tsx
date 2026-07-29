@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { useMemo, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { useMemo, useState, useEffect } from 'react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer/Footer';
 import { CategoryBanner } from '../components/category/CategoryBanner';
@@ -40,12 +40,19 @@ export function CategoryPage({
 }: CategoryPageProps) {
   const [intention, setIntention] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
+  const location = useLocation();
+  const navigate = useNavigate();
   const [maxPrice, setMaxPrice] = useState(25000);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
 
   const category = findCategoryBySlug(slug);
   const categoryId = category?.id ?? 'all';
+
+  const handleCategoryChange = (newCategory: string) => {
+    setSelectedCategory(newCategory);
+    navigate(`/category/${newCategory}`);
+  };
 
   const filteredProducts = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -63,6 +70,12 @@ export function CategoryPage({
         return b.reviewsCount - a.reviewsCount;
       });
   }, [categoryId, intention, maxPrice, searchTerm, sortBy]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const intent = params.get('intent') ?? 'all';
+    setIntention(intent);
+  }, [location.search]);
 
   if (!category && slug !== 'all') {
     return <Navigate to="/category/all" replace />;
@@ -101,7 +114,7 @@ export function CategoryPage({
           <div className="hidden lg:block">
             <FilterSidebar
               category={categoryId}
-              setCategory={setSelectedCategory}
+              setCategory={handleCategoryChange}
               intention={intention}
               setIntention={setIntention}
               searchTerm={searchTerm}
@@ -145,7 +158,7 @@ export function CategoryPage({
         open={mobileFiltersOpen}
         onClose={() => setMobileFiltersOpen(false)}
         category={categoryId}
-        setCategory={setSelectedCategory}
+        setCategory={handleCategoryChange}
         intention={intention}
         setIntention={setIntention}
         searchTerm={searchTerm}

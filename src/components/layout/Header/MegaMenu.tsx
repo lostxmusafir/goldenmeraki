@@ -11,7 +11,7 @@ export const MegaMenu = memo(function MegaMenu({ item, onNavigateToSection }: Me
   if (item.type !== 'mega') return null;
 
   return (
-    <div className="absolute left-1/2 top-full z-50 mt-4 hidden w-[min(1120px,calc(100vw-2rem))] -translate-x-1/2 lg:block">
+    <div className="absolute left-1/2 top-full z-50 mt-1 hidden w-[min(1120px,calc(100vw-2rem))] -translate-x-1/2 lg:block">
       <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.16)]">
         <div className="grid grid-cols-[1.1fr_1.2fr_1fr_0.95fr] gap-0">
           <div className="space-y-4 border-r border-slate-100 bg-slate-950 p-6 text-white">

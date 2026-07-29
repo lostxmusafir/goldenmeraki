@@ -45,7 +45,7 @@ export function FilterSidebar({
               key={item.id}
               type="button"
               onClick={() => setCategory(item.id as ProductCategoryId)}
-              className={`rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
+              className={`cursor-pointer rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
                 category === item.id
                   ? 'border-slate-950 bg-slate-950 text-white'
                   : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -63,7 +63,7 @@ export function FilterSidebar({
           <button
             type="button"
             onClick={() => setIntention('all')}
-            className={`rounded-full border px-3 py-2 text-xs font-medium ${intention === 'all' ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-700'}`}
+            className={`cursor-pointer rounded-full border px-3 py-2 text-xs font-medium ${intention === 'all' ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-700'}`}
           >
             All
           </button>
@@ -72,7 +72,7 @@ export function FilterSidebar({
               key={item.id}
               type="button"
               onClick={() => setIntention(item.id)}
-              className={`rounded-full border px-3 py-2 text-xs font-medium ${intention === item.id ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-700'}`}
+              className={`cursor-pointer rounded-full border px-3 py-2 text-xs font-medium ${intention === item.id ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-700'}`}
             >
               {item.label}
             </button>
