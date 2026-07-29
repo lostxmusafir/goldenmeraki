@@ -1,24 +1,10 @@
 import type { BaseEntity, ImagePath, Nullable } from './common';
 
-export type ProductCategoryId =
-  | 'all'
-  | 'bracelets'
-  | 'raw-stones'
-  | 'trees-decor'
-  | 'malas-jewelry'
-  | 'face-wellness'
-  | 'zodiac-kits';
+export type ProductCategoryId = string;
 
-export type ProductIntentionId = 'wealth' | 'love' | 'peace' | 'protection' | 'health';
+export type ProductIntentionId = string;
 
-export type ProductChakraId =
-  | 'crown'
-  | 'third-eye'
-  | 'throat'
-  | 'heart'
-  | 'solar'
-  | 'sacral'
-  | 'root';
+export type ProductChakraId = string;
 
 export type ProductSubcategoryId = string;
 
@@ -28,6 +14,7 @@ export interface ProductSpecification {
 }
 
 export interface Product extends BaseEntity {
+  id: string;
   name: string;
   category: ProductCategoryId;
   subCategory: ProductSubcategoryId;
@@ -57,4 +44,3 @@ export interface CustomBead extends BaseEntity {
   energy: string;
   image: ImagePath;
 }
-
