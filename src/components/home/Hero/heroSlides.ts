@@ -10,7 +10,7 @@ export const heroSlides: HeroSlide[] = [
     image: '/images/fengshui_crystal_tree.png',
     primaryButton: 'Shop Collection',
     secondaryButton: 'Explore Category',
-    href: '/category/crystal-trees',
+    href: '/category/trees-decor',
     secondaryHref: '/category/all',
     badge: 'Artisanal Ritual'
   },
@@ -24,7 +24,7 @@ export const heroSlides: HeroSlide[] = [
     primaryButton: 'Shop Collection',
     secondaryButton: 'Explore Category',
     href: '/category/bracelets',
-    secondaryHref: '/category/bracelets',
+    secondaryHref: '/category/all',
     badge: 'Lab Certified'
   },
   {
@@ -37,7 +37,7 @@ export const heroSlides: HeroSlide[] = [
     primaryButton: 'Shop Collection',
     secondaryButton: 'Explore Category',
     href: '/category/raw-stones',
-    secondaryHref: '/category/raw-stones',
+    secondaryHref: '/category/all',
     badge: 'Untreated Stones'
   },
   {
@@ -49,8 +49,8 @@ export const heroSlides: HeroSlide[] = [
     image: '/images/lapis_lazuli_sphere.png',
     primaryButton: 'Shop Collection',
     secondaryButton: 'Explore Category',
-    href: '/category/healing-crystals',
-    secondaryHref: '/category/healing-crystals',
+    href: '/category/raw-stones',
+    secondaryHref: '/category/all',
     badge: '360° Harmony'
   },
   {
@@ -62,8 +62,8 @@ export const heroSlides: HeroSlide[] = [
     image: '/images/amethyst_geode_slice.png',
     primaryButton: 'Shop Collection',
     secondaryButton: 'Explore Category',
-    href: '/category/geodes-clusters',
-    secondaryHref: '/category/raw-stones',
+    href: '/category/raw-stones',
+    secondaryHref: '/category/all',
     badge: 'Collector Edition'
   }
 ];

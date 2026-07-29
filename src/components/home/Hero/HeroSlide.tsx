@@ -4,11 +4,7 @@ import type { HeroSlideProps } from './types';
 
 export function HeroSlide({ slide, isActive }: HeroSlideProps) {
   return (
-    <div
-      className={`relative w-full flex-none overflow-hidden transition-opacity duration-700 select-none ${
-        isActive ? 'opacity-100 z-10' : 'opacity-90 z-0'
-      }`}
-    >
+    <div className="min-w-0 flex-[0_0_100%] relative w-full overflow-hidden select-none">
       <div className="relative w-full min-h-[440px] sm:h-[500px] md:h-[620px] bg-[#FAF8F5] flex items-center justify-center">
         {/* Soft luxury ambient background highlights */}
         <div className="absolute top-0 right-1/4 w-[450px] h-[450px] bg-gradient-to-br from-amber-100/40 via-amber-50/20 to-transparent rounded-full blur-3xl pointer-events-none" />
@@ -18,8 +14,8 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left Content Column */}
-            <div className={`lg:col-span-7 flex flex-col justify-center space-y-4 sm:space-y-6 transition-all duration-700 transform ${
-              isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            <div className={`lg:col-span-7 flex flex-col justify-center space-y-4 sm:space-y-6 transition-all duration-500 transform ${
+              isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-90'
             }`}>
               {/* Collection Eyebrow / Badge */}
               <div className="flex items-center gap-2.5">
@@ -69,8 +65,8 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
             </div>
 
             {/* Right Image Showcase Column */}
-            <div className={`lg:col-span-5 flex items-center justify-center transition-all duration-700 delay-150 transform ${
-              isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+            <div className={`lg:col-span-5 flex items-center justify-center transition-all duration-500 delay-100 transform ${
+              isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-90'
             }`}>
               <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] aspect-square flex items-center justify-center">
                 {/* Decorative background frame */}
