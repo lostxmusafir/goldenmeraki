@@ -49,9 +49,10 @@ export function CategoryPage({
   const category = findCategoryBySlug(slug);
   const categoryId = category?.id ?? 'all';
 
-  const handleCategoryChange = (newCategory: string) => {
-    setSelectedCategory(newCategory);
-    navigate(`/category/${newCategory}`);
+  const handleCategoryChange = (action: SetStateAction<string>) => {
+    const nextCategory = typeof action === 'function' ? action(categoryId) : action;
+    setSelectedCategory(nextCategory);
+    navigate(`/category/${nextCategory}`);
   };
 
   const filteredProducts = useMemo(() => {
