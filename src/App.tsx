@@ -15,10 +15,21 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { ToastNotification } from './components/ToastNotification';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { PRODUCTS } from './data/products';
+import type { CartItem } from './types/cart';
+import type { Product } from './types/product';
+
+type ToastType = 'cart' | 'wishlist';
+
+interface ToastMessage {
+  type: ToastType;
+  message: string;
+}
 
 export function App() {
-  const [cartItems, setCartItems] = useState([
-    { ...PRODUCTS[0], quantity: 1 } // Pyrite Cluster by default in cart
+  const products = PRODUCTS as Product[];
+
+  const [cartItems, setCartItems] = useState<CartItem[]>([
+    { ...products[0], quantity: 1 } // Pyrite Cluster by default in cart
   ]);
   const [wishlist, setWishlist] = useState(['prod-2', 'prod-4']);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -30,11 +41,11 @@ export function App() {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [isCanvasOpen, setIsCanvasOpen] = useState(false);
-  const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [toast, setToast] = useState(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
 
   // Cart Operations
-  const handleAddToCart = (product) => {
+  const handleAddToCart = (product: Product) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
@@ -51,18 +62,18 @@ export function App() {
     });
   };
 
-  const handleBuyNow = (product) => {
+  const handleBuyNow = (product: Product) => {
     handleAddToCart(product);
     setIsCheckoutOpen(true);
   };
 
-  const handleUpdateQuantity = (productId, quantity) => {
+  const handleUpdateQuantity = (productId: string, quantity: number) => {
     setCartItems(prev =>
       prev.map(item => (item.id === productId ? { ...item, quantity } : item))
     );
   };
 
-  const handleRemoveCartItem = (productId) => {
+  const handleRemoveCartItem = (productId: string) => {
     setCartItems(prev => prev.filter(item => item.id !== productId));
   };
 
@@ -71,14 +82,14 @@ export function App() {
   };
 
   // Wishlist Operations
-  const handleToggleWishlist = (productId) => {
+  const handleToggleWishlist = (productId: string) => {
     setWishlist(prev => {
       const exists = prev.includes(productId);
       const updated = exists
         ? prev.filter(id => id !== productId)
         : [...prev, productId];
 
-      const product = PRODUCTS.find(p => p.id === productId);
+      const product = products.find(p => p.id === productId);
       setToast({
         type: 'wishlist',
         message: exists
@@ -118,7 +129,7 @@ export function App() {
         onOpenQuiz={() => setIsQuizOpen(true)}
         onOpenBuilder={() => setIsBuilderOpen(true)}
         onOpenCanvas={() => setIsCanvasOpen(true)}
-        onSelectProduct={(p) => setQuickViewProduct(p)}
+        onSelectProduct={(p: Product) => setQuickViewProduct(p)}
       />
 
       {/* Main Page Body */}
@@ -147,7 +158,7 @@ export function App() {
           searchTerm={searchTerm}
           wishlist={wishlist}
           onToggleWishlist={handleToggleWishlist}
-          onQuickView={(product) => setQuickViewProduct(product)}
+          onQuickView={(product: Product) => setQuickViewProduct(product)}
           onAddToCart={handleAddToCart}
           onBuyNow={handleBuyNow}
         />
@@ -186,7 +197,7 @@ export function App() {
         isOpen={isQuizOpen}
         onClose={() => setIsQuizOpen(false)}
         onAddToCart={handleAddToCart}
-        onSelectProduct={(p) => setQuickViewProduct(p)}
+        onSelectProduct={(p: Product) => setQuickViewProduct(p)}
       />
 
       <BraceletBuilder
