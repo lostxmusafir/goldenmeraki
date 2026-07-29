@@ -83,6 +83,10 @@ export function App() {
     setSelectedCategory(pathCategory || 'all');
   }, [location.pathname]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [location.pathname]);
+
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const handleAddToCart = (product: Product) => {

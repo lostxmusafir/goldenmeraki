@@ -1,5 +1,5 @@
 import { memo, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Sparkles } from 'lucide-react';
 import { MAIN_NAVIGATION } from './navigation';
 import { MegaMenu } from './MegaMenu';
 import type { NavigationItem } from './navigation';
@@ -9,6 +9,7 @@ export interface DesktopNavigationProps {
   selectedCategory: string;
   setSelectedCategory: (value: string) => void;
   onSelectProduct: (product: Product) => void;
+  onOpenBuilder: () => void;
 }
 
 function scrollToCatalog() {
@@ -21,7 +22,8 @@ function scrollToCatalog() {
 export const DesktopNavigation = memo(function DesktopNavigation({
   selectedCategory,
   setSelectedCategory,
-  onSelectProduct
+  onSelectProduct,
+  onOpenBuilder
 }: DesktopNavigationProps) {
   const [activeMegaItem, setActiveMegaItem] = useState<NavigationItem | null>(null);
 
@@ -78,6 +80,15 @@ export const DesktopNavigation = memo(function DesktopNavigation({
                 </button>
               );
             })}
+
+            <button
+              type="button"
+              onClick={onOpenBuilder}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 transition-all hover:border-amber-300 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+            >
+              <Sparkles className="h-4 w-4" />
+              Crystal Finder & Studio
+            </button>
           </div>
         </div>
       </nav>
@@ -99,6 +110,15 @@ export const DesktopNavigation = memo(function DesktopNavigation({
               {item.label}
             </button>
           ))}
+
+          <button
+            type="button"
+            onClick={onOpenBuilder}
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 transition-colors hover:border-amber-300 hover:bg-amber-100"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Studio
+          </button>
         </div>
       </nav>
     </>

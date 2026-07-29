@@ -17,19 +17,10 @@ export const HeaderActions = memo(function HeaderActions({
   notificationCount = 0,
   onOpenWishlist,
   onOpenCart,
-  onOpenAccount,
-  onOpenBuilder
+  onOpenAccount
 }: HeaderActionsProps) {
   return (
     <div className="flex items-center gap-2 sm:gap-3">
-      <button
-        type="button"
-        onClick={onOpenBuilder}
-        className="hidden rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 xl:inline-flex"
-      >
-        Studio
-      </button>
-
       <button
         type="button"
         onClick={onOpenWishlist}

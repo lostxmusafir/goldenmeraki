@@ -1,4 +1,5 @@
 import { memo, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnnouncementBar } from './AnnouncementBar';
 import { DesktopNavigation } from './DesktopNavigation';
 import { HeaderActions } from './HeaderActions';
@@ -35,6 +36,7 @@ export const Header = memo(function Header({
   onOpenAccount,
   onSelectProduct
 }: HeaderProps) {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [products] = useState<Product[]>(() => PRODUCTS as Product[]);
 
@@ -87,9 +89,10 @@ export const Header = memo(function Header({
               type="button"
               onClick={() => {
                 setSelectedCategory('all');
+                navigate('/');
                 scrollToTop();
               }}
-              className="group flex items-center gap-3 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
+              className="group flex cursor-pointer items-center gap-3 rounded-full transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
               aria-label="Go to home"
             >
               <Logo className="h-10 sm:h-11 lg:h-12" />
@@ -107,24 +110,6 @@ export const Header = memo(function Header({
           </div>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                onOpenQuiz();
-              }}
-              className="hidden rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 md:inline-flex"
-            >
-              Crystal Finder
-            </button>
-
-            <button
-              type="button"
-              onClick={onOpenBuilder}
-              className="hidden rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:text-slate-950 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 xl:inline-flex"
-            >
-              Studio
-            </button>
-
             <HeaderActions
               wishlistCount={wishlistCount}
               cartCount={cartCount}
@@ -142,6 +127,7 @@ export const Header = memo(function Header({
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         onSelectProduct={onSelectProduct}
+        onOpenBuilder={onOpenBuilder}
       />
     </header>
   );

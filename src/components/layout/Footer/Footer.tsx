@@ -80,18 +80,7 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col gap-3 text-sm text-slate-400 sm:items-end">
-            <p>Copyright 2026 Golden Meraki. All rights reserved.</p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link to="/" className="inline-flex items-center gap-1 transition-colors hover:text-white">
-                Home <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-              <Link to="/cart" className="transition-colors hover:text-white">
-                Cart
-              </Link>
-              <Link to="/checkout" className="transition-colors hover:text-white">
-                Checkout
-              </Link>
-            </div>
+            <p>Copyright 2026 Golden Meraki. All rights reserved.</p>            
           </div>
         </div>
       </div>
