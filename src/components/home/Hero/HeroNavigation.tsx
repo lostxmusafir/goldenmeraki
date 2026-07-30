@@ -2,54 +2,15 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { HeroNavigationProps } from './types';
 
 export function HeroNavigation({
-  slideCount,
-  selectedIndex,
   scrollPrev,
   scrollNext,
-  scrollTo,
   canScrollPrev,
   canScrollNext,
   progressPercent,
 }: HeroNavigationProps) {
   return (
     <div className="absolute inset-x-0 bottom-4 sm:bottom-6 z-20 pointer-events-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
-        
-        {/* Pagination Dots */}
-        <div className="pointer-events-auto flex items-center gap-3 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-stone-200/80 shadow-sm">
-          <div className="flex items-center gap-1.5" role="tablist" aria-label="Carousel Slides">
-            {Array.from({ length: slideCount }).map((_, index) => {
-              const isSelected = index === selectedIndex;
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  role="tab"
-                  aria-selected={isSelected}
-                  aria-label={`Go to slide ${index + 1} of ${slideCount}`}
-                  onClick={() => scrollTo(index)}
-                  className={`relative overflow-hidden transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-stone-400 ${
-                    isSelected
-                      ? 'w-8 h-2 bg-stone-900'
-                      : 'w-2 h-2 bg-stone-300 hover:bg-stone-400'
-                  }`}
-                >
-                  {isSelected && (
-                    <div
-                      className="absolute inset-y-0 left-0 bg-amber-600 transition-all duration-100 ease-linear"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          <span className="text-[11px] font-mono font-medium text-stone-500 pl-1 border-l border-stone-200">
-            0{selectedIndex + 1} / 0{slideCount}
-          </span>
-        </div>
-
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-end gap-3">
         {/* Previous / Next Arrow Controls */}
         <div className="pointer-events-auto flex items-center gap-2">
           <button
