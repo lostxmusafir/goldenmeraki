@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { HeroSlideProps } from './types';
 
 export function HeroSlide({ slide, isActive }: HeroSlideProps) {
@@ -17,19 +17,6 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
             <div className={`lg:col-span-7 flex flex-col justify-center space-y-4 sm:space-y-6 transition-all duration-500 transform ${
               isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-90'
             }`}>
-              {/* Collection Eyebrow / Badge */}
-              <div className="flex items-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-[0.2em] bg-stone-900/5 text-stone-700 border border-stone-200/60">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-                  {slide.collection}
-                </span>
-                {slide.badge && (
-                  <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide bg-amber-100/70 text-amber-900 border border-amber-200/50">
-                    {slide.badge}
-                  </span>
-                )}
-              </div>
-
               {/* Title & Subtitle */}
               <div className="space-y-2">
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-light text-stone-900 tracking-tight leading-[1.12]">
