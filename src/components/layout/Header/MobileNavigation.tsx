@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Menu, Search, X, ArrowRight, Heart, User, ShoppingBag } from 'lucide-react';
 import { MAIN_NAVIGATION } from './navigation';
 import type { Product } from '../../../types/product';
@@ -78,26 +79,27 @@ export const MobileNavigation = memo(function MobileNavigation({
         <Menu className="h-5 w-5" />
       </button>
 
-      {isOpen ? (
-        <div
-          className="fixed inset-0 z-[70] lg:hidden pointer-events-auto"
-          aria-hidden={false}
-        >
-          <button
-            type="button"
-            aria-label="Close navigation overlay"
-            onClick={closeDrawer}
-            className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity duration-300 opacity-100"
-          />
+      {isOpen
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[100] lg:hidden pointer-events-auto"
+              aria-hidden={false}
+            >
+              <button
+                type="button"
+                aria-label="Close navigation overlay"
+                onClick={closeDrawer}
+                className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity duration-300 opacity-100"
+              />
 
-          <div
-            ref={drawerRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile navigation"
-            className="absolute left-0 top-0 z-10 flex h-full w-full sm:w-80 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[24px_0_60px_rgba(15,23,42,0.22)] transition-transform duration-300 ease-out translate-x-0 focus-visible:outline-none"
-          >
+              <div
+                ref={drawerRef}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Mobile navigation"
+                className="fixed left-0 top-0 bottom-0 z-10 flex h-full w-full sm:w-80 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[24px_0_60px_rgba(15,23,42,0.22)] transition-transform duration-300 ease-out translate-x-0 focus-visible:outline-none"
+              >
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Menu</div>
             <button
@@ -222,9 +224,10 @@ export const MobileNavigation = memo(function MobileNavigation({
             </div>
           ) : null}
         </div>
-      </div>
-      ) : null}
-    </>
-  );
+      </div>,
+      document.body
+    ) : null}
+  </>
+);
 });
 
