@@ -1,7 +1,6 @@
 import { memo, useEffect, useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { AnnouncementBar } from './AnnouncementBar';
 import { HeaderActions } from './HeaderActions';
 import { Logo } from './Logo';
 import { MobileNavigation } from './MobileNavigation';
@@ -66,8 +65,6 @@ export const Header = memo(function Header({
 
   return (
     <header className={headerClassName}>
-      <AnnouncementBar />
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 py-3 lg:py-4">
           <div className="flex items-center gap-2 lg:gap-4">
