@@ -34,7 +34,7 @@ export function ProductInfo({ product, wishlist, onToggleWishlist, onAddToCart, 
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Stone</p>
-            <p className="mt-1 text-sm text-slate-950 truncate">{product.stone}</p>
+            <p className="mt-1 text-sm text-slate-950">{product.stone}</p>
           </div>
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Certificate</p>
@@ -99,7 +99,10 @@ export function ProductInfo({ product, wishlist, onToggleWishlist, onAddToCart, 
         </div>
       </div>
 
-      <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-slate-600 break-words">{product.description}</p>
+      <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-5">
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">About this item</p>
+        <p className="mt-2 text-sm sm:text-base leading-relaxed text-slate-700">{product.description}</p>
+      </div>
     </div>
   );
 }
