@@ -95,7 +95,7 @@ export const MobileNavigation = memo(function MobileNavigation({
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation"
-          className={`absolute left-0 top-0 flex h-full w-[min(90vw,22rem)] flex-col border-r border-slate-200 bg-white shadow-[24px_0_60px_rgba(15,23,42,0.18)] transition-transform duration-300 ease-out focus-visible:outline-none ${
+          className={`absolute left-0 top-0 z-10 flex h-full w-[min(88vw,22rem)] flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[24px_0_60px_rgba(15,23,42,0.22)] transition-transform duration-300 ease-out focus-visible:outline-none ${
             isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
@@ -201,9 +201,9 @@ export const MobileNavigation = memo(function MobileNavigation({
           </div>
 
           {products.length > 0 ? (
-            <div className="border-t border-slate-100 p-4">
-              <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Popular search</div>
-              <div className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="bg-white border-t border-slate-100 p-4">
+              <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Popular search</div>
+              <div className="flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {products.slice(0, 4).map((product) => (
                   <button
                     key={product.id}
@@ -212,11 +212,11 @@ export const MobileNavigation = memo(function MobileNavigation({
                       onSelectProduct(product);
                       closeDrawer();
                     }}
-                    className="min-w-[10rem] rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm"
+                    className="w-[8.5rem] flex-shrink-0 rounded-2xl border border-slate-200 bg-slate-50/70 p-2.5 text-left transition-colors hover:bg-slate-100"
                   >
-                    <img src={product.image} alt={product.name} className="mb-3 h-24 w-full rounded-xl object-cover" />
-                    <div className="truncate text-sm font-medium text-slate-950">{product.name}</div>
-                    <div className="mt-1 text-sm font-semibold text-slate-950">₹{product.price.toLocaleString()}</div>
+                    <img src={product.image} alt={product.name} className="mb-2 h-20 w-full rounded-xl object-cover" />
+                    <div className="truncate text-xs font-medium text-slate-950">{product.name}</div>
+                    <div className="mt-0.5 text-xs font-semibold text-slate-950">₹{product.price.toLocaleString()}</div>
                   </button>
                 ))}
               </div>
