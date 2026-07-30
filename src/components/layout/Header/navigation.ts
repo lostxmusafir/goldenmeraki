@@ -44,8 +44,7 @@ export interface NavigationItem {
 
 export const ANNOUNCEMENTS = [
   'Free shipping on orders above ₹999',
-  'Use GOLDEN50 for instant savings',
-  'Need help? Speak to our support team'
+  'Use GOLDEN50 for instant savings'
 ] as const;
 
 export const MAIN_NAVIGATION: NavigationItem[] = [
