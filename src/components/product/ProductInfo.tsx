@@ -19,12 +19,12 @@ export function ProductInfo({ product, wishlist, onToggleWishlist, onAddToCart, 
   const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       <div className="space-y-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Product detail</p>
-        <h1 className="text-3xl font-light tracking-tight text-slate-950 sm:text-4xl">{product.name}</h1>
+        <h1 className="text-2xl font-light tracking-tight text-slate-950 sm:text-4xl break-words">{product.name}</h1>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-3xl font-light text-slate-950">{formatCurrency(product.price)}</span>
+          <span className="text-2xl sm:text-3xl font-light text-slate-950">{formatCurrency(product.price)}</span>
           <span className="text-sm text-slate-400 line-through">{formatCurrency(product.originalPrice)}</span>
           <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700">{discount}% off</Badge>
         </div>
@@ -32,36 +32,53 @@ export function ProductInfo({ product, wishlist, onToggleWishlist, onAddToCart, 
 
       <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4">
         <div className="grid gap-3 sm:grid-cols-2">
-          <div>
+          <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Stone</p>
-            <p className="mt-1 text-sm text-slate-950">{product.stone}</p>
+            <p className="mt-1 text-sm text-slate-950 truncate">{product.stone}</p>
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Certificate</p>
-            <p className="mt-1 text-sm text-slate-950">{product.certificate}</p>
+            <p className="mt-1 text-sm text-slate-950 break-words">{product.certificate}</p>
           </div>
         </div>
       </div>
 
       <div className="space-y-3">
         <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Quantity</p>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-700">
-            -
-          </button>
-          <button type="button" className="inline-flex h-11 min-w-14 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-900">
-            {quantity}
-          </button>
-          <button type="button" onClick={() => setQuantity(quantity + 1)} className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-700">
-            +
-          </button>
-          <Button className="bg-slate-950 px-5 text-white hover:bg-slate-800" onClick={() => onAddToCart(product)}>
-            <ShoppingBag className="mr-2 h-4 w-4" />
-            Add to cart
-          </Button>
-          <Button className="border border-slate-200 bg-white px-5 text-slate-900 hover:border-slate-300 hover:bg-slate-50" onClick={() => onBuyNow(product)}>
-            Buy now
-          </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="inline-flex items-center rounded-full border border-slate-200 bg-white p-1">
+            <button
+              type="button"
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 focus:outline-none"
+            >
+              -
+            </button>
+            <span className="min-w-10 px-2 text-center text-sm font-medium text-slate-950">{quantity}</span>
+            <button
+              type="button"
+              onClick={() => setQuantity(quantity + 1)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 focus:outline-none"
+            >
+              +
+            </button>
+          </div>
+
+          <div className="flex flex-1 flex-wrap items-center gap-2 min-w-[200px]">
+            <Button
+              className="flex-1 bg-slate-950 px-4 py-3 text-sm text-white hover:bg-slate-800"
+              onClick={() => onAddToCart(product)}
+            >
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              Add to cart
+            </Button>
+            <Button
+              className="flex-1 border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 hover:border-slate-300 hover:bg-slate-50"
+              onClick={() => onBuyNow(product)}
+            >
+              Buy now
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -82,7 +99,7 @@ export function ProductInfo({ product, wishlist, onToggleWishlist, onAddToCart, 
         </div>
       </div>
 
-      <p className="max-w-2xl text-base leading-7 text-slate-600">{product.description}</p>
+      <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-slate-600 break-words">{product.description}</p>
     </div>
   );
 }
