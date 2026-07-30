@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { HeroNavigationProps } from './types';
 
 export function HeroNavigation({
@@ -10,30 +10,13 @@ export function HeroNavigation({
   canScrollPrev,
   canScrollNext,
   progressPercent,
-  isAutoplayPlaying,
-  toggleAutoplay
 }: HeroNavigationProps) {
   return (
     <div className="absolute inset-x-0 bottom-4 sm:bottom-6 z-20 pointer-events-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
         
-        {/* Pagination Dots & Autoplay Toggle */}
+        {/* Pagination Dots */}
         <div className="pointer-events-auto flex items-center gap-3 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-stone-200/80 shadow-sm">
-          {toggleAutoplay && (
-            <button
-              type="button"
-              onClick={toggleAutoplay}
-              aria-label={isAutoplayPlaying ? 'Pause autoplay' : 'Start autoplay'}
-              className="text-stone-600 hover:text-stone-900 transition-colors p-1 focus:outline-none focus:ring-2 focus:ring-stone-400 rounded-full"
-            >
-              {isAutoplayPlaying ? (
-                <Pause className="w-3.5 h-3.5" />
-              ) : (
-                <Play className="w-3.5 h-3.5 fill-current" />
-              )}
-            </button>
-          )}
-
           <div className="flex items-center gap-1.5" role="tablist" aria-label="Carousel Slides">
             {Array.from({ length: slideCount }).map((_, index) => {
               const isSelected = index === selectedIndex;
