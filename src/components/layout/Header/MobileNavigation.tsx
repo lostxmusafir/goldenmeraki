@@ -78,27 +78,26 @@ export const MobileNavigation = memo(function MobileNavigation({
         <Menu className="h-5 w-5" />
       </button>
 
-      <div
-        className={`fixed inset-0 z-[70] lg:hidden ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
-        aria-hidden={!isOpen}
-      >
-        <button
-          type="button"
-          aria-label="Close navigation overlay"
-          onClick={closeDrawer}
-          className={`absolute inset-0 bg-slate-950/45 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
-        />
-
+      {isOpen ? (
         <div
-          ref={drawerRef}
-          tabIndex={-1}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mobile navigation"
-          className={`absolute left-0 top-0 z-10 flex h-full w-full sm:w-80 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[24px_0_60px_rgba(15,23,42,0.22)] transition-transform duration-300 ease-out focus-visible:outline-none ${
-            isOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+          className="fixed inset-0 z-[70] lg:hidden pointer-events-auto"
+          aria-hidden={false}
         >
+          <button
+            type="button"
+            aria-label="Close navigation overlay"
+            onClick={closeDrawer}
+            className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity duration-300 opacity-100"
+          />
+
+          <div
+            ref={drawerRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
+            className="absolute left-0 top-0 z-10 flex h-full w-full sm:w-80 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[24px_0_60px_rgba(15,23,42,0.22)] transition-transform duration-300 ease-out translate-x-0 focus-visible:outline-none"
+          >
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Menu</div>
             <button
@@ -224,6 +223,7 @@ export const MobileNavigation = memo(function MobileNavigation({
           ) : null}
         </div>
       </div>
+      ) : null}
     </>
   );
 });
