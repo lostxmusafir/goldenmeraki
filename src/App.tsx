@@ -10,6 +10,7 @@ import { PRODUCTS } from './data/products';
 import type { CartItem } from './types/cart';
 import type { Product } from './types/product';
 import { productSlug } from './utils/catalog';
+import { AdminRoutes } from './admin/routes/AdminRoutes';
 
 type ToastType = 'cart' | 'wishlist';
 
@@ -195,6 +196,14 @@ export function App() {
     const timeout = window.setTimeout(() => setToast(null), 2400);
     return () => window.clearTimeout(timeout);
   }, [toast]);
+
+  if (location.pathname.startsWith('/admin')) {
+    return (
+      <Routes>
+        <Route path="/admin/*" element={<AdminRoutes />} />
+      </Routes>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
