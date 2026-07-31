@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { getImageUrl } from '../../utils/image';
 
@@ -45,11 +46,16 @@ const DRIBBLLE_REVIEWS = [
 ];
 
 export function Testimonials() {
+  const [isHolding, setIsHolding] = useState(false);
+
+  const handleHoldStart = () => setIsHolding(true);
+  const handleHoldEnd = () => setIsHolding(false);
+
   // Duplicated for 100% seamless infinite right-to-left marquee scroll across all screen sizes
   const marqueeItems = [...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS];
 
   return (
-    <section className="relative overflow-hidden bg-slate-100/70 py-20 sm:py-28">
+    <section className="relative overflow-hidden bg-slate-100/70 py-20 sm:py-28 select-none">
       {/* Subtle Grid Background Pattern */}
       <div 
         className="pointer-events-none absolute inset-0 opacity-[0.4]"
@@ -72,13 +78,27 @@ export function Testimonials() {
         </p>
       </div>
 
-      {/* Non-Stop Moving Marquee Row (Right to Left, Pauses ONLY on Hover/Hold) */}
+      {/* Non-Stop Moving Marquee Row (Right to Left, Pauses ONLY when finger/mouse is held down) */}
       <div className="relative w-full overflow-hidden py-6">
         {/* Soft edge gradient fades */}
         <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
 
-        <div className="animate-marquee-left flex gap-8 px-4">
+        <div 
+          className="animate-marquee-left flex gap-8 px-4"
+          style={{
+            animationPlayState: isHolding ? 'paused' : undefined
+          }}
+          onMouseEnter={handleHoldStart}
+          onMouseLeave={handleHoldEnd}
+          onMouseDown={handleHoldStart}
+          onMouseUp={handleHoldEnd}
+          onTouchStart={handleHoldStart}
+          onTouchEnd={handleHoldEnd}
+          onTouchCancel={handleHoldEnd}
+          onPointerDown={handleHoldStart}
+          onPointerUp={handleHoldEnd}
+        >
           {marqueeItems.map((review, idx) => (
             <div key={`${review.id}-${idx}`} className="relative group shrink-0">
               {/* Stacked background cards for Dribbble ID Badge pass effect */}
