@@ -12,7 +12,7 @@ export const AnnouncementBar = memo(function AnnouncementBar() {
         </div>
         <div className="flex items-center gap-8 text-slate-300">
           <span>{ANNOUNCEMENTS[1]}</span>
-          <a href="tel:+919930000944" className="flex items-center gap-2 text-slate-100 transition-colors hover:text-amber-300">
+          <a href="tel:+919998583126" className="flex items-center gap-2 text-slate-100 transition-colors hover:text-amber-300">
             <Phone className="h-3.5 w-3.5 text-emerald-300" />
             <span>{ANNOUNCEMENTS[2]}</span>
           </a>

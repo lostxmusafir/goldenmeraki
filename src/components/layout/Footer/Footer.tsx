@@ -38,27 +38,27 @@ export function Footer() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Support</div>
-              <div className="space-y-2 text-sm text-slate-300">
-                <a href="tel:+919930000944" className="flex items-center gap-2 transition-colors hover:text-white">
-                  <Phone className="h-4 w-4" />
-                  +91 99300 00944
-                </a>
-                <a href="mailto:info@goldenmeraki.com" className="flex items-center gap-2 transition-colors hover:text-white">
-                  <Mail className="h-4 w-4" />
-                  info@goldenmeraki.com
-                </a>
+              <div className="space-y-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Support</div>
+                <div className="space-y-2 text-sm text-slate-300">
+                  <a href="tel:+919998583126" className="flex items-center gap-2 transition-colors hover:text-white">
+                    <Phone className="h-4 w-4" />
+                    +91 99985 83126
+                  </a>
+                  <a href="mailto:info@goldenmeraki.com" className="flex items-center gap-2 transition-colors hover:text-white">
+                    <Mail className="h-4 w-4" />
+                    info@goldenmeraki.com
+                  </a>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-3">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Visit</div>
-              <p className="text-sm leading-7 text-slate-300">
-                <MapPin className="mr-2 inline h-4 w-4" />
-                Mumbai, India
-              </p>
-            </div>
+              <div className="space-y-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Visit</div>
+                <p className="text-sm leading-7 text-slate-300">
+                  <MapPin className="mr-2 inline h-4 w-4" />
+                  Vadodara, Gujarat, India
+                </p>
+              </div>
           </div>
         </div>
 
