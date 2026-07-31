@@ -25,7 +25,7 @@ export function Newsletter() {
               const name = String(formData.get('name') ?? '');
               const phone = String(formData.get('phone') ?? '');
               const message = `Hi Golden Meraki, I am ${name}. My WhatsApp number is ${phone}. Please add me to your updates list.`;
-              window.open(`https://wa.me/919173087595?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+              window.open(`https://wa.me/919998583126?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
             }}
           >
             <Input name="name" type="text" placeholder="Your name" aria-label="Your name" required />
