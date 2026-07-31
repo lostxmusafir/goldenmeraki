@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { getImageUrl } from '../../utils/image';
 
@@ -46,13 +46,58 @@ const DRIBBLLE_REVIEWS = [
 ];
 
 export function Testimonials() {
-  const [isHolding, setIsHolding] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleHoldStart = () => setIsHolding(true);
-  const handleHoldEnd = () => setIsHolding(false);
-
-  // Duplicated for 100% seamless infinite right-to-left marquee scroll across all screen sizes
+  // Duplicated 4 times for seamless infinite loop scroll
   const marqueeItems = [...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS];
+
+  // Smooth continuous right-to-left auto-scroll using requestAnimationFrame
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let animId: number;
+
+    const step = () => {
+      if (!isInteracting && container) {
+        // Continuous right-to-left movement (speed: 1.2px per frame)
+        container.scrollLeft += 1.2;
+
+        // Loop seamlessly back when reached middle half
+        const halfWidth = container.scrollWidth / 2;
+        if (container.scrollLeft >= halfWidth) {
+          container.scrollLeft -= halfWidth;
+        }
+      }
+      animId = requestAnimationFrame(step);
+    };
+
+    animId = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(animId);
+    };
+  }, [isInteracting]);
+
+  // Touch / Pointer interaction handlers (thumb drag left/right, pause on hold, resume on lift)
+  const handleTouchStart = () => {
+    setIsInteracting(true);
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    // Resume auto-scroll 1.5 seconds after user lifts thumb
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+    }
+    resumeTimeoutRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, 1500);
+  };
 
   return (
     <section className="relative overflow-hidden bg-slate-100/70 py-20 sm:py-28 select-none">
@@ -74,30 +119,31 @@ export function Testimonials() {
           TRUSTED BY PEOPLE WHO VALUE CRAFTSMANSHIP
         </h2>
         <p className="mt-3 text-sm text-slate-500 font-medium">
-          Real stories that speak through customer voices.
+          Real stories that speak through customer voices. Swipe or hold to pause.
         </p>
       </div>
 
-      {/* Non-Stop Moving Marquee Row (Right to Left, Pauses ONLY when finger/mouse is held down) */}
+      {/* Touch-Draggable & Auto-Moving Screen-To-Screen Scroll Container */}
       <div className="relative w-full overflow-hidden py-6">
         {/* Soft edge gradient fades */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-12 bg-gradient-to-r from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-12 bg-gradient-to-l from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
 
-        <div 
-          className="animate-marquee-left flex gap-8 px-4"
+        <div
+          ref={scrollRef}
+          onMouseEnter={handleTouchStart}
+          onMouseLeave={handleTouchEnd}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
+          onPointerDown={handleTouchStart}
+          onPointerUp={handleTouchEnd}
+          className="flex gap-8 overflow-x-auto px-6 py-2 no-scrollbar scroll-smooth cursor-grab active:cursor-grabbing"
           style={{
-            animationPlayState: isHolding ? 'paused' : undefined
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
           }}
-          onMouseEnter={handleHoldStart}
-          onMouseLeave={handleHoldEnd}
-          onMouseDown={handleHoldStart}
-          onMouseUp={handleHoldEnd}
-          onTouchStart={handleHoldStart}
-          onTouchEnd={handleHoldEnd}
-          onTouchCancel={handleHoldEnd}
-          onPointerDown={handleHoldStart}
-          onPointerUp={handleHoldEnd}
         >
           {marqueeItems.map((review, idx) => (
             <div key={`${review.id}-${idx}`} className="relative group shrink-0">
@@ -106,7 +152,7 @@ export function Testimonials() {
               <div className="absolute inset-0 translate-y-1 -translate-x-1 rounded-[2rem] bg-slate-300/50" />
 
               {/* Main Badge Pass Card with Fixed Equal Size */}
-              <article className="relative flex h-[310px] sm:h-[330px] w-[320px] sm:w-[400px] flex-col justify-between rounded-[2rem] border border-slate-200/90 bg-white p-7 sm:p-8 shadow-xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:border-slate-300">
+              <article className="relative flex h-[310px] sm:h-[330px] w-[300px] sm:w-[400px] flex-col justify-between rounded-[2rem] border border-slate-200/90 bg-white p-7 sm:p-8 shadow-xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:border-slate-300">
                 {/* Lanyard Clip Ribbon Holder at top center */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
                   <div className="h-4 w-12 rounded-t-lg bg-gradient-to-b from-slate-200 to-slate-300 border border-slate-300/90 shadow-xs" />
@@ -145,7 +191,7 @@ export function Testimonials() {
                         <span>{review.name}</span>
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                       </div>
-                      <div className="text-xs text-slate-500 font-medium truncate max-w-[160px]">
+                      <div className="text-xs text-slate-500 font-medium truncate max-w-[150px]">
                         {review.role}
                       </div>
                     </div>
