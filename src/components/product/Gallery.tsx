@@ -1,5 +1,5 @@
 import { memo, useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product } from '../../types/product';
 import { getImageUrl } from '../../utils/image';
 
@@ -23,11 +23,6 @@ export const Gallery = memo(function Gallery({ product }: GalleryProps) {
           alt={product.name}
           className="block aspect-square w-full max-w-full object-cover"
         />
-
-        <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-700 backdrop-blur-md">
-          <ZoomIn className="h-3.5 w-3.5" />
-          Tap to inspect
-        </div>
       </div>
 
       <div className="flex w-full items-center gap-2 overflow-hidden">
