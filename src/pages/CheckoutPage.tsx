@@ -142,7 +142,7 @@ export function CheckoutPage({
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>{shipping === 0 ? 'Free' : formatCurrency(shipping)}</span>
+              <span>{subtotal === 0 ? formatCurrency(0) : shipping === 0 ? 'Free' : formatCurrency(shipping)}</span>
             </div>
             <div className="flex justify-between border-t border-slate-200 pt-3 text-base text-slate-950">
               <span>Total</span>

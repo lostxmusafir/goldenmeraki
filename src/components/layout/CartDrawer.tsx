@@ -158,7 +158,9 @@ export function CartDrawer({
             </div>
             <div className="flex items-center justify-between">
               <span>Shipping</span>
-              <span className="font-medium text-slate-950">{subtotal > 999 ? 'Free' : formatCurrency(99)}</span>
+              <span className="font-medium text-slate-950">
+                {subtotal === 0 ? formatCurrency(0) : subtotal > 999 ? 'Free' : formatCurrency(99)}
+              </span>
             </div>
           </div>
 
@@ -171,7 +173,12 @@ export function CartDrawer({
               View cart
               <ExternalLink className="ml-2 h-4 w-4" />
             </Button>
-            <Button type="button" onClick={onPlaceOrder} className="flex-1 bg-slate-950 text-white hover:bg-slate-800">
+            <Button
+              type="button"
+              onClick={onPlaceOrder}
+              disabled={cartItems.length === 0}
+              className="flex-1 bg-slate-950 text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Proceed to checkout
             </Button>
           </div>
