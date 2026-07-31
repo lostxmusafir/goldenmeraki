@@ -15,10 +15,11 @@
     --brand-amber: #f59e0b;
     --brand-rose: #ec4899;
     --brand-indigo: #4338ca;
-    
+
     --bg-light: #faf5ff;
     --bg-card: #ffffff;
-    --text-primary: #1e1b4b; /* Deep Indigo - Never Pure Black */
+    --text-primary: #1e1b4b;
+    /* Deep Indigo - Never Pure Black */
     --text-secondary: #475569;
     --text-muted: #64748b;
   }
@@ -30,7 +31,11 @@
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, .font-heading {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-heading {
     font-family: var(--font-heading);
   }
 
@@ -120,8 +125,15 @@
 
 /* Floating Animation */
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(2deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
 }
 
 .animate-float {
@@ -130,8 +142,13 @@
 
 /* Slow Spin Animation */
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-spin-slow {
@@ -140,8 +157,17 @@
 
 /* Pulsing Aura Keyframe */
 @keyframes pulse-aura {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.08); }
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
 }
 
 .animate-pulse-aura {
@@ -153,34 +179,16 @@
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
-
-/* Infinite Marquee Animation for Testimonials (Right to Left, Pauses on Hover) */
-@keyframes marquee-left {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee-left {
-  display: flex;
-  width: max-content;
-  animation: marquee-left 35s linear infinite;
-}
-
-.animate-marquee-left:hover {
-  animation-play-state: paused;
-}
-
