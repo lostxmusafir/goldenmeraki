@@ -85,8 +85,8 @@ export function Testimonials() {
               <div className="absolute inset-0 translate-y-2 translate-x-1.5 rounded-[2rem] bg-slate-200/80 shadow-sm" />
               <div className="absolute inset-0 translate-y-1 -translate-x-1 rounded-[2rem] bg-slate-300/50" />
 
-              {/* Main Badge Pass Card */}
-              <article className="relative w-[340px] sm:w-[420px] rounded-[2rem] border border-slate-200/90 bg-white p-8 shadow-xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:border-slate-300">
+              {/* Main Badge Pass Card with Fixed Equal Size */}
+              <article className="relative flex h-[310px] sm:h-[330px] w-[320px] sm:w-[400px] flex-col justify-between rounded-[2rem] border border-slate-200/90 bg-white p-7 sm:p-8 shadow-xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:border-slate-300">
                 {/* Lanyard Clip Ribbon Holder at top center */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
                   <div className="h-4 w-12 rounded-t-lg bg-gradient-to-b from-slate-200 to-slate-300 border border-slate-300/90 shadow-xs" />
@@ -94,7 +94,7 @@ export function Testimonials() {
                 </div>
 
                 {/* Brand Logo Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 pb-5 pt-2">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4 pt-1">
                   <span className="font-sans text-xs font-black uppercase tracking-[0.25em] text-slate-900">
                     GOLDEN MERAKI
                   </span>
@@ -104,18 +104,18 @@ export function Testimonials() {
                   </div>
                 </div>
 
-                {/* Left Quote Mark */}
-                <div className="mt-5 text-2xl font-serif text-slate-900 leading-none">
-                  “
+                {/* Review Text Body Container */}
+                <div className="my-auto py-2">
+                  <div className="text-xl font-serif text-slate-900 leading-none mb-1">
+                    “
+                  </div>
+                  <p className="text-sm sm:text-[15px] leading-relaxed text-slate-900 font-medium line-clamp-3">
+                    {review.comment}
+                  </p>
                 </div>
 
-                {/* Review Text Body - Crisp Dark Slate Text */}
-                <p className="mt-2 text-sm sm:text-[15px] leading-relaxed text-slate-900 font-medium line-clamp-4">
-                  {review.comment}
-                </p>
-
                 {/* Card Footer Row: Avatar + Name + Product Image Badge */}
-                <div className="mt-7 flex items-center justify-between border-t border-slate-100 pt-5">
+                <div className="flex items-center justify-between border-t border-slate-100 pt-4">
                   <div className="flex items-center gap-3">
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr ${review.gradient} text-xs font-bold text-white shadow-md`}>
                       {review.initials}
