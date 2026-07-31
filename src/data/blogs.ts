@@ -27,6 +27,33 @@ export const REVIEWS: Review[] = [
     date: '2 weeks ago',
     comment: 'Bought the Amethyst Geode slice for my meditation room. High vibrational energy and beautiful deep purple color.',
     productName: 'Amethyst Geode Slice'
+  },
+  {
+    id: 4,
+    name: 'Meera Iyer',
+    city: 'Bengaluru',
+    rating: 5,
+    date: '3 days ago',
+    comment: 'The Rose Quartz Gua Sha roller completely upgraded my daily skincare routine! So soothing and 100% authentic.',
+    productName: 'Rose Quartz Gua Sha'
+  },
+  {
+    id: 5,
+    name: 'Vikram Malhotra',
+    city: 'Chandigarh',
+    rating: 5,
+    date: '5 days ago',
+    comment: 'Purchased the 108 Bead Sandalwood Jaap Mala. The natural aroma and premium finish are absolutely top class.',
+    productName: 'Sandalwood Jaap Mala'
+  },
+  {
+    id: 6,
+    name: 'Sneha Kulkarni',
+    city: 'Pune',
+    rating: 5,
+    date: '1 week ago',
+    comment: 'The Golden Pyrite Gemstone Tree brought so much positive vibe into our living space. Highly recommended!',
+    productName: 'Pyrite Gemstone Tree'
   }
 ];
 
