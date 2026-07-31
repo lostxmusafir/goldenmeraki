@@ -1,4 +1,3 @@
-import { useRef, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { getImageUrl } from '../../utils/image';
 
@@ -46,28 +45,11 @@ const DRIBBLLE_REVIEWS = [
 ];
 
 export function Testimonials() {
-  const [isClickPaused, setIsClickPaused] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // When user clicks anywhere on the section or cards, stop animation for 5 seconds
-  const handleClick = () => {
-    setIsClickPaused(true);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      setIsClickPaused(false);
-    }, 5000);
-  };
-
-  // Duplicated for seamless screen-to-screen infinite right-to-left marquee scroll
+  // Duplicated for seamless infinite right-to-left marquee scroll across all screen sizes
   const marqueeItems = [...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS];
 
   return (
-    <section 
-      onClick={handleClick}
-      className="relative overflow-hidden bg-slate-100/70 py-20 sm:py-28 cursor-pointer select-none"
-    >
+    <section className="relative overflow-hidden bg-slate-100/70 py-20 sm:py-28">
       {/* Subtle Grid Background Pattern */}
       <div 
         className="pointer-events-none absolute inset-0 opacity-[0.4]"
@@ -86,22 +68,17 @@ export function Testimonials() {
           TRUSTED BY PEOPLE WHO VALUE CRAFTSMANSHIP
         </h2>
         <p className="mt-3 text-sm text-slate-500 font-medium">
-          Real stories that speak through customer voices. {isClickPaused && <span className="text-amber-800 font-bold ml-2">• Paused for 5s (Click again to reset)</span>}
+          Real stories that speak through customer voices.
         </p>
       </div>
 
-      {/* Screen-To-Screen Full-Width Moving Marquee Row (Right to Left) */}
+      {/* Non-Stop Moving Marquee Row (Right to Left, Pauses ONLY on Hover/Hold) */}
       <div className="relative w-full overflow-hidden py-6">
         {/* Soft edge gradient fades */}
         <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-slate-100 via-slate-100/80 to-transparent sm:w-40" />
 
-        <div 
-          className="animate-marquee-left flex gap-8 px-4"
-          style={{
-            animationPlayState: isClickPaused ? 'paused' : undefined
-          }}
-        >
+        <div className="animate-marquee-left flex gap-8 px-4">
           {marqueeItems.map((review, idx) => (
             <div key={`${review.id}-${idx}`} className="relative group shrink-0">
               {/* Stacked background cards for Dribbble ID Badge pass effect */}
@@ -132,8 +109,8 @@ export function Testimonials() {
                   “
                 </div>
 
-                {/* Review Text Body */}
-                <p className="mt-2 text-sm sm:text-[15px] leading-relaxed text-slate-600 font-normal line-clamp-4">
+                {/* Review Text Body - Crisp Dark Slate Text */}
+                <p className="mt-2 text-sm sm:text-[15px] leading-relaxed text-slate-900 font-medium line-clamp-4">
                   {review.comment}
                 </p>
 
@@ -144,11 +121,11 @@ export function Testimonials() {
                       {review.initials}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 text-sm font-bold text-slate-900">
+                      <div className="flex items-center gap-1.5 text-sm font-bold text-slate-950">
                         <span>{review.name}</span>
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                       </div>
-                      <div className="text-xs text-slate-400 font-medium truncate max-w-[160px]">
+                      <div className="text-xs text-slate-500 font-medium truncate max-w-[160px]">
                         {review.role}
                       </div>
                     </div>
