@@ -68,8 +68,8 @@ export function App() {
   const location = useLocation();
   const products = useMemo(() => PRODUCTS as Product[], []);
 
-  const [cartItems, setCartItems] = useState<CartItem[]>([{ ...products[0], quantity: 1 }]);
-  const [wishlist, setWishlist] = useState(['prod-2', 'prod-4']);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
