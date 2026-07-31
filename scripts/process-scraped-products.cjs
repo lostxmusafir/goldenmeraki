@@ -67,7 +67,6 @@ const cleanBenefits = (desc = '') => {
     '100% natural, ethically sourced crystal.'
   ];
   
-  const matches = desc.match(/Benefits\s*:?\s*([^.]+?\.)/i);
   const sentences = desc.split('.').map(s => s.trim()).filter(s => s.length > 20 && s.length < 150);
   if (sentences.length >= 3) {
     return sentences.slice(0, 4);
@@ -79,13 +78,47 @@ const cleanBenefits = (desc = '') => {
   ];
 };
 
+const cleanImageList = (rawImages = [], fallbackImage = '') => {
+  let list = Array.isArray(rawImages) ? [...rawImages] : [];
+  if (fallbackImage && !list.includes(fallbackImage)) {
+    list.unshift(fallbackImage);
+  }
+
+  // Filter out promo cards & generic placeholder graphics
+  const promoKeywords = ['cleanse-your-crystals', 'shub123', 'shub.jpg', 'shubhanjali-logo', 'banner'];
+  list = list.filter(imgUrl => {
+    if (!imgUrl) return false;
+    const lower = imgUrl.toLowerCase();
+    return !promoKeywords.some(kw => lower.includes(kw));
+  });
+
+  if (list.length === 0) {
+    list = [fallbackImage || '/images/pyrite_cluster.png'];
+  }
+
+  // If first image is a paper card info image (often named with capital Shubhanjali-X.jpg), 
+  // and there are numbered clean product shots like x-1.jpg, shift to the clean product shot as primary image!
+  if (list.length > 1) {
+    const firstLower = list[0].toLowerCase();
+    // Check if image 1 is paper card layout or composite card graphic
+    if (firstLower.includes('shubhanjali-') && (list[1].toLowerCase().includes('-1') || list[1].toLowerCase().includes('-2') || list[1].toLowerCase().includes('stone'))) {
+      const cardImg = list.shift();
+      list.push(cardImg); // move paper card to the end of gallery
+    }
+  }
+
+  return list;
+};
+
 const processed = items.map((item, idx) => {
   const rawTitle = item.name || 'Natural Gemstone Crystal';
   const name = cleanTitle(rawTitle);
   const cat = mapCategory(item.categories);
   const tagList = item.tags || [];
-  const mainImage = item.image || (item.images && item.images[0]) || '/images/pyrite_cluster.png';
-  const gallery = (item.images && item.images.length > 0) ? item.images : [mainImage];
+
+  const gallery = cleanImageList(item.images, item.image);
+  const mainImage = gallery[0];
+
   const priceVal = Math.round(item.price || item.price_max || 499);
   const origPriceVal = Math.round(item.regular_price || item.regular_price_max || (priceVal * 1.35));
 
