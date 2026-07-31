@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ChevronDown, ChevronUp, ExternalLink, MessageCircle, ShoppingBag, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink, MessageCircle, ShoppingBag, Trash2, X } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { formatCurrency } from '../../utils/catalog';
@@ -106,9 +106,12 @@ export function CartDrawer({
                         <button
                           type="button"
                           onClick={() => onRemoveItem(item.id)}
-                          className="text-xs font-medium text-slate-400 transition-colors hover:text-slate-950"
+                          className="inline-flex items-center gap-1 rounded-lg p-1 text-xs font-medium text-rose-500 transition-colors hover:bg-rose-50 hover:text-rose-700"
+                          aria-label={`Remove ${item.name}`}
+                          title="Remove item"
                         >
-                          Remove
+                          <Trash2 className="h-4 w-4 text-rose-500" />
+                          <span>Remove</span>
                         </button>
                       </div>
 

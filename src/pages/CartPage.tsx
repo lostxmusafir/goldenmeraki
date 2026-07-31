@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { Trash2 } from 'lucide-react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer/Footer';
 import { Button } from '../components/common/Button';
@@ -110,8 +111,15 @@ export function CartPage({
                         >
                           +
                         </button>
-                        <button type="button" onClick={() => onRemoveItem(item.id)} className="text-sm text-slate-500 hover:text-slate-950">
-                          Remove
+                        <button
+                          type="button"
+                          onClick={() => onRemoveItem(item.id)}
+                          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-medium text-rose-500 transition-colors hover:bg-rose-50 hover:text-rose-700"
+                          aria-label={`Remove ${item.name}`}
+                          title="Remove item"
+                        >
+                          <Trash2 className="h-4 w-4 text-rose-500" />
+                          <span>Remove</span>
                         </button>
                       </div>
                     </div>
