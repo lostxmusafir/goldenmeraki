@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import type { NavigationItem } from './navigation';
+import { getImageUrl } from '../../../utils/image';
 
 export interface MegaMenuProps {
   item: NavigationItem;
@@ -34,7 +35,7 @@ export const MegaMenu = memo(function MegaMenu({ item, onNavigateToSection }: Me
             ) : null}
             {item.featured ? (
               <img
-                src={item.featured.image}
+                src={getImageUrl(item.featured.image)}
                 alt={item.featured.title}
                 className="mt-auto aspect-[4/5] w-full rounded-[1.5rem] object-cover opacity-90"
               />
@@ -101,7 +102,7 @@ export const MegaMenu = memo(function MegaMenu({ item, onNavigateToSection }: Me
             onClick={() => onNavigateToSection()}
             className="group relative min-h-full overflow-hidden bg-slate-100 text-left"
           >
-            <img src={item.banner?.image} alt={item.banner?.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src={getImageUrl(item.banner?.image)} alt={item.banner?.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-b from-slate-950/10 via-slate-950/35 to-slate-950/80" />
             <div className="absolute inset-x-0 bottom-0 space-y-3 p-6 text-white">
               <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-amber-300">

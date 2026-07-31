@@ -1,6 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import type { Product } from '../../types/product';
+import { getImageUrl } from '../../utils/image';
 
 export interface GalleryProps {
   product: Product;
@@ -18,7 +19,7 @@ export const Gallery = memo(function Gallery({ product }: GalleryProps) {
     <div className="w-full min-w-0 space-y-4 overflow-hidden">
       <div className="relative w-full overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-100 shadow-sm">
         <img
-          src={images[activeIndex]}
+          src={getImageUrl(images[activeIndex])}
           alt={product.name}
           className="block aspect-square w-full max-w-full object-cover"
         />
@@ -54,7 +55,7 @@ export const Gallery = memo(function Gallery({ product }: GalleryProps) {
               }`}
             >
               <img
-                src={image}
+                src={getImageUrl(image)}
                 alt={`${product.name} ${index + 1}`}
                 className="h-full w-full object-cover"
               />

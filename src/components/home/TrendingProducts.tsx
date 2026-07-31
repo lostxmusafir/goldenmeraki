@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
 import { getBestSellers, formatCurrency, productSlug } from '../../utils/catalog';
 import type { Product } from '../../types/product';
+import { getImageUrl } from '../../utils/image';
 
 export interface TrendingProductsProps {
   onAddToCart: (product: Product) => void;
@@ -32,7 +33,7 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
               <article key={product.id} className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
                 <Link to={`/product/${productSlug(product)}`} className="block">
                   <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
-                    <img src={product.image} alt={product.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <img src={getImageUrl(product.image)} alt={product.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     <button
                       type="button"
                       onClick={(event) => {

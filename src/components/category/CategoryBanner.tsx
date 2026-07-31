@@ -1,5 +1,6 @@
 import type { ProductCategoryId } from '../../types/product';
 import { getCategoryTitle } from '../../utils/catalog';
+import { getImageUrl } from '../../utils/image';
 
 export interface CategoryBannerProps {
   slug: ProductCategoryId;
@@ -50,7 +51,7 @@ export function CategoryBanner({ slug }: CategoryBannerProps) {
           <p className="max-w-2xl text-base leading-7 text-slate-600">{copy.description}</p>
         </div>
         <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
-          <img src={copy.image} alt={getCategoryTitle(slug)} className="h-full min-h-64 w-full object-cover" />
+          <img src={getImageUrl(copy.image)} alt={getCategoryTitle(slug)} className="h-full min-h-64 w-full object-cover" />
         </div>
       </div>
     </section>

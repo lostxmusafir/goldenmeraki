@@ -5,6 +5,7 @@ import { Button } from '../components/common/Button';
 import { formatCurrency } from '../utils/catalog';
 import type { CartItem } from '../types/cart';
 import type { CommonPageProps } from './HomePage';
+import { getImageUrl } from '../utils/image';
 
 export interface CartPageProps extends CommonPageProps {
   cartItems: CartItem[];
@@ -87,7 +88,7 @@ export function CartPage({
               ) : (
                 cartItems.map((item) => (
                   <div key={item.id} className="flex gap-4 rounded-[1.5rem] border border-slate-200 p-4">
-                    <img src={item.image} alt={item.name} className="h-24 w-24 rounded-2xl object-cover" />
+                    <img src={getImageUrl(item.image)} alt={item.name} className="h-24 w-24 rounded-2xl object-cover" />
                     <div className="flex-1 space-y-3">
                       <div>
                         <h2 className="text-base font-medium text-slate-950">{item.name}</h2>

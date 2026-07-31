@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import type { HeroSlideProps } from './types';
+import { getImageUrl } from '../../../utils/image';
 
 export function HeroSlide({ slide, isActive }: HeroSlideProps) {
   return (
@@ -62,7 +63,7 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
                 {/* Image container */}
                 <div className="relative w-full h-full rounded-3xl overflow-hidden border border-stone-200/80 bg-white/60 shadow-xl backdrop-blur-sm p-4 flex items-center justify-center group">
                   <img
-                    src={slide.image}
+                    src={getImageUrl(slide.image)}
                     alt={slide.title}
                     className="w-full h-full object-contain transform transition-transform duration-700 ease-out group-hover:scale-105"
                     loading={slide.id === 1 ? 'eager' : 'lazy'}

@@ -4,6 +4,7 @@ import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { formatCurrency } from '../../utils/catalog';
 import type { CartItem } from '../../types/cart';
+import { getImageUrl } from '../../utils/image';
 
 export interface CartDrawerProps {
   open: boolean;
@@ -95,7 +96,7 @@ export function CartDrawer({
               {cartItems.map((item) => (
                 <article key={item.id} className="rounded-[1.5rem] border border-slate-200 p-3">
                   <div className="flex gap-3">
-                    <img src={item.image} alt={item.name} className="h-20 w-20 rounded-2xl object-cover" />
+                    <img src={getImageUrl(item.image)} alt={item.name} className="h-20 w-20 rounded-2xl object-cover" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">

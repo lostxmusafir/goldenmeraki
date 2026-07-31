@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../../data/navigation';
 import { slugify } from '../../utils/catalog';
 
+import { getImageUrl } from '../../utils/image';
+
 const CATEGORY_IMAGES: Record<string, string> = {
   bracelets: '/images/seven_chakra_bracelet.png',
   'raw-stones': '/images/pyrite_cluster.png',
@@ -34,7 +36,7 @@ export function TopCategories() {
             >
               <div className="aspect-square overflow-hidden bg-white">
                 <img
-                  src={CATEGORY_IMAGES[category.id] ?? '/images/pyrite_cluster.png'}
+                  src={getImageUrl(CATEGORY_IMAGES[category.id] ?? '/images/pyrite_cluster.png')}
                   alt={category.name}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../../utils/image';
 
 export function OfferBanner() {
   return (
@@ -12,7 +13,7 @@ export function OfferBanner() {
                 <h2 className="text-2xl font-light tracking-tight">A refined first look at our most loved stones.</h2>
                 <p className="text-sm leading-6 text-slate-300">A clean edit of best sellers and ritual essentials selected for gifting and daily use.</p>
               </div>
-              <img src="/images/fengshui_crystal_tree.png" alt="Featured collection" className="w-full rounded-3xl object-cover lg:w-[260px]" />
+              <img src={getImageUrl('/images/fengshui_crystal_tree.png')} alt="Featured collection" className="w-full rounded-3xl object-cover lg:w-[260px]" />
             </div>
           </Link>
 
@@ -23,7 +24,7 @@ export function OfferBanner() {
                 <h2 className="text-2xl font-light tracking-tight text-slate-950">Minimal bracelets. Modern energy. Elevated everyday wear.</h2>
                 <p className="text-sm leading-6 text-slate-600">Designed to feel polished, understated, and effortlessly premium.</p>
               </div>
-              <img src="/images/seven_chakra_bracelet.png" alt="Bracelets collection" className="w-full rounded-3xl object-cover lg:w-[260px]" />
+              <img src={getImageUrl('/images/seven_chakra_bracelet.png')} alt="Bracelets collection" className="w-full rounded-3xl object-cover lg:w-[260px]" />
             </div>
           </Link>
         </div>

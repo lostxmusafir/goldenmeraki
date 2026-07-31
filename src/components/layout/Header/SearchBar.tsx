@@ -1,6 +1,7 @@
 import { memo, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import type { Product } from '../../../types/product';
+import { getImageUrl } from '../../../utils/image';
 
 export interface SearchBarProps {
   searchTerm: string;
@@ -97,7 +98,7 @@ export const SearchBar = memo(function SearchBar({
                 className="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
                 role="option"
               >
-                <img src={product.image} alt={product.name} className="h-12 w-12 rounded-xl object-cover" />
+                <img src={getImageUrl(product.image)} alt={product.name} className="h-12 w-12 rounded-xl object-cover" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-slate-950">{product.name}</div>
                   <div className="truncate text-xs text-slate-500">{product.certificate}</div>
