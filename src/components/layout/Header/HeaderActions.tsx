@@ -1,40 +1,24 @@
 import { memo } from 'react';
-import { Bell, Heart, User, ShoppingBag } from 'lucide-react';
+import { Bell, User, ShoppingBag } from 'lucide-react';
 
 export interface HeaderActionsProps {
-  wishlistCount: number;
+  wishlistCount?: number;
   cartCount: number;
   notificationCount?: number;
-  onOpenWishlist: () => void;
+  onOpenWishlist?: () => void;
   onOpenCart: () => void;
   onOpenAccount?: () => void;
   onOpenBuilder?: () => void;
 }
 
 export const HeaderActions = memo(function HeaderActions({
-  wishlistCount,
   cartCount,
   notificationCount = 0,
-  onOpenWishlist,
   onOpenCart,
   onOpenAccount
 }: HeaderActionsProps) {
   return (
     <div className="flex items-center gap-2 sm:gap-3">
-      <button
-        type="button"
-        onClick={onOpenWishlist}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:text-rose-600 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
-        aria-label={`Wishlist, ${wishlistCount} items`}
-      >
-        <Heart className="h-4.5 w-4.5" />
-        {wishlistCount > 0 && (
-          <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-950 px-1 text-[10px] font-semibold text-white">
-            {wishlistCount}
-          </span>
-        )}
-      </button>
-
       <button
         type="button"
         onClick={onOpenAccount}

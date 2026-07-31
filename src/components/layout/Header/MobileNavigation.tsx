@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Menu, Search, X, ArrowRight, Heart, User, ShoppingBag } from 'lucide-react';
+import { Menu, Search, X, ArrowRight, User, ShoppingBag } from 'lucide-react';
 import { MAIN_NAVIGATION } from './navigation';
 import type { Product } from '../../../types/product';
 
@@ -149,21 +149,6 @@ export const MobileNavigation = memo(function MobileNavigation({
             </div>
 
             <div className="mt-6 grid gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  closeDrawer();
-                  onOpenWishlist();
-                }}
-                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 transition-colors hover:bg-slate-50"
-              >
-                <span className="flex items-center gap-3">
-                  <Heart className="h-4.5 w-4.5" />
-                  Wishlist
-                </span>
-                {wishlistCount > 0 ? <span className="rounded-full bg-slate-950 px-2 py-0.5 text-xs text-white">{wishlistCount}</span> : null}
-              </button>
-
               <button
                 type="button"
                 onClick={() => {
