@@ -66,9 +66,9 @@ export function Testimonials() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-100/80 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-amber-900 shadow-xs">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-amber-900">
               <Sparkles className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-              <span>Customer Reviews</span>
+              <span>Testimonials</span>
             </div>
             <h2 className="font-serif text-3xl font-light tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
               Trusted by people who value <span className="font-semibold text-amber-900 underline decoration-amber-300 decoration-wavy decoration-2">craftsmanship.</span>
