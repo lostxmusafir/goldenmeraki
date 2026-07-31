@@ -45,8 +45,8 @@ const DRIBBLLE_REVIEWS = [
 ];
 
 export function Testimonials() {
-  // Duplicated for seamless infinite right-to-left marquee scroll across all screen sizes
-  const marqueeItems = [...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS];
+  // Duplicated for 100% seamless infinite right-to-left marquee scroll across all screen sizes
+  const marqueeItems = [...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS, ...DRIBBLLE_REVIEWS];
 
   return (
     <section className="relative overflow-hidden bg-slate-100/70 py-20 sm:py-28">
