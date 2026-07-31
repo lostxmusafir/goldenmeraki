@@ -52,24 +52,18 @@ export function HeroSlide({ slide, isActive }: HeroSlideProps) {
               </div>
             </div>
 
-            {/* Right Image Showcase Column */}
+            {/* Right Image Showcase Column - Clean Image Without Heavy White Frame/Border */}
             <div className={`lg:col-span-5 flex items-center justify-center transition-all duration-500 delay-100 transform ${
               isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-90'
             }`}>
               <div className="relative w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[420px] aspect-square flex items-center justify-center">
-                {/* Decorative background frame */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-stone-200/60 to-amber-100/40 transform rotate-3 scale-95 transition-transform duration-500 hover:rotate-1" />
-                
-                {/* Image container */}
-                <div className="relative w-full h-full rounded-3xl overflow-hidden border border-stone-200/80 bg-white/60 shadow-xl backdrop-blur-sm p-4 flex items-center justify-center group">
+                <div className="relative w-full h-full rounded-3xl overflow-hidden flex items-center justify-center group">
                   <img
                     src={getImageUrl(slide.image)}
                     alt={slide.title}
-                    className="w-full h-full object-contain transform transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="w-full h-full object-cover rounded-3xl transform transition-transform duration-700 ease-out group-hover:scale-105"
                     loading={slide.id === 1 ? 'eager' : 'lazy'}
                   />
-                  {/* Subtle lighting highlight */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/10 via-transparent to-white/20 pointer-events-none rounded-3xl" />
                 </div>
               </div>
             </div>
