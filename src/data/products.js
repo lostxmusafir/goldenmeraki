@@ -85,8 +85,7 @@ export const CATEGORIES = [
   { id: 'raw-stones', name: 'Raw Crystals & Clusters', icon: 'Gem', color: 'from-cyan-400 to-blue-600' },
   { id: 'trees-decor', name: 'Gemstone Trees & Decor', icon: 'TreeEvergreen', color: 'from-emerald-400 to-teal-600' },
   { id: 'malas-jewelry', name: 'Jaap Malas & Silver Jewelry', icon: 'Flame', color: 'from-purple-500 to-pink-500' },
-  { id: 'face-wellness', name: 'Facial Gua Sha & Wellness', icon: 'HeartHandshake', color: 'from-pink-400 to-rose-500' },
-  { id: 'zodiac-kits', name: 'Zodiac & Chakra Kits', icon: 'Compass', color: 'from-indigo-400 to-cyan-500' }
+  { id: 'face-wellness', name: 'Facial Gua Sha & Wellness', icon: 'HeartHandshake', color: 'from-pink-400 to-rose-500' }
 ];
 
 export const INTENTIONS = [

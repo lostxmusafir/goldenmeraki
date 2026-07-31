@@ -9,8 +9,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
   'raw-stones': '/images/pyrite_cluster.png',
   'trees-decor': '/images/fengshui_crystal_tree.png',
   'malas-jewelry': '/images/amethyst_jaap_mala.png',
-  'face-wellness': '/images/rose_quartz_guasha.png',
-  'zodiac-kits': '/images/shree_yantra_pendant.png'
+  'face-wellness': '/images/rose_quartz_guasha.png'
 };
 
 export function TopCategories() {
@@ -27,7 +26,7 @@ export function TopCategories() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {CATEGORIES.filter((category) => category.id !== 'all').map((category) => (
             <Link
               key={category.id}
