@@ -13,14 +13,14 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
   const products = getBestSellers(8);
 
   return (
-    <section className="bg-[linear-gradient(180deg,#fff_0%,#fbfbfb_100%)] py-14">
+    <section className="bg-[linear-gradient(180deg,#fff_0%,#fbfbfb_100%)] py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-end justify-between gap-4">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Trending / Best sellers</p>
             <h2 className="mt-2 text-2xl font-light tracking-tight text-slate-950 sm:text-3xl">Best sellers with a quieter, more elevated presentation.</h2>
           </div>
-          <Link to="/category/all" className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-950">
+          <Link to="/category/all" className="self-end text-sm font-medium text-slate-600 transition-colors hover:text-slate-950 sm:self-auto">
             Shop all
           </Link>
         </div>

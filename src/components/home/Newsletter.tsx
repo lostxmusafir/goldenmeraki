@@ -4,7 +4,7 @@ import { Input } from '../common/Input';
 
 export function Newsletter() {
   return (
-    <section className="bg-[linear-gradient(180deg,#ffffff_0%,#fafafa_100%)] py-14">
+    <section className="bg-[linear-gradient(180deg,#ffffff_0%,#fafafa_100%)] py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-6 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:p-8">
           <div className="space-y-3">

@@ -18,16 +18,7 @@ export interface HeroSlideProps {
 }
 
 export interface HeroNavigationProps {
-  slideCount: number;
-  selectedIndex: number;
-  scrollPrev: () => void;
-  scrollNext: () => void;
-  scrollTo: (index: number) => void;
-  canScrollPrev: boolean;
-  canScrollNext: boolean;
   progressPercent: number;
-  isAutoplayPlaying: boolean;
-  toggleAutoplay?: () => void;
 }
 
 export interface HeroCarouselProps {

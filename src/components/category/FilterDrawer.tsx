@@ -22,7 +22,7 @@ export function FilterDrawer(props: FilterDrawerProps) {
         </button>
       </div>
       <div className="p-4">
-        <FilterSidebar {...filterProps} />
+        <FilterSidebar {...filterProps} onClose={onClose} />
       </div>
     </Drawer>
   );

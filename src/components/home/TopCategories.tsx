@@ -13,14 +13,14 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 export function TopCategories() {
   return (
-    <section className="bg-white py-14">
+    <section className="bg-white py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-end justify-between gap-4">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Top categories</p>
             <h2 className="mt-2 text-2xl font-light tracking-tight text-slate-950 sm:text-3xl">A clean way to browse the collection.</h2>
           </div>
-          <Link to="/category/all" className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-950">
+          <Link to="/category/all" className="self-end text-sm font-medium text-slate-600 transition-colors hover:text-slate-950 sm:self-auto">
             View all
           </Link>
         </div>

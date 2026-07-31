@@ -16,7 +16,7 @@ export function Testimonials() {
   const activeReview = REVIEWS[activeIndex];
 
   return (
-    <section className="bg-white py-14">
+    <section className="bg-white py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div className="max-w-2xl">

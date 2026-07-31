@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Filter } from 'lucide-react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer/Footer';
 import { CategoryBanner } from '../components/category/CategoryBanner';
@@ -126,16 +127,23 @@ export function CategoryPage({
           </div>
 
           <div className="space-y-5">
-            <SortBar sortBy={sortBy} onChange={setSortBy} count={filteredProducts.length} />
-
-            <div className="lg:hidden">
+            <div className="flex flex-col gap-3 lg:hidden">
+              <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <SortBar sortBy={sortBy} onChange={setSortBy} count={filteredProducts.length} />
+              </div>
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(true)}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm"
+                className="shrink-0 inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-slate-300"
+                aria-label="Open filters"
               >
-                Open filters
+                <Filter className="h-5 w-5" />
               </button>
+            </div>
+            </div>
+            <div className="hidden lg:block">
+              <SortBar sortBy={sortBy} onChange={setSortBy} count={filteredProducts.length} />
             </div>
 
             <ProductGrid products={visibleProducts} wishlist={wishlist} onToggleWishlist={onToggleWishlist} onAddToCart={onAddToCart} />

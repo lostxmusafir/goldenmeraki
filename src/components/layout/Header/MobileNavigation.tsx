@@ -1,7 +1,9 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { Menu, Search, X, ArrowRight, User, ShoppingBag } from 'lucide-react';
 import { MAIN_NAVIGATION } from './navigation';
+import { CATEGORIES, INTENTIONS } from './data';
 import type { Product } from '../../../types/product';
 
 export interface MobileNavigationProps {
@@ -60,12 +62,19 @@ export const MobileNavigation = memo(function MobileNavigation({
     };
   }, [isOpen]);
 
+  const navigate = useNavigate();
   const closeDrawer = () => setIsOpen(false);
 
   const onNavigate = (categoryId?: string) => {
-    if (categoryId) setSelectedCategory(categoryId);
+    if (!categoryId) return;
+    setSelectedCategory(categoryId);
     closeDrawer();
-    scrollToCatalog();
+    navigate(`/category/${categoryId}`);
+  };
+
+  const onIntentNavigate = (intentId: string) => {
+    closeDrawer();
+    navigate(`/category/all?intent=${encodeURIComponent(intentId)}`);
   };
 
   return (
@@ -127,25 +136,40 @@ export const MobileNavigation = memo(function MobileNavigation({
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-4">
-            <div className="space-y-2">
-              {MAIN_NAVIGATION.map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => onNavigate(item.categoryId)}
-                  className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-all ${
-                    item.type === 'category' && selectedCategory === item.categoryId
-                      ? 'border-slate-950 bg-slate-950 text-white'
-                      : 'border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon ? <item.icon className="h-4.5 w-4.5" /> : null}
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 text-slate-400" />
-                </button>
-              ))}
+            <div className="space-y-3">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Categories</div>
+                <div className="mt-3 space-y-2">
+                  {CATEGORIES.filter((category) => category.id !== 'all').map((category) => (
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() => onNavigate(category.id)}
+                      className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 transition-colors hover:border-slate-300 hover:bg-slate-50"
+                    >
+                      <span>{category.name}</span>
+                      <ArrowRight className="h-4 w-4 text-slate-400" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Intentions</div>
+                <div className="mt-3 space-y-2">
+                  {INTENTIONS.map((intention) => (
+                    <button
+                      key={intention.id}
+                      type="button"
+                      onClick={() => onIntentNavigate(intention.id)}
+                      className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 transition-colors hover:border-slate-300 hover:bg-slate-50"
+                    >
+                      <span>{intention.label}</span>
+                      <ArrowRight className="h-4 w-4 text-slate-400" />
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="mt-6 grid gap-3">
@@ -166,17 +190,6 @@ export const MobileNavigation = memo(function MobileNavigation({
 
               <button
                 type="button"
-                onClick={() => {
-                  closeDrawer();
-                  onOpenBuilder();
-                }}
-                className="rounded-2xl bg-slate-950 px-4 py-3 text-left text-sm font-medium text-white transition-colors hover:bg-slate-800"
-              >
-                Design your bracelet
-              </button>
-
-              <button
-                type="button"
                 className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 transition-colors hover:bg-slate-50"
                 aria-label="Account"
               >
@@ -185,29 +198,6 @@ export const MobileNavigation = memo(function MobileNavigation({
               </button>
             </div>
           </div>
-
-          {products.length > 0 ? (
-            <div className="bg-white border-t border-slate-100 p-4">
-              <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Popular search</div>
-              <div className="grid grid-cols-2 gap-2.5">
-                {products.slice(0, 2).map((product) => (
-                  <button
-                    key={product.id}
-                    type="button"
-                    onClick={() => {
-                      onSelectProduct(product);
-                      closeDrawer();
-                    }}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-2.5 text-left transition-colors hover:bg-slate-100"
-                  >
-                    <img src={product.image} alt={product.name} className="mb-2 h-20 w-full rounded-xl object-cover" />
-                    <div className="truncate text-xs font-medium text-slate-950">{product.name}</div>
-                    <div className="mt-0.5 text-xs font-semibold text-slate-950">₹{product.price.toLocaleString()}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>,
       document.body

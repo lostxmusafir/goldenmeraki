@@ -25,7 +25,7 @@ const POINTS = [
 
 export function WhyChooseUs() {
   return (
-    <section className="bg-slate-950 py-14 text-white">
+    <section className="bg-slate-950 py-10 sm:py-14 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 max-w-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Why choose us</p>

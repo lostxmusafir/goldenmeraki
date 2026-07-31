@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { HeroSlide } from './HeroSlide';
-import { HeroNavigation } from './HeroNavigation';
 import { heroSlides } from './heroSlides';
 import type { HeroCarouselProps } from './types';
 
@@ -13,13 +12,12 @@ export function HeroCarousel({ slides = heroSlides }: HeroCarouselProps) {
   const [canScrollPrev, setCanScrollPrev] = useState(true);
   const [canScrollNext, setCanScrollNext] = useState(true);
   const [progressPercent, setProgressPercent] = useState(0);
-  const [isAutoplayPlaying, setIsAutoplayPlaying] = useState(true);
 
   const autoplayPlugin = useRef(
     Autoplay({
       delay: AUTOPLAY_DELAY_MS,
       stopOnInteraction: false,
-      stopOnMouseEnter: true
+      stopOnMouseEnter: false
     })
   );
 
@@ -83,35 +81,18 @@ export function HeroCarousel({ slides = heroSlides }: HeroCarouselProps) {
       }
     };
 
-    if (isAutoplayPlaying) {
-      startTime = performance.now();
-      animationFrameId = requestAnimationFrame(updateProgress);
-    }
+    startTime = performance.now();
+    animationFrameId = requestAnimationFrame(updateProgress);
 
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
-  }, [selectedIndex, isAutoplayPlaying]);
-
-  const toggleAutoplay = useCallback(() => {
-    const autoplay = emblaApi?.plugins()?.autoplay;
-    if (!autoplay) return;
-
-    if (autoplay.isPlaying()) {
-      autoplay.stop();
-      setIsAutoplayPlaying(false);
-    } else {
-      autoplay.play();
-      setIsAutoplayPlaying(true);
-    }
-  }, [emblaApi]);
+  }, [selectedIndex]);
 
   return (
     <section
       aria-label="Featured Collections Hero Carousel"
-      className="relative w-full overflow-hidden bg-[#FAF8F5]"
-      onMouseEnter={() => setIsAutoplayPlaying(false)}
-      onMouseLeave={() => setIsAutoplayPlaying(true)}
+      className="relative w-full overflow-hidden bg-[#FAF8F5] pb-4 sm:pb-20 lg:pb-24 mb-0 sm:mb-20 lg:mb-24"
     >
       <div ref={emblaRef} className="overflow-hidden w-full cursor-grab active:cursor-grabbing">
         <div className="flex w-full">
@@ -124,19 +105,6 @@ export function HeroCarousel({ slides = heroSlides }: HeroCarouselProps) {
           ))}
         </div>
       </div>
-
-      <HeroNavigation
-        slideCount={slides.length}
-        selectedIndex={selectedIndex}
-        scrollPrev={scrollPrev}
-        scrollNext={scrollNext}
-        scrollTo={scrollTo}
-        canScrollPrev={canScrollPrev}
-        canScrollNext={canScrollNext}
-        progressPercent={progressPercent}
-        isAutoplayPlaying={isAutoplayPlaying}
-        toggleAutoplay={toggleAutoplay}
-      />
     </section>
   );
 }

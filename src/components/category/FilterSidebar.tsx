@@ -13,6 +13,7 @@ export interface FilterSidebarProps {
   setSearchTerm: Dispatch<SetStateAction<string>>;
   maxPrice: number;
   setMaxPrice: Dispatch<SetStateAction<number>>;
+  onClose?: () => void;
 }
 
 export function FilterSidebar({
@@ -23,7 +24,8 @@ export function FilterSidebar({
   searchTerm,
   setSearchTerm,
   maxPrice,
-  setMaxPrice
+  setMaxPrice,
+  onClose
 }: FilterSidebarProps) {
   return (
     <aside className="space-y-5 rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
@@ -44,7 +46,10 @@ export function FilterSidebar({
             <button
               key={item.id}
               type="button"
-              onClick={() => setCategory(item.id as ProductCategoryId)}
+              onClick={() => {
+                setCategory(item.id as ProductCategoryId);
+                onClose?.();
+              }}
               className={`cursor-pointer rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
                 category === item.id
                   ? 'border-slate-950 bg-slate-950 text-white'
@@ -71,7 +76,10 @@ export function FilterSidebar({
             <button
               key={item.id}
               type="button"
-              onClick={() => setIntention(item.id)}
+              onClick={() => {
+                setIntention(item.id);
+                onClose?.();
+              }}
               className={`cursor-pointer rounded-full border px-3 py-2 text-xs font-medium ${intention === item.id ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-700'}`}
             >
               {item.label}
