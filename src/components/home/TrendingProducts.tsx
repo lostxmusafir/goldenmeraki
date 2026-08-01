@@ -1,8 +1,10 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
-import { getBestSellers, formatCurrency, productSlug } from '../../utils/catalog';
+import { formatCurrency, productSlug } from '../../utils/catalog';
 import type { Product } from '../../types/product';
 import { getImageUrl } from '../../utils/image';
+import { getProducts } from '../../services/catalogApi';
 
 export interface TrendingProductsProps {
   onAddToCart: (product: Product) => void;
@@ -11,7 +13,32 @@ export interface TrendingProductsProps {
 }
 
 export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: TrendingProductsProps) {
-  const products = getBestSellers(8);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadProducts = async () => {
+      try {
+        const response = await getProducts({ limit: 20 });
+        if (isActive) {
+          setProducts(response.products);
+        }
+      } catch (error) {
+        console.error('Failed to load trending products', error);
+      }
+    };
+
+    loadProducts();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const featuredProducts = useMemo(() => {
+    return [...products].sort((a, b) => b.rating - a.rating || b.reviewsCount - a.reviewsCount).slice(0, 8);
+  }, [products]);
 
   return (
     <section className="bg-[linear-gradient(180deg,#fff_0%,#fbfbfb_100%)] py-10 sm:py-14">
@@ -27,7 +54,7 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {products.map((product) => {
+          {featuredProducts.map((product) => {
             const isWishlisted = wishlist.includes(product.id);
             return (
               <article key={product.id} className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">

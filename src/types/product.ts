@@ -30,11 +30,11 @@ export interface Product extends BaseEntity {
   certificate: string;
   description: string;
   weights: string[];
-  sku: string;
   stone: string;
   tags: string[];
   benefits: string[];
-  specifications: ProductSpecification;
+  specifications: Record<string, string> | ProductSpecification;
+  slug?: string;
 }
 
 export interface CustomBead extends BaseEntity {

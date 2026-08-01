@@ -11,7 +11,8 @@ export function slugify(value: string): string {
 }
 
 export function productSlug(product: Product): string {
-  return `${slugify(product.name)}-${product.id}`;
+  const slug = product.slug || product.name;
+  return slug ? `${slugify(slug)}-${product.id}` : `${slugify(product.name)}-${product.id}`;
 }
 
 export function categorySlug(categoryId: ProductCategoryId): string {

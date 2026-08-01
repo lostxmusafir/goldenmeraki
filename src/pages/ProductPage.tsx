@@ -5,10 +5,11 @@ import { Gallery } from '../components/product/Gallery';
 import { ProductInfo } from '../components/product/ProductInfo';
 import { ProductTabs } from '../components/product/ProductTabs';
 import { RelatedProducts } from '../components/product/RelatedProducts';
-import { findProductBySlug, getRelatedProducts, categorySlug } from '../utils/catalog';
+import { categorySlug } from '../utils/catalog';
 import type { Product } from '../types/product';
 import type { CommonPageProps } from './HomePage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getProductBySlug, getProducts } from '../services/catalogApi';
 
 export interface ProductPageProps extends CommonPageProps {
   slug: string;
@@ -39,9 +40,75 @@ export function ProductPage({
   wishlist
 }: ProductPageProps) {
   const [quantity, setQuantity] = useState(1);
-  const product = findProductBySlug(slug);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!product) {
+  useEffect(() => {
+    let isActive = true;
+
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        const [currentProduct, productResponse] = await Promise.all([
+          getProductBySlug(slug),
+          getProducts({ limit: 20 })
+        ]);
+
+        if (!isActive) return;
+
+        setProduct(currentProduct);
+        setRelatedProducts(
+          (productResponse.products ?? [])
+            .filter((item) => item.id !== currentProduct?.id)
+            .filter((item) => currentProduct && (item.category === currentProduct.category || item.intention === currentProduct.intention))
+            .slice(0, 4)
+        );
+        setError(null);
+      } catch (catalogError) {
+        if (!isActive) return;
+        console.error('Failed to load product', catalogError);
+        setError('Unable to load this product right now.');
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadProduct();
+
+    return () => {
+      isActive = false;
+    };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-950">
+        <Header
+          cartCount={cartCount}
+          wishlistCount={wishlistCount}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          onOpenCart={onOpenCart}
+          onOpenWishlist={onOpenWishlist}
+          onOpenAccount={onOpenAccount}
+          onOpenQuiz={onOpenQuiz}
+          onOpenBuilder={onOpenBuilder}
+          onOpenCanvas={onOpenCanvas}
+          onSelectProduct={onSelectProduct}
+        />
+        <main className="mx-auto max-w-7xl px-4 py-12 text-center text-sm text-slate-600">Loading product...</main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !product) {
     return <Navigate to="/category/all" replace />;
   }
 
@@ -93,7 +160,7 @@ export function ProductPage({
           </div>
         </div>
 
-        <RelatedProducts products={getRelatedProducts(product)} />
+        <RelatedProducts products={relatedProducts} />
       </main>
 
       <Footer />

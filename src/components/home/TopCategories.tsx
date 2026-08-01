@@ -1,8 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CATEGORIES } from '../../data/navigation';
 import { slugify } from '../../utils/catalog';
-
 import { getImageUrl } from '../../utils/image';
+import { getCategories, type CatalogCategory } from '../../services/catalogApi';
 
 const CATEGORY_IMAGES: Record<string, string> = {
   bracelets: '/images/seven_chakra_bracelet.png',
@@ -13,6 +13,29 @@ const CATEGORY_IMAGES: Record<string, string> = {
 };
 
 export function TopCategories() {
+  const [categories, setCategories] = useState<CatalogCategory[]>([]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadCategories = async () => {
+      try {
+        const response = await getCategories();
+        if (isActive) {
+          setCategories(response);
+        }
+      } catch (error) {
+        console.error('Failed to load categories', error);
+      }
+    };
+
+    loadCategories();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   return (
     <section className="bg-white py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -27,10 +50,10 @@ export function TopCategories() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {CATEGORIES.filter((category) => category.id !== 'all').map((category) => (
+          {categories.filter((category) => category.id !== 'all').map((category) => (
             <Link
               key={category.id}
-              to={`/category/${slugify(category.id)}`}
+              to={`/category/${slugify(category.slug ?? category.id)}`}
               className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50 shadow-sm transition-all hover:-translate-y-1 hover:border-slate-300 hover:shadow-md"
             >
               <div className="aspect-square overflow-hidden bg-white">
@@ -41,7 +64,7 @@ export function TopCategories() {
                 />
               </div>
               <div className="px-4 py-4">
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{category.id.replace('-', ' ')}</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{(category.slug ?? category.id).replace('-', ' ')}</div>
                 <div className="mt-1 text-sm font-medium text-slate-950">{category.name}</div>
               </div>
             </Link>
