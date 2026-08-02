@@ -1,10 +1,12 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { Filter } from 'lucide-react';
-import { CATEGORIES, INTENTIONS } from '../../data/navigation';
+import { INTENTIONS } from '../../data/navigation';
 import { Input } from '../common/Input';
 import type { ProductCategoryId } from '../../types/product';
+import type { CatalogCategory } from '../../services/catalogApi';
 
 export interface FilterSidebarProps {
+  categories: CatalogCategory[];
   category: ProductCategoryId;
   setCategory: Dispatch<SetStateAction<ProductCategoryId>>;
   intention: string;
@@ -17,6 +19,7 @@ export interface FilterSidebarProps {
 }
 
 export function FilterSidebar({
+  categories,
   category,
   setCategory,
   intention,
@@ -42,16 +45,30 @@ export function FilterSidebar({
       <div className="space-y-3">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Category</p>
         <div className="grid gap-2">
-          {CATEGORIES.map((item) => (
+          <button
+            type="button"
+            onClick={() => {
+              setCategory('all' as ProductCategoryId);
+              onClose?.();
+            }}
+            className={`cursor-pointer rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
+              category === 'all'
+                ? 'border-slate-950 bg-slate-950 text-white'
+                : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+            }`}
+          >
+            All Products
+          </button>
+          {categories.map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => {
-                setCategory(item.id as ProductCategoryId);
+                setCategory((item.slug ?? item.id) as ProductCategoryId);
                 onClose?.();
               }}
               className={`cursor-pointer rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
-                category === item.id
+                category === (item.slug ?? item.id)
                   ? 'border-slate-950 bg-slate-950 text-white'
                   : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
               }`}

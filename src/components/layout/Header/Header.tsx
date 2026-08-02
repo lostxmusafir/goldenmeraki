@@ -5,9 +5,10 @@ import { HeaderActions } from './HeaderActions';
 import { Logo } from './Logo';
 import { MobileNavigation } from './MobileNavigation';
 import { SearchBar } from './SearchBar';
-import { CATEGORIES, INTENTIONS, PRODUCTS } from './data';
+import { INTENTIONS } from './data';
 import type { HeaderProps } from './types';
 import type { Product } from '../../../types/product';
+import { getCategories, getProducts, type CatalogCategory } from '../../../services/catalogApi';
 
 function scrollToCatalog() {
   const element = document.getElementById('catalog-section');
@@ -37,7 +38,8 @@ export const Header = memo(function Header({
 }: HeaderProps) {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [products] = useState<Product[]>(() => PRODUCTS as Product[]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<CatalogCategory[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +51,32 @@ export const Header = memo(function Header({
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadCatalog = async () => {
+      try {
+        const [categoryResponse, productResponse] = await Promise.all([
+          getCategories(),
+          getProducts({ limit: 100 })
+        ]);
+
+        if (!isActive) return;
+
+        setCategories(categoryResponse);
+        setProducts(productResponse.products);
+      } catch (error) {
+        console.error('Failed to load catalog for header', error);
+      }
+    };
+
+    loadCatalog();
+
+    return () => {
+      isActive = false;
     };
   }, []);
 
@@ -116,13 +144,13 @@ export const Header = memo(function Header({
                 <ChevronDown className="h-4 w-4 text-slate-500" />
               </button>
               <div className="invisible absolute left-0 top-full z-30 mt-0 min-w-[18rem] overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.12)] opacity-0 transition duration-200 group-hover:visible group-hover:opacity-100">
-                {CATEGORIES.filter((category) => category.id !== 'all').map((category) => (
+                {categories.filter((category) => category.id !== 'all').map((category) => (
                   <button
                     key={category.id}
                     type="button"
                     onClick={() => {
-                      setSelectedCategory(category.id);
-                      navigate(`/category/${category.id}`);
+                      setSelectedCategory(category.slug ?? category.id);
+                      navigate(`/category/${category.slug ?? category.id}`);
                     }}
                     className="w-full cursor-pointer rounded-full px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                   >
