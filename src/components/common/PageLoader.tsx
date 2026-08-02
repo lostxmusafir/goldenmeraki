@@ -14,17 +14,16 @@ export function PageLoader({ variant = 'splash' }: PageLoaderProps) {
           {/* Orbiting golden ring effect for category transition */}
           {variant === 'category' && <div className="golden-orbit-ring" />}
 
-          {/* Product Page Halo & Sparkles effect */}
+          {/* Luxury Gemstone Light Flare & Aura for Product Page */}
           {variant === 'product' && (
-            <>
-              <div className="golden-product-halo" />
-              <div className="product-sparkles">
-                <span className="sparkle s1">✦</span>
-                <span className="sparkle s2">✦</span>
-                <span className="sparkle s3">✦</span>
-                <span className="sparkle s4">✦</span>
+            <div className="product-luxury-card">
+              <div className="gem-glow-aura" />
+              <div className="gem-shimmer-ray" />
+              <div className="sparkle-stars">
+                <span className="star s-top">✨</span>
+                <span className="star s-bottom">✨</span>
               </div>
-            </>
+            </div>
           )}
 
           {/* Base faded logo */}
