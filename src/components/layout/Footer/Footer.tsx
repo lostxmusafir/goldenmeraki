@@ -2,9 +2,9 @@ import { ArrowUpRight, Mail, MapPin, Phone, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const socialLinks = [
-  { label: 'Facebook', href: 'https://www.facebook.com/' },
-  { label: 'Instagram', href: 'https://www.instagram.com/' },
-  { label: 'YouTube', href: 'https://www.youtube.com/' }
+  { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61578067474178' },
+  { label: 'Instagram', href: 'https://www-fallback.instagram.com/goldenmerakigems/' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@GoldenmerakiGems' }
 ];
 
 export function Footer() {
