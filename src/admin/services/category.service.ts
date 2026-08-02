@@ -1,11 +1,30 @@
+import { apiClient } from './apiClient';
 import type { Category, CreateCategoryDTO, UpdateCategoryDTO } from '../types/category.types';
 import type { PaginatedResponse, PaginationParams } from '../types/common.types';
-import { mockStorage } from './mockData';
+
+const unwrapData = <T>(response: { data: { data: T } }): T => response.data.data;
+
+const mapCategory = (item: any): Category => ({
+  id: item._id ?? item.id,
+  name: item.name ?? 'Untitled Category',
+  slug: item.slug ?? item.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') ?? 'category',
+  description: item.description ?? '',
+  image: item.image ?? '',
+  status: item.isActive === false ? 'inactive' : 'active',
+  productCount: item.productCount ?? 0,
+  category: item.category ?? '',
+  parent: item.parent?._id ?? item.parent ?? '',
+  createdAt: item.createdAt ?? new Date().toISOString(),
+  updatedAt: item.updatedAt ?? item.createdAt ?? new Date().toISOString()
+});
 
 export const categoryService = {
   async getCategories(params: PaginationParams = {}): Promise<PaginatedResponse<Category>> {
-    await new Promise((res) => setTimeout(res, 300));
-    let items = mockStorage.getCategories();
+    const response = await apiClient.get('/categories', {
+      params: { includeInactive: true }
+    });
+
+    let items = (unwrapData<any[]>(response) ?? []).map(mapCategory);
 
     if (params.search) {
       const q = params.search.toLowerCase();
@@ -16,7 +35,6 @@ export const categoryService = {
     const limit = params.limit || 10;
     const total = items.length;
     const totalPages = Math.ceil(total / limit) || 1;
-
     const start = (page - 1) * limit;
     const data = items.slice(start, start + limit);
 
@@ -30,52 +48,37 @@ export const categoryService = {
   },
 
   async getCategoryById(id: string): Promise<Category | null> {
-    await new Promise((res) => setTimeout(res, 200));
-    const items = mockStorage.getCategories();
-    return items.find((c) => c.id === id) || null;
+    const response = await apiClient.get(`/categories/${id}`);
+    return mapCategory(unwrapData<any>(response));
   },
 
   async createCategory(dto: CreateCategoryDTO): Promise<Category> {
-    await new Promise((res) => setTimeout(res, 300));
-    const items = mockStorage.getCategories();
-    const newCategory: Category = {
-      id: `cat-${Date.now()}`,
+    const response = await apiClient.post('/categories', {
       name: dto.name,
-      slug: dto.slug || dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       description: dto.description,
-      image: dto.image || 'https://images.unsplash.com/photo-1611591475240-4f20c16a0846?auto=format&fit=crop&w=600&q=80',
-      status: dto.status,
-      productCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+      image: dto.image,
+      category: dto.category,
+      parent: dto.parent,
+      isActive: dto.status === 'active'
+    });
 
-    items.unshift(newCategory);
-    mockStorage.setCategories(items);
-    return newCategory;
+    return mapCategory(unwrapData<any>(response));
   },
 
   async updateCategory(id: string, dto: UpdateCategoryDTO): Promise<Category> {
-    await new Promise((res) => setTimeout(res, 300));
-    const items = mockStorage.getCategories();
-    const index = items.findIndex((c) => c.id === id);
-    if (index === -1) throw new Error('Category not found');
+    const response = await apiClient.patch(`/categories/${id}`, {
+      name: dto.name,
+      description: dto.description,
+      image: dto.image,
+      category: dto.category,
+      parent: dto.parent,
+      isActive: dto.status === 'active'
+    });
 
-    const updated: Category = {
-      ...items[index],
-      ...dto,
-      updatedAt: new Date().toISOString()
-    };
-
-    items[index] = updated;
-    mockStorage.setCategories(items);
-    return updated;
+    return mapCategory(unwrapData<any>(response));
   },
 
   async deleteCategory(id: string): Promise<void> {
-    await new Promise((res) => setTimeout(res, 300));
-    const items = mockStorage.getCategories();
-    const next = items.filter((c) => c.id !== id);
-    mockStorage.setCategories(next);
+    await apiClient.delete(`/categories/${id}`);
   }
 };

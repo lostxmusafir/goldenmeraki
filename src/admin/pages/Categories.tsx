@@ -1,15 +1,14 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Layers } from 'lucide-react';
 import { Table, type Column } from '../components/common/Table';
 import { Pagination } from '../components/common/Pagination';
 import { SearchInput } from '../components/common/SearchInput';
 import { FilterSelect } from '../components/common/FilterSelect';
 import { StatusBadge } from '../components/common/StatusBadge';
-import { Modal } from '../components/common/Modal';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
-import { ImageUpload } from '../components/common/ImageUpload';
 import { useCategories } from '../hooks/useCategories';
-import type { Category, CreateCategoryDTO } from '../types/category.types';
+import type { Category } from '../types/category.types';
 import { formatDate } from '../utils/formatters';
 
 export function Categories() {
@@ -23,66 +22,22 @@ export function Categories() {
     loading,
     setSearch,
     setPage,
-    createCategory,
-    updateCategory,
     deleteCategory
   } = useCategories();
+  const navigate = useNavigate();
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-
-  // Form State
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
-  const [status, setStatus] = useState<'active' | 'inactive'>('active');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Delete Dialog State
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const openCreateModal = () => {
-    setEditingCategory(null);
-    setName('');
-    setDescription('');
-    setImage('');
-    setStatus('active');
-    setIsModalOpen(true);
+  const openCreatePage = () => {
+    navigate('/admin/categories/new');
   };
 
-  const openEditModal = (cat: Category) => {
-    setEditingCategory(cat);
-    setName(cat.name);
-    setDescription(cat.description);
-    setImage(cat.image || '');
-    setStatus(cat.status);
-    setIsModalOpen(true);
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      const dto: CreateCategoryDTO = {
-        name,
-        description,
-        image,
-        status
-      };
-
-      if (editingCategory) {
-        await updateCategory(editingCategory.id, dto);
-      } else {
-        await createCategory(dto);
-      }
-      setIsModalOpen(false);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const openEditPage = (cat: Category) => {
+    navigate(`/admin/categories/${cat.id}/edit`);
   };
 
   const handleDeleteConfirm = async () => {
@@ -146,7 +101,7 @@ export function Categories() {
       cell: (row) => (
         <div className="flex items-center justify-end gap-2">
           <button
-            onClick={() => openEditModal(row)}
+            onClick={() => openEditPage(row)}
             className="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition"
             title="Edit Category"
           >
@@ -178,7 +133,7 @@ export function Categories() {
           </p>
         </div>
         <button
-          onClick={openCreateModal}
+          onClick={openCreatePage}
           className="px-4 py-2.5 text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-md transition flex items-center gap-2 shrink-0"
         >
           <Plus className="w-4 h-4" />
@@ -219,74 +174,6 @@ export function Categories() {
         limit={limit}
         onPageChange={(p) => setPage(p)}
       />
-
-      {/* Create / Edit Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingCategory ? 'Edit Category' : 'Create New Category'}
-        subtitle="Fill in details for product category."
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Category Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Healing Bracelets"
-              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Description
-            </label>
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Short category summary..."
-              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-            />
-          </div>
-
-          <ImageUpload label="Category Banner / Thumbnail" value={image} onChange={setImage} />
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Status</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as 'active' | 'inactive')}
-              className="w-full px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition disabled:opacity-50"
-            >
-              {isSubmitting ? 'Saving...' : editingCategory ? 'Update Category' : 'Create Category'}
-            </button>
-          </div>
-        </form>
-      </Modal>
 
       {/* Delete Confirmation */}
       <ConfirmDialog

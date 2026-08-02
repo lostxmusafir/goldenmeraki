@@ -154,7 +154,12 @@ export function CategoryPage({
           <span className="text-slate-950">{category?.name ?? 'All Products'}</span>
         </nav>
 
-        <CategoryBanner slug={categorySlug(categoryId)} />
+        <CategoryBanner
+          slug={categorySlug(categoryId)}
+          title={category?.name}
+          description={category?.description}
+          image={category?.image}
+        />
 
         {loading ? (
           <div className="mt-10 rounded-[1.75rem] border border-slate-200 bg-white p-10 text-center text-sm text-slate-600">

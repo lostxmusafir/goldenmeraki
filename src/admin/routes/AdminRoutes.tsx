@@ -6,7 +6,9 @@ import { AdminLayout } from '../layouts/AdminLayout';
 import { Login } from '../pages/Login';
 import { Dashboard } from '../pages/Dashboard';
 import { Categories } from '../pages/Categories';
+import { CategoryFormPage } from '../pages/CategoryFormPage';
 import { Products } from '../pages/Products';
+import { ProductFormPage } from '../pages/ProductFormPage';
 import { Orders } from '../pages/Orders';
 import { Customers } from '../pages/Customers';
 import { Blogs } from '../pages/Blogs';
@@ -29,7 +31,11 @@ export function AdminRoutes() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="categories" element={<Categories />} />
+            <Route path="categories/new" element={<CategoryFormPage />} />
+            <Route path="categories/:id/edit" element={<CategoryFormPage />} />
             <Route path="products" element={<Products />} />
+            <Route path="products/new" element={<ProductFormPage />} />
+            <Route path="products/:id/edit" element={<ProductFormPage />} />
             <Route path="orders" element={<Orders />} />
             <Route path="customers" element={<Customers />} />
             <Route path="blogs" element={<Blogs />} />

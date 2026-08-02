@@ -6,6 +6,8 @@ export interface Category {
   image?: string;
   status: 'active' | 'inactive';
   productCount: number;
+  category?: string;
+  parent?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,6 +18,8 @@ export interface CreateCategoryDTO {
   description: string;
   image?: string;
   status: 'active' | 'inactive';
+  category?: string;
+  parent?: string;
 }
 
 export type UpdateCategoryDTO = Partial<CreateCategoryDTO>;

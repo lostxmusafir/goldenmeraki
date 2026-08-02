@@ -2,11 +2,11 @@ import axios from 'axios';
 import { tokenStorage } from '../utils/tokenStorage';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/admin',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000
+  timeout: 15000
 });
 
 apiClient.interceptors.request.use(
