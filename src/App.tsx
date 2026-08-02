@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CartDrawer } from './components/layout/CartDrawer';
 import { CategoryPage } from './pages/CategoryPage';
@@ -70,10 +70,6 @@ export function App() {
   const products = useMemo(() => PRODUCTS as Product[], []);
 
   const [isAppLoading, setIsAppLoading] = useState(true);
-  const [isRouteLoading, setIsRouteLoading] = useState(false);
-  const [routeVariant, setRouteVariant] = useState<'category' | 'product'>('category');
-  const isFirstRender = useRef(true);
-
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -86,25 +82,6 @@ export function App() {
     const timer = setTimeout(() => setIsAppLoading(false), 3500);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    if (location.pathname.startsWith('/product/')) {
-      setRouteVariant('product');
-      setIsRouteLoading(true);
-      const timer = setTimeout(() => setIsRouteLoading(false), 1200);
-      return () => clearTimeout(timer);
-    } else if (location.pathname.startsWith('/category/')) {
-      setRouteVariant('category');
-      setIsRouteLoading(true);
-      const timer = setTimeout(() => setIsRouteLoading(false), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [location.pathname]);
 
   useEffect(() => {
     const pathCategory = location.pathname.startsWith('/category/')
@@ -228,12 +205,11 @@ export function App() {
   }, [toast]);
 
   if (isAppLoading) {
-    return <PageLoader variant="splash" />;
+    return <PageLoader />;
   }
 
   return (
     <div className="min-h-screen bg-white">
-      {isRouteLoading && <PageLoader variant={routeVariant} />}
       <Routes>
         <Route path="/" element={<HomeRoute {...shellProps} />} />
         <Route path="/category/:slug" element={<CategoryRoute {...shellProps} />} />
