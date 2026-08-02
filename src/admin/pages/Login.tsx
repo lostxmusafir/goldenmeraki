@@ -8,8 +8,8 @@ export function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('admin@goldenmeraki.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -62,7 +62,7 @@ export function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@goldenmeraki.com"
+                placeholder="Enter your registered admin email"
                 className="w-full pl-10 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
               />
             </div>
@@ -77,7 +77,7 @@ export function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 className="w-full pl-10 pr-10 py-3 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
               />
               <button
@@ -118,13 +118,6 @@ export function Login() {
             )}
           </button>
         </form>
-
-        <div className="mt-8 text-center border-t border-slate-800 pt-4">
-          <p className="text-[11px] text-slate-500">
-            Demo Credentials: <span className="font-semibold text-slate-400">admin@goldenmeraki.com</span> /{' '}
-            <span className="font-semibold text-slate-400">admin123</span>
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -1,69 +1,95 @@
+import axios from 'axios';
 import type { AdminUser, AuthResponse, LoginCredentials } from '../types/auth.types';
 import { tokenStorage } from '../utils/tokenStorage';
 
-const MOCK_ADMIN_USER: AdminUser = {
-  id: 'admin-01',
-  name: 'Manoj Admin',
-  email: 'admin@goldenmeraki.com',
-  role: 'super_admin',
-  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80',
-  createdAt: '2026-01-01T00:00:00Z'
-};
+function normalizeUser(user: any): AdminUser {
+  const role = user?.role === 'editor' ? 'editor' : user?.role === 'user' ? 'user' : 'admin';
+
+  return {
+    id: user?._id ?? user?.id ?? '',
+    name: user?.name ?? user?.email ?? 'Admin User',
+    email: user?.email ?? '',
+    role,
+    avatar: user?.avatar ?? '',
+    createdAt: user?.createdAt ?? new Date().toISOString()
+  };
+}
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    await new Promise((res) => setTimeout(res, 500));
-    if (credentials.email === 'admin@goldenmeraki.com' && credentials.password === 'admin123') {
-      const response: AuthResponse = {
-        user: MOCK_ADMIN_USER,
-        token: 'mock_jwt_token_' + Date.now(),
-        refreshToken: 'mock_refresh_token_' + Date.now()
-      };
-      tokenStorage.setToken(response.token);
-      tokenStorage.setRefreshToken(response.refreshToken);
-      tokenStorage.setUser(response.user);
-      return response;
-    }
-    
-    // For easy testing, allow any valid email format with password length >= 6
-    if (credentials.email.includes('@') && credentials.password.length >= 6) {
-      const customUser: AdminUser = {
-        ...MOCK_ADMIN_USER,
-        email: credentials.email,
-        name: credentials.email.split('@')[0] || 'Admin User'
-      };
-      const response: AuthResponse = {
-        user: customUser,
-        token: 'mock_jwt_token_' + Date.now(),
-        refreshToken: 'mock_refresh_token_' + Date.now()
-      };
-      tokenStorage.setToken(response.token);
-      tokenStorage.setRefreshToken(response.refreshToken);
-      tokenStorage.setUser(response.user);
-      return response;
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/login`, {
+      email: credentials.email,
+      password: credentials.password
+    });
+
+    const payload = response.data?.data ?? response.data;
+    const accessToken = payload?.tokens?.accessToken ?? payload?.accessToken ?? payload?.token;
+    const refreshToken = payload?.tokens?.refreshToken ?? payload?.refreshToken;
+    const user = normalizeUser(payload?.user);
+
+    if (!accessToken || !refreshToken) {
+      throw new Error('Invalid authentication response from the server');
     }
 
-    throw new Error('Invalid email or password. (Default: admin@goldenmeraki.com / admin123)');
+    tokenStorage.setToken(accessToken);
+    tokenStorage.setRefreshToken(refreshToken);
+    tokenStorage.setUser(user);
+
+    return {
+      user,
+      token: accessToken,
+      refreshToken
+    };
   },
 
   async logout(): Promise<void> {
-    await new Promise((res) => setTimeout(res, 200));
+    try {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/logout`, {}, {
+        headers: {
+          Authorization: `Bearer ${tokenStorage.getToken()}`
+        }
+      });
+    } catch {
+      // Ignore logout failures and clear local storage anyway.
+    }
+
     tokenStorage.clear();
   },
 
   async getProfile(): Promise<AdminUser> {
-    await new Promise((res) => setTimeout(res, 200));
-    const user = tokenStorage.getUser();
-    if (!user) {
+    const token = tokenStorage.getToken();
+    if (!token) {
       throw new Error('Unauthenticated');
     }
+
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const payload = response.data?.data ?? response.data;
+    const user = normalizeUser(payload);
+    tokenStorage.setUser(user);
     return user;
   },
 
   async refreshToken(): Promise<{ token: string }> {
-    await new Promise((res) => setTimeout(res, 200));
-    const newToken = 'mock_jwt_token_refreshed_' + Date.now();
-    tokenStorage.setToken(newToken);
-    return { token: newToken };
+    const refreshToken = tokenStorage.getRefreshToken();
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/refresh`, {
+      refreshToken
+    });
+
+    const nextToken = response.data?.tokens?.accessToken ?? response.data?.accessToken ?? response.data?.token;
+    if (!nextToken) {
+      throw new Error('Failed to refresh token');
+    }
+
+    tokenStorage.setToken(nextToken);
+    return { token: nextToken };
   }
 };

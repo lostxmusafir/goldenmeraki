@@ -58,7 +58,9 @@ export function TopCategories() {
             >
               <div className="aspect-square overflow-hidden bg-white">
                 <img
-                  src={getImageUrl(CATEGORY_IMAGES[category.id] ?? '/images/pyrite_cluster.png')}
+                  src={getImageUrl(
+                    category.image || CATEGORY_IMAGES[category.slug ?? category.id] || '/images/pyrite_cluster.png'
+                  )}
                   alt={category.name}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
