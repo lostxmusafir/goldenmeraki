@@ -48,7 +48,7 @@ export function CartPage({
       `Total: ₹${(subtotal + shipping).toLocaleString('en-IN')}`
     ].join('\n');
 
-    window.open(`https://wa.me/919998583126?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://wa.me/919667290056?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   };
 
   return (

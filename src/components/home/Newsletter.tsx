@@ -10,7 +10,7 @@ export function Newsletter() {
           <div className="space-y-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Stay connected on WhatsApp</p>
             <h2 className="text-2xl font-light tracking-tight text-slate-950 sm:text-3xl">
-              Get exclusive offers & updates on WhatsApp.
+              For customized product, contact on WhatsApp.
             </h2>
             <p className="max-w-xl text-sm leading-6 text-slate-600">
               Share your name and 10 digit mobile number to receive curated drops, offers, and order updates in one place.
@@ -25,7 +25,7 @@ export function Newsletter() {
               const name = String(formData.get('name') ?? '');
               const phone = String(formData.get('phone') ?? '');
               const message = `Hi Golden Meraki, I am ${name}. My WhatsApp number is ${phone}. Please add me to your updates list.`;
-              window.open(`https://wa.me/919998583126?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+              window.open(`https://wa.me/919667290056?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
             }}
           >
             <Input name="name" type="text" placeholder="Your name" aria-label="Your name" required />
