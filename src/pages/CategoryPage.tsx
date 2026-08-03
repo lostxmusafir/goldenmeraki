@@ -107,13 +107,13 @@ export function CategoryPage({
       .filter((product) => product.price <= maxPrice)
       .filter((product) => {
         if (!query) return true;
-        return [product.name, product.description, product.tags.join(' ')].some((value) => value.toLowerCase().includes(query));
+        return [product.name, product.description, (product.tags || []).join(' ')].some((value) => value.toLowerCase().includes(query));
       })
       .sort((a, b) => {
         if (sortBy === 'price-low') return a.price - b.price;
         if (sortBy === 'price-high') return b.price - a.price;
-        if (sortBy === 'rating') return b.rating - a.rating;
-        return b.reviewsCount - a.reviewsCount;
+        if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+        return (b.reviewsCount || 0) - (a.reviewsCount || 0);
       });
   }, [categoryId, category?.id, intention, maxPrice, products, searchTerm, slug, sortBy]);
 

@@ -18,7 +18,7 @@ export function useOrders() {
     setLoading(true);
     setError(null);
     try {
-      const res = await orderService.getOrders({ page, limit, search, status, paymentStatus });
+      const res = await orderService.getOrders({ page, limit, search, orderStatus: status, paymentStatus });
       setOrders(res.data);
       setTotal(res.total);
       setTotalPages(res.totalPages);

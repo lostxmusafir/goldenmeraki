@@ -4,6 +4,7 @@ import { CartDrawer } from './components/layout/CartDrawer';
 import { CategoryPage } from './pages/CategoryPage';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { ThankYouPage } from './pages/ThankYouPage';
 import { HomePage } from './pages/HomePage';
 import { ProductPage } from './pages/ProductPage';
 import { PRODUCTS } from './data/products';
@@ -40,6 +41,7 @@ interface AppShellProps {
   cartItems: CartItem[];
   onUpdateQuantity: (productId: string, quantity: number) => void;
   onRemoveItem: (productId: string) => void;
+  onClearCart?: () => void;
 }
 
 function HomeRoute(props: AppShellProps) {
@@ -64,10 +66,14 @@ function CheckoutRoute(props: AppShellProps) {
   return <CheckoutPage {...props} />;
 }
 
+function ThankYouRoute(props: AppShellProps) {
+  return <ThankYouPage {...props} />;
+}
+
 export function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const products = useMemo(() => PRODUCTS as Product[], []);
+  const products = useMemo(() => PRODUCTS as unknown as Product[], []);
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -116,6 +122,10 @@ export function App() {
 
   const handleRemoveItem = (productId: string) => {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
+  };
+
+  const handleClearCart = () => {
+    setCartItems([]);
   };
 
   const handleToggleWishlist = (productId: string) => {
@@ -187,7 +197,8 @@ export function App() {
     wishlist,
     cartItems,
     onUpdateQuantity: handleUpdateQuantity,
-    onRemoveItem: handleRemoveItem
+    onRemoveItem: handleRemoveItem,
+    onClearCart: handleClearCart,
   };
 
   useEffect(() => {
@@ -213,6 +224,7 @@ export function App() {
         <Route path="/product/:slug" element={<ProductRoute {...shellProps} />} />
         <Route path="/cart" element={<CartRoute {...shellProps} />} />
         <Route path="/checkout" element={<CheckoutRoute {...shellProps} />} />
+        <Route path="/thank-you" element={<ThankYouRoute {...shellProps} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

@@ -27,8 +27,8 @@ export const SearchBar = memo(function SearchBar({
 
     return products
       .filter((product) => {
-        const haystacks = [product.name, product.category, product.stone, product.tags.join(' ')];
-        return haystacks.some((value) => value.toLowerCase().includes(query));
+        const haystacks = [product.name, product.category, product.stone || '', (product.tags || []).join(' ')];
+        return haystacks.some((value) => (value || '').toLowerCase().includes(query));
       })
       .slice(0, 5);
   }, [deferredSearch, products]);
@@ -101,7 +101,7 @@ export const SearchBar = memo(function SearchBar({
                 <img src={getImageUrl(product.image)} alt={product.name} className="h-12 w-12 rounded-xl object-cover" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-slate-950">{product.name}</div>
-                  <div className="truncate text-xs text-slate-500">{product.certificate}</div>
+                  <div className="truncate text-xs text-slate-500">{product.certificate || 'Certified'}</div>
                 </div>
                 <div className="text-sm font-semibold text-slate-950">₹{product.price.toLocaleString()}</div>
               </button>
@@ -112,4 +112,3 @@ export const SearchBar = memo(function SearchBar({
     </div>
   );
 });
-

@@ -37,7 +37,9 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
   }, []);
 
   const featuredProducts = useMemo(() => {
-    return [...products].sort((a, b) => b.rating - a.rating || b.reviewsCount - a.reviewsCount).slice(0, 8);
+    return [...products]
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0) || (b.reviewsCount || 0) - (a.reviewsCount || 0))
+      .slice(0, 8);
   }, [products]);
 
   return (
@@ -81,8 +83,8 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
                   <div>
                     <div className="flex items-center gap-1 text-sm text-amber-500">
                       <Star className="h-4 w-4 fill-current" />
-                      <span className="font-medium text-slate-900">{product.rating}</span>
-                      <span className="text-slate-400">({product.reviewsCount})</span>
+                      <span className="font-medium text-slate-900">{product.rating || 5}</span>
+                      <span className="text-slate-400">({product.reviewsCount || 0})</span>
                     </div>
                     <Link to={`/product/${productSlug(product)}`} className="mt-2 block text-base font-medium leading-6 text-slate-950">
                       {product.name}
@@ -93,7 +95,9 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-lg font-medium text-slate-950">{formatCurrency(product.price)}</div>
-                      <div className="text-xs text-slate-400 line-through">{formatCurrency(product.originalPrice)}</div>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <div className="text-xs text-slate-400 line-through">{formatCurrency(product.originalPrice)}</div>
+                      )}
                     </div>
                     <button
                       type="button"
@@ -113,4 +117,3 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
     </section>
   );
 }
-

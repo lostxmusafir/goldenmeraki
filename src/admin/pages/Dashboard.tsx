@@ -13,9 +13,9 @@ export function Dashboard() {
   const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(10);
 
   // Calculations
-  const totalSales = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const totalSales = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
   const totalUnitsSold = orders.reduce(
-    (sum, o) => sum + o.items.reduce((iSum, item) => iSum + item.quantity, 0),
+    (sum, o) => sum + (o.cartItems || []).reduce((iSum: number, item: any) => iSum + (item.quantity || 0), 0),
     0
   );
   const avgOrderValue = orders.length > 0 ? Math.round(totalSales / orders.length) : 0;
@@ -25,9 +25,9 @@ export function Dashboard() {
   const avgProductPrice = products.length > 0 ? Math.round(products.reduce((sum, p) => sum + p.price, 0) / products.length) : 0;
 
   // Order & Catalog Status Breakdown
-  const pendingCount = orders.filter((o) => o.status === 'pending').length;
-  const processingCount = orders.filter((o) => o.status === 'processing').length;
-  const deliveredCount = orders.filter((o) => o.status === 'delivered').length;
+  const pendingCount = orders.filter((o) => o.orderStatus === 'PENDING').length;
+  const processingCount = orders.filter((o) => o.orderStatus === 'PROCESSING').length;
+  const deliveredCount = orders.filter((o) => o.orderStatus === 'DELIVERED').length;
   const inStockCount = products.filter((p) => p.stock > 0).length;
 
   // Daily Chart Bar Data Mock Generator
