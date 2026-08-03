@@ -2,9 +2,9 @@ import { ArrowUpRight, Mail, MapPin, Phone, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const socialLinks = [
-  { label: 'Facebook', href: 'https://www.facebook.com/' },
-  { label: 'Instagram', href: 'https://www.instagram.com/' },
-  { label: 'YouTube', href: 'https://www.youtube.com/' }
+  { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61578067474178' },
+  { label: 'Instagram', href: 'https://www-fallback.instagram.com/goldenmerakigems/' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@GoldenmerakiGems' }
 ];
 
 export function Footer() {
@@ -41,9 +41,9 @@ export function Footer() {
               <div className="space-y-3">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">Support</div>
                 <div className="space-y-2 text-sm text-slate-300">
-                  <a href="tel:+919998583126" className="flex items-center gap-2 transition-colors hover:text-white">
+                  <a href="tel:+919667290056" className="flex items-center gap-2 transition-colors hover:text-white">
                     <Phone className="h-4 w-4" />
-                    +91 99985 83126
+                    +91 96672 90056
                   </a>
                   <a href="mailto:info@goldenmeraki.com" className="flex items-center gap-2 transition-colors hover:text-white">
                     <Mail className="h-4 w-4" />

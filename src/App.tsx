@@ -7,6 +7,7 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { HomePage } from './pages/HomePage';
 import { ProductPage } from './pages/ProductPage';
 import { PRODUCTS } from './data/products';
+import { PageLoader } from './components/common/PageLoader';
 import type { CartItem } from './types/cart';
 import type { Product } from './types/product';
 import { productSlug } from './utils/catalog';
@@ -69,12 +70,19 @@ export function App() {
   const location = useLocation();
   const products = useMemo(() => PRODUCTS as Product[], []);
 
+  const [isAppLoading, setIsAppLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
+
+  useEffect(() => {
+    // Show the splash screen loader for 3.5 seconds on every app load
+    const timer = setTimeout(() => setIsAppLoading(false), 3500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const pathCategory = location.pathname.startsWith('/category/')
@@ -205,6 +213,10 @@ export function App() {
     );
   }
 
+  if (isAppLoading) {
+    return <PageLoader />;
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Routes>
@@ -213,6 +225,7 @@ export function App() {
         <Route path="/product/:slug" element={<ProductRoute {...shellProps} />} />
         <Route path="/cart" element={<CartRoute {...shellProps} />} />
         <Route path="/checkout" element={<CheckoutRoute {...shellProps} />} />
+        <Route path="/loader" element={<PageLoader />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
