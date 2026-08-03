@@ -30,4 +30,6 @@ export interface Product extends BaseEntity {
   specifications?: Record<string, string> | any;
   isFeatured?: boolean;
   isActive?: boolean;
+  widthSizes?: (string | { size: string; price?: number; stock?: number })[];
+  selectedWidthSize?: string;
 }

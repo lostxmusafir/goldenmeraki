@@ -26,16 +26,60 @@ export function ProductInfo({
   setQuantity,
 }: ProductInfoProps) {
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
-  const isWishlisted = wishlist.includes(product.id);
 
+  const rawWidthSizes = product.widthSizes || [];
+  const isBracelet =
+    product.category === 'bracelets' ||
+    product.name.toLowerCase().includes('bracelet') ||
+    product.tags?.some((t) => t.toLowerCase().includes('bracelet'));
+
+  const parsedSizes = rawWidthSizes.map((s) =>
+    typeof s === 'string'
+      ? { size: s, price: product.price }
+      : { size: s.size, price: s.price ?? product.price, stock: s.stock },
+  );
+
+  const sizesList =
+    parsedSizes.length > 0
+      ? parsedSizes
+      : isBracelet
+      ? [
+          { size: '8 mm', price: product.price },
+          { size: '10 mm', price: product.price },
+        ]
+      : [];
+
+  const [selectedSize, setSelectedSize] = useState<string>(sizesList[0]?.size || '');
+  const activeSize = selectedSize || sizesList[0]?.size;
+  const currentSizeObj = sizesList.find((s) => s.size === activeSize) || sizesList[0];
+  const currentPrice = currentSizeObj?.price ?? product.price;
+
+  const isWishlisted = wishlist.includes(product.id);
   const isOutOfStock = product.inventoryStatus === 'OUT_OF_STOCK' || product.stock <= 0;
   const isComingSoon = product.inventoryStatus === 'COMING_SOON';
   const isDiscontinued = product.inventoryStatus === 'DISCONTINUED';
 
-  const originalPrice = product.originalPrice || product.price;
-  const discount = originalPrice > product.price
-    ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
-    : 0;
+  const originalPrice = product.originalPrice || currentPrice;
+  const discount =
+    originalPrice > currentPrice
+      ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
+      : 0;
+
+  const handleAddToCart = () => {
+    onAddToCart({
+      ...product,
+      price: currentPrice,
+      selectedWidthSize: activeSize,
+    });
+  };
+
+  const handleBuyNow = () => {
+    onBuyNow({
+      ...product,
+      price: currentPrice,
+      selectedWidthSize: activeSize,
+    });
+  };
 
   return (
     <div className="w-full min-w-0 space-y-6 overflow-hidden">
@@ -61,7 +105,7 @@ export function ProductInfo({
 
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-3xl font-light text-slate-950">
-            {formatCurrency(product.price)}
+            {formatCurrency(currentPrice)}
           </span>
 
           {discount > 0 && (
@@ -77,6 +121,37 @@ export function ProductInfo({
           )}
         </div>
       </div>
+
+      {sizesList.length > 0 && (
+        <div className="space-y-2.5 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+          <p className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-700">
+            Width Size
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {sizesList.map((item) => {
+              const isSelected = item.size === activeSize;
+              return (
+                <button
+                  key={item.size}
+                  type="button"
+                  onClick={() => setSelectedSize(item.size)}
+                  className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition cursor-pointer ${
+                    isSelected
+                      ? 'border-amber-500 bg-amber-500 text-white shadow-sm ring-2 ring-amber-500/30'
+                      : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
+                >
+                  <span className="text-xs">{isSelected ? '●' : '○'}</span>
+                  <span>{item.size}</span>
+                  {item.price && item.price !== product.price ? (
+                    <span className="text-xs opacity-80">(₹{item.price})</span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         {!isOutOfStock && !isComingSoon && !isDiscontinued ? (
@@ -111,7 +186,7 @@ export function ProductInfo({
               <div className="flex w-full flex-col gap-3 sm:flex-row">
                 <Button
                   className="w-full bg-slate-950 py-3 text-white sm:flex-1 hover:bg-slate-800"
-                  onClick={() => onAddToCart(product)}
+                  onClick={handleAddToCart}
                 >
                   <ShoppingBag className="mr-2 h-4 w-4" />
                   Add to cart
@@ -119,7 +194,7 @@ export function ProductInfo({
 
                 <Button
                   className="w-full border border-slate-200 bg-white py-3 text-slate-900 sm:flex-1 hover:bg-slate-50"
-                  onClick={() => onBuyNow(product)}
+                  onClick={handleBuyNow}
                 >
                   Buy now
                 </Button>
@@ -183,6 +258,7 @@ export function ProductInfo({
       <NotifyMeModal
         productId={product.id}
         productTitle={product.name}
+        selectedWidthSize={activeSize}
         isOpen={isNotifyModalOpen}
         onClose={() => setIsNotifyModalOpen(false)}
       />

@@ -5,13 +5,19 @@ import { productService } from '../admin/services/product.service';
 interface NotifyMeModalProps {
   productId: string;
   productTitle: string;
+  selectedWidthSize?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function NotifyMeModal({ productId, productTitle, isOpen, onClose }: NotifyMeModalProps) {
+export function NotifyMeModal({
+  productId,
+  productTitle,
+  selectedWidthSize,
+  isOpen,
+  onClose,
+}: NotifyMeModalProps) {
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,18 +28,36 @@ export function NotifyMeModal({ productId, productTitle, isOpen, onClose }: Noti
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !whatsapp.trim()) return;
+    if (!name.trim() || !whatsapp.trim()) return;
 
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // 1. Save notification in database & Admin Panel via Backend API
       await productService.notifyMe(productId, {
-        name,
-        phone,
-        whatsapp,
+        name: name.trim(),
+        whatsapp: whatsapp.trim(),
         email: email.trim() || undefined,
+        requestedSize: selectedWidthSize,
       });
+
+      // 2. Generate WhatsApp message similar to Order flow
+      const sizeText = selectedWidthSize ? `\n*Requested Width Size:* ${selectedWidthSize}` : '';
+      const message =
+        `🔔 *RESTOCK NOTIFICATION REQUEST*\n\n` +
+        `*Product:* ${productTitle}${sizeText}\n` +
+        `*Customer Name:* ${name.trim()}\n` +
+        `*WhatsApp Number:* ${whatsapp.trim()}\n` +
+        (email.trim() ? `*Email:* ${email.trim()}\n` : '') +
+        `\nPlease notify me when this product is back in stock! Thank you.`;
+
+      const businessPhone = '919876543210';
+      const whatsappUrl = `https://wa.me/${businessPhone}?text=${encodeURIComponent(message)}`;
+
+      // 3. Open WhatsApp chat for customer
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+
       setIsSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit notification request');
@@ -60,7 +84,7 @@ export function NotifyMeModal({ productId, productTitle, isOpen, onClose }: Noti
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">You're on the list!</h3>
             <p className="text-sm text-slate-600 dark:text-slate-300">
-              We have received your restock notification request for <span className="font-semibold text-amber-600 dark:text-amber-400">{productTitle}</span>. We will contact you via WhatsApp as soon as it is back in stock!
+              We have saved your request for <span className="font-semibold text-amber-600 dark:text-amber-400">{productTitle}</span>{selectedWidthSize ? ` (${selectedWidthSize})` : ''} and opened WhatsApp chat. We will notify you immediately when back in stock!
             </p>
             <button
               type="button"
@@ -78,7 +102,9 @@ export function NotifyMeModal({ productId, productTitle, isOpen, onClose }: Noti
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Notify Me When Available</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{productTitle}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {productTitle}{selectedWidthSize ? ` (${selectedWidthSize})` : ''}
+                </p>
               </div>
             </div>
 
@@ -88,25 +114,13 @@ export function NotifyMeModal({ productId, productTitle, isOpen, onClose }: Noti
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Your Full Name *</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Full Name *</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Priya Sharma"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Phone Number *</label>
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="e.g. +91 98765 43210"
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                 />
               </div>

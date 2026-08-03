@@ -106,16 +106,23 @@ export function App() {
 
   const handleAddToCart = (product: Product) => {
     setCartItems((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
+      const existing = prev.find(
+        (item) => item.id === product.id && item.selectedWidthSize === product.selectedWidthSize,
+      );
 
       if (existing) {
-        return prev.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item));
+        return prev.map((item) =>
+          item.id === product.id && item.selectedWidthSize === product.selectedWidthSize
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        );
       }
 
       return [...prev, { ...product, quantity: 1 }];
     });
 
-    setToast({ type: 'cart', message: `Added ${product.name} to cart.` });
+    const sizeSuffix = product.selectedWidthSize ? ` (${product.selectedWidthSize})` : '';
+    setToast({ type: 'cart', message: `Added ${product.name}${sizeSuffix} to cart.` });
     setIsCartDrawerOpen(true);
   };
 
@@ -124,12 +131,20 @@ export function App() {
     navigate('/checkout');
   };
 
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
-    setCartItems((prev) => prev.map((item) => (item.id === productId ? { ...item, quantity } : item)));
+  const handleUpdateQuantity = (productId: string, quantity: number, selectedWidthSize?: string) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.id === productId && (selectedWidthSize ? item.selectedWidthSize === selectedWidthSize : true)
+          ? { ...item, quantity }
+          : item,
+      ),
+    );
   };
 
-  const handleRemoveItem = (productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== productId));
+  const handleRemoveItem = (productId: string, selectedWidthSize?: string) => {
+    setCartItems((prev) =>
+      prev.filter((item) => !(item.id === productId && (selectedWidthSize ? item.selectedWidthSize === selectedWidthSize : true))),
+    );
   };
 
   const handleClearCart = () => {

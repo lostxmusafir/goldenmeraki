@@ -15,6 +15,7 @@ export interface OrderItem {
   quantity: number;
   price: number;
   image?: string;
+  selectedWidthSize?: string;
 }
 
 export interface AdminOrder {

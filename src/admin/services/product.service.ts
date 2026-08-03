@@ -36,6 +36,7 @@ const mapProduct = (item: any): AdminProduct => {
     badge: item.badge ?? undefined,
     isFeatured: Boolean(item.isFeatured),
     isActive: item.isActive !== false,
+    widthSizes: item.widthSizes ?? [],
     ratings: item.ratings ? { average: Number(item.ratings.average || 0), count: Number(item.ratings.count || 0) } : undefined,
     createdAt: item.createdAt ?? new Date().toISOString(),
     updatedAt: item.updatedAt ?? item.createdAt ?? new Date().toISOString(),
@@ -86,6 +87,7 @@ export const productService = {
       images: dto.images ?? [],
       isFeatured: dto.isFeatured,
       isActive: dto.status !== 'draft',
+      widthSizes: dto.widthSizes,
     });
 
     return mapProduct(unwrapData<any>(response));
@@ -105,6 +107,7 @@ export const productService = {
       images: dto.images ?? undefined,
       isFeatured: dto.isFeatured,
       isActive: dto.status !== undefined ? (dto.status !== 'draft') : undefined,
+      widthSizes: dto.widthSizes,
     });
 
     return mapProduct(unwrapData<any>(response));
@@ -128,7 +131,10 @@ export const productService = {
   },
 
   // --- Notify Me (Requirement #5 & #7) ---
-  async notifyMe(productId: string, data: { name: string; phone: string; whatsapp: string; email?: string }): Promise<any> {
+  async notifyMe(
+    productId: string,
+    data: { name: string; phone?: string; whatsapp: string; email?: string; requestedSize?: string },
+  ): Promise<any> {
     const response = await apiClient.post(`/products/${productId}/notify`, data);
     return response.data;
   },

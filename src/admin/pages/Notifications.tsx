@@ -133,8 +133,8 @@ export function Notifications() {
           <thead>
             <tr className="border-b border-slate-200/80 bg-slate-50/50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
               <th className="p-4">Product</th>
+              <th className="p-4">Requested Size</th>
               <th className="p-4">Customer Name</th>
-              <th className="p-4">Phone</th>
               <th className="p-4">WhatsApp</th>
               <th className="p-4">Email</th>
               <th className="p-4">Requested Date</th>
@@ -156,11 +156,19 @@ export function Notifications() {
               notifications.map((notif) => (
                 <tr key={notif._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
                   <td className="p-4 font-semibold text-slate-900 dark:text-slate-100">{notif.productTitle}</td>
+                  <td className="p-4">
+                    {notif.requestedSize ? (
+                      <span className="inline-block rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/40">
+                        {notif.requestedSize}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400">—</span>
+                    )}
+                  </td>
                   <td className="p-4 text-slate-800 dark:text-slate-200">{notif.customerName}</td>
-                  <td className="p-4 text-slate-600 dark:text-slate-400">{notif.phone}</td>
                   <td className="p-4">
                     <a
-                      href={`https://wa.me/${notif.whatsapp.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hi ${notif.customerName}, "${notif.productTitle}" is back in stock!`)}`}
+                      href={`https://wa.me/${notif.whatsapp.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hi ${notif.customerName}, "${notif.productTitle}"${notif.requestedSize ? ` (${notif.requestedSize})` : ''} is back in stock!`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 font-medium text-emerald-600 hover:underline"

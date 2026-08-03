@@ -367,6 +367,11 @@ export function Orders() {
                       {item.image && <img src={item.image} alt={item.title} className="h-9 w-9 rounded-lg object-cover" />}
                       <div>
                         <p className="font-semibold text-slate-900 dark:text-slate-100">{item.title}</p>
+                        {item.selectedWidthSize ? (
+                          <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                            Width Size: {item.selectedWidthSize}
+                          </p>
+                        ) : null}
                         <p className="text-slate-500">Qty: {item.quantity}</p>
                       </div>
                     </div>

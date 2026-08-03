@@ -24,9 +24,18 @@ export function ProductFormPage() {
   const [image, setImage] = useState('');
   const [badge, setBadge] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
+  const [selectedWidthSizes, setSelectedWidthSizes] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const selectedCategoryObj = categories.find((c) => c.id === selectedCatId);
+  const isBraceletProduct = Boolean(
+    selectedCategoryObj &&
+      (selectedCategoryObj.name.toLowerCase().includes('bracelet') ||
+        selectedCategoryObj.slug.toLowerCase().includes('bracelet') ||
+        selectedCategoryObj.id.toLowerCase().includes('bracelet')),
+  );
 
   useEffect(() => {
     if (!isEdit || !id) return;
@@ -51,6 +60,9 @@ export function ProductFormPage() {
         setImage(product.images[0] || '');
         setBadge(product.badge || '');
         setIsFeatured(Boolean(product.isFeatured));
+        const rawSizes = product.widthSizes || [];
+        const sizes = rawSizes.map((s) => (typeof s === 'string' ? s : s.size));
+        setSelectedWidthSizes(sizes);
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load product');
@@ -85,6 +97,7 @@ export function ProductFormPage() {
         images: image ? [image] : [],
         badge: badge || undefined,
         isFeatured,
+        widthSizes: isBraceletProduct ? selectedWidthSizes : [],
       };
 
       if (isEdit && id) {
@@ -153,6 +166,46 @@ export function ProductFormPage() {
             </select>
           </div>
         </div>
+
+        {isBraceletProduct && (
+          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-4 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+              Width Sizes (Bracelet Product)
+            </label>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Select one or multiple width sizes available for this bracelet product:
+            </p>
+            <div className="flex flex-wrap gap-4 pt-1">
+              {['8 mm', '10 mm'].map((size) => {
+                const isSelected = selectedWidthSizes.includes(size);
+                return (
+                  <label
+                    key={size}
+                    className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition cursor-pointer ${
+                      isSelected
+                        ? 'border-amber-500 bg-amber-500 text-white shadow-sm'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedWidthSizes((prev) => [...prev, size]);
+                        } else {
+                          setSelectedWidthSizes((prev) => prev.filter((s) => s !== size));
+                        }
+                      }}
+                      className="sr-only"
+                    />
+                    <span>{isSelected ? '✓' : '○'} {size}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>

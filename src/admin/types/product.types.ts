@@ -17,6 +17,7 @@ export interface AdminProduct {
   badge?: string;
   isFeatured?: boolean;
   isActive?: boolean;
+  widthSizes?: (string | { size: string; price?: number; stock?: number })[];
   ratings?: {
     average: number;
     count: number;
@@ -40,6 +41,7 @@ export interface CreateProductDTO {
   badge?: string;
   isFeatured?: boolean;
   isActive?: boolean;
+  widthSizes?: (string | { size: string; price?: number; stock?: number })[];
 }
 
 export type UpdateProductDTO = Partial<CreateProductDTO>;

@@ -111,6 +111,7 @@ export function CheckoutPage({
           quantity: item.quantity,
           price: item.price,
           image: item.image,
+          selectedWidthSize: item.selectedWidthSize,
         })),
         totalAmount: total,
         source: 'WHATSAPP_WEB',
@@ -225,9 +226,26 @@ export function CheckoutPage({
           </form>
         </section>
 
-        <aside className="h-fit rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <aside className="h-fit rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-900">Summary</h2>
-          <div className="mt-5 space-y-3 text-sm text-slate-600">
+          
+          <div className="divide-y divide-slate-100 space-y-2">
+            {cartItems.map((item) => (
+              <div key={`${item.id}-${item.selectedWidthSize || 'default'}`} className="pt-2 flex justify-between gap-2 text-xs text-slate-700">
+                <div>
+                  <span className="font-semibold text-slate-900">{item.name}</span> (x{item.quantity})
+                  {item.selectedWidthSize ? (
+                    <p className="text-[11px] font-semibold text-amber-600">
+                      Width Size: {item.selectedWidthSize}
+                    </p>
+                  ) : null}
+                </div>
+                <span className="font-medium text-slate-900">{formatCurrency(item.price * item.quantity)}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-slate-200 pt-3 space-y-3 text-sm text-slate-600">
             <div className="flex justify-between">
               <span>Items</span>
               <span>{cartItems.length}</span>

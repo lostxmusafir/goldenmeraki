@@ -10,8 +10,8 @@ import { getImageUrl } from '../utils/image';
 
 export interface CartPageProps extends CommonPageProps {
   cartItems: CartItem[];
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onRemoveItem: (productId: string) => void;
+  onUpdateQuantity: (productId: string, quantity: number, selectedWidthSize?: string) => void;
+  onRemoveItem: (productId: string, selectedWidthSize?: string) => void;
 }
 
 export function CartPage({
@@ -37,7 +37,10 @@ export function CartPage({
   const shipping = subtotal > 999 ? 0 : 99;
 
   const handleWhatsAppOrder = () => {
-    const orderLines = cartItems.map((item) => `- ${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toLocaleString('en-IN')}`);
+    const orderLines = cartItems.map(
+      (item) =>
+        `- ${item.name}${item.selectedWidthSize ? ` (Width Size: ${item.selectedWidthSize})` : ''} x${item.quantity} = ₹${(item.price * item.quantity).toLocaleString('en-IN')}`,
+    );
     const message = [
       'Hi Golden Meraki, I want to place an order.',
       '',
@@ -88,17 +91,22 @@ export function CartPage({
                 <p className="text-sm text-slate-500">Your cart is currently empty.</p>
               ) : (
                 cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4 rounded-[1.5rem] border border-slate-200 p-4">
+                  <div key={`${item.id}-${item.selectedWidthSize || 'default'}`} className="flex gap-4 rounded-[1.5rem] border border-slate-200 p-4">
                     <img src={getImageUrl(item.image)} alt={item.name} className="h-24 w-24 rounded-2xl object-cover" />
                     <div className="flex-1 space-y-3">
                       <div>
                         <h2 className="text-base font-medium text-slate-950">{item.name}</h2>
+                        {item.selectedWidthSize ? (
+                          <p className="text-xs font-semibold text-amber-600 dark:text-amber-500">
+                            Width Size: {item.selectedWidthSize}
+                          </p>
+                        ) : null}
                         <p className="text-sm text-slate-500">{formatCurrency(item.price)}</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
                         <button
                           type="button"
-                          onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                          onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1), item.selectedWidthSize)}
                           className="h-9 w-9 rounded-full border border-slate-200"
                         >
                           -
@@ -106,14 +114,14 @@ export function CartPage({
                         <span className="min-w-10 text-center text-sm">{item.quantity}</span>
                         <button
                           type="button"
-                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1, item.selectedWidthSize)}
                           className="h-9 w-9 rounded-full border border-slate-200"
                         >
                           +
                         </button>
                         <button
                           type="button"
-                          onClick={() => onRemoveItem(item.id)}
+                          onClick={() => onRemoveItem(item.id, item.selectedWidthSize)}
                           className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-medium text-rose-500 transition-colors hover:bg-rose-50 hover:text-rose-700"
                           aria-label={`Remove ${item.name}`}
                           title="Remove item"
