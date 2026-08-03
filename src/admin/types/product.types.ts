@@ -1,35 +1,31 @@
+export type InventoryStatusType = 'IN_STOCK' | 'OUT_OF_STOCK' | 'COMING_SOON' | 'DISCONTINUED';
+
 export interface AdminProduct {
   id: string;
-  sku: string;
   name: string;
   slug: string;
   categoryId: string;
-  categoryName: string;
+  categoryName?: string;
   price: number;
   originalPrice?: number;
   discountPrice?: number;
   stock: number;
+  inventoryStatus: InventoryStatusType;
   images: string[];
-  status: 'active' | 'draft' | 'out_of_stock';
+  status: 'active' | 'draft';
   description: string;
   badge?: string;
-  certificate?: string;
-  chakra?: string;
-  intention?: string;
-  stone?: string;
-  subCategory?: string;
-  benefits?: string[];
-  tags?: string[];
-  weights?: string[];
   isFeatured?: boolean;
-  attributes?: Record<string, string>;
-  specifications?: Record<string, string>;
-  createdAt: string;
-  updatedAt: string;
+  isActive?: boolean;
+  ratings?: {
+    average: number;
+    count: number;
+  };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateProductDTO {
-  sku?: string;
   name: string;
   slug?: string;
   categoryId: string;
@@ -37,21 +33,13 @@ export interface CreateProductDTO {
   originalPrice?: number;
   discountPrice?: number;
   stock: number;
+  inventoryStatus: InventoryStatusType;
   images: string[];
-  status: 'active' | 'draft' | 'out_of_stock';
+  status?: 'active' | 'draft';
   description: string;
   badge?: string;
-  certificate?: string;
-  chakra?: string;
-  intention?: string;
-  stone?: string;
-  subCategory?: string;
-  benefits?: string[];
-  tags?: string[];
-  weights?: string[];
   isFeatured?: boolean;
-  attributes?: Record<string, string>;
-  specifications?: Record<string, string>;
+  isActive?: boolean;
 }
 
 export type UpdateProductDTO = Partial<CreateProductDTO>;

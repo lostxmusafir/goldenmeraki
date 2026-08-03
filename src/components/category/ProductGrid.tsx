@@ -38,8 +38,8 @@ export function ProductGrid({ products, wishlist, onToggleWishlist, onAddToCart 
               <div>
                 <div className="flex items-center gap-1 text-sm text-amber-500">
                   <Star className="h-4 w-4 fill-current" />
-                  <span className="font-medium text-slate-900">{product.rating}</span>
-                  <span className="text-slate-400">({product.reviewsCount})</span>
+                  <span className="font-medium text-slate-900">{product.rating || 5}</span>
+                  <span className="text-slate-400">({product.reviewsCount || 0})</span>
                 </div>
                 <Link to={`/product/${productSlug(product)}`} className="mt-2 block text-base font-medium leading-6 text-slate-950">
                   {product.name}
@@ -48,7 +48,9 @@ export function ProductGrid({ products, wishlist, onToggleWishlist, onAddToCart 
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-lg font-medium text-slate-950">{formatCurrency(product.price)}</div>
-                  <div className="text-xs text-slate-400 line-through">{formatCurrency(product.originalPrice)}</div>
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <div className="text-xs text-slate-400 line-through">{formatCurrency(product.originalPrice)}</div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -66,4 +68,3 @@ export function ProductGrid({ products, wishlist, onToggleWishlist, onAddToCart 
     </div>
   );
 }
-

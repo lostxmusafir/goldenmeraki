@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { ProductCategoryOption } from '../types/category';
-import type { Product } from '../types/product';
+import type { Product, InventoryStatusType } from '../types/product';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 
@@ -62,6 +62,12 @@ export function normalizeProduct(raw: any): Product {
   const rawImages = Array.isArray(raw?.images) ? raw.images.filter(Boolean) : [];
   const fallbackImage = raw?.image ?? rawImages[0] ?? '';
 
+  const stock = Number(raw?.stock ?? 10);
+  let inventoryStatus: InventoryStatusType = raw?.inventoryStatus;
+  if (!inventoryStatus) {
+    inventoryStatus = stock > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK';
+  }
+
   const specSource =
     raw?.specifications && typeof raw.specifications === 'object' && !Array.isArray(raw.specifications)
       ? raw.specifications
@@ -78,6 +84,8 @@ export function normalizeProduct(raw: any): Product {
     chakra: raw?.chakra ?? '',
     price: Number(raw?.price ?? 0),
     originalPrice: Number(raw?.originalPrice ?? raw?.discountPrice ?? raw?.price ?? 0),
+    stock,
+    inventoryStatus,
     rating: Number(raw?.ratings?.average ?? raw?.rating ?? 0),
     reviewsCount: Number(raw?.ratings?.count ?? raw?.reviewsCount ?? 0),
     badge: raw?.badge ?? '',

@@ -11,6 +11,8 @@ export const ADMIN_ROUTES = {
   CATEGORIES: '/admin/categories',
   PRODUCTS: '/admin/products',
   ORDERS: '/admin/orders',
+  NOTIFICATIONS: '/admin/notifications',
+  ABANDONED_CARTS: '/admin/abandoned-carts',
   CUSTOMERS: '/admin/customers',
   BLOGS: '/admin/blogs',
   NEWSLETTER: '/admin/newsletter',

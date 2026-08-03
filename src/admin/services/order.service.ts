@@ -1,73 +1,91 @@
-import type { AdminOrder, OrderStatus, PaymentStatus, UpdateOrderStatusDTO } from '../types/order.types';
+import { apiClient } from './apiClient';
+import type { AdminOrder, CreateOrderDTO, UpdateOrderStatusDTO } from '../types/order.types';
 import type { PaginatedResponse, PaginationParams } from '../types/common.types';
-import { mockStorage } from './mockData';
 
 export interface OrderQueryParams extends PaginationParams {
-  status?: OrderStatus | 'all';
-  paymentStatus?: PaymentStatus | 'all';
+  orderStatus?: string;
+  paymentStatus?: string;
 }
 
+const unwrapData = <T>(response: any): T => {
+  return response.data?.data !== undefined ? response.data.data : response.data;
+};
+
+const mapOrder = (item: any): AdminOrder => ({
+  id: item._id ?? item.id,
+  orderNumber: item.orderNumber ?? 'GM-ORD-000',
+  customerName: item.customerName ?? 'Guest Customer',
+  phone: item.phone ?? '',
+  whatsapp: item.whatsapp ?? item.phone ?? '',
+  shippingAddress: item.shippingAddress || { street: '', city: '', state: '', country: 'India', pincode: '' },
+  cartItems: item.cartItems || [],
+  totalAmount: Number(item.totalAmount || 0),
+  orderDate: item.orderDate ?? item.createdAt ?? new Date().toISOString(),
+  orderStatus: item.orderStatus ?? 'PENDING',
+  paymentStatus: item.paymentStatus ?? 'PENDING',
+  source: item.source ?? 'WHATSAPP_WEB',
+  orderNotes: item.orderNotes,
+  generatedWhatsappMessage: item.generatedWhatsappMessage,
+  createdAt: item.createdAt ?? new Date().toISOString(),
+  updatedAt: item.updatedAt ?? item.createdAt ?? new Date().toISOString(),
+});
+
 export const orderService = {
+  async createOrder(dto: CreateOrderDTO): Promise<{ order: AdminOrder; whatsappUrl: string }> {
+    const response = await apiClient.post('/orders', dto);
+    const data = unwrapData<{ order: any; whatsappUrl: string }>(response);
+    return {
+      order: mapOrder(data.order),
+      whatsappUrl: data.whatsappUrl,
+    };
+  },
+
   async getOrders(params: OrderQueryParams = {}): Promise<PaginatedResponse<AdminOrder>> {
-    await new Promise((res) => setTimeout(res, 300));
-    let items = mockStorage.getOrders();
+    const response = await apiClient.get('/orders', {
+      params: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        search: params.search,
+        orderStatus: params.orderStatus && params.orderStatus !== 'all' ? params.orderStatus : undefined,
+        paymentStatus: params.paymentStatus && params.paymentStatus !== 'all' ? params.paymentStatus : undefined,
+      },
+    });
 
-    if (params.status && params.status !== 'all') {
-      items = items.filter((o) => o.status === params.status);
-    }
-
-    if (params.paymentStatus && params.paymentStatus !== 'all') {
-      items = items.filter((o) => o.paymentStatus === params.paymentStatus);
-    }
-
-    if (params.search) {
-      const q = params.search.toLowerCase();
-      items = items.filter(
-        (o) =>
-          o.orderNumber.toLowerCase().includes(q) ||
-          o.customerName.toLowerCase().includes(q) ||
-          o.customerEmail.toLowerCase().includes(q)
-      );
-    }
-
-    const page = params.page || 1;
-    const limit = params.limit || 10;
-    const total = items.length;
-    const totalPages = Math.ceil(total / limit) || 1;
-
-    const start = (page - 1) * limit;
-    const data = items.slice(start, start + limit);
+    const payload = unwrapData<{ orders: any[]; meta: { total: number; page: number; limit: number; totalPages: number } }>(response);
+    const orders = (payload.orders ?? []).map(mapOrder);
 
     return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages
+      data: orders,
+      total: payload.meta?.total ?? orders.length,
+      page: payload.meta?.page ?? (params.page || 1),
+      limit: payload.meta?.limit ?? (params.limit || 10),
+      totalPages: payload.meta?.totalPages ?? 1,
     };
   },
 
   async getOrderById(id: string): Promise<AdminOrder | null> {
-    await new Promise((res) => setTimeout(res, 200));
-    const items = mockStorage.getOrders();
-    return items.find((o) => o.id === id) || null;
+    const response = await apiClient.get(`/orders/${id}`);
+    return mapOrder(unwrapData<any>(response));
   },
 
   async updateOrderStatus(id: string, dto: UpdateOrderStatusDTO): Promise<AdminOrder> {
-    await new Promise((res) => setTimeout(res, 300));
-    const items = mockStorage.getOrders();
-    const index = items.findIndex((o) => o.id === id);
-    if (index === -1) throw new Error('Order not found');
+    const response = await apiClient.patch(`/orders/${id}/status`, dto);
+    return mapOrder(unwrapData<any>(response));
+  },
 
-    const updated: AdminOrder = {
-      ...items[index],
-      ...(dto.status ? { status: dto.status } : {}),
-      ...(dto.paymentStatus ? { paymentStatus: dto.paymentStatus } : {}),
-      updatedAt: new Date().toISOString()
-    };
+  async deleteOrder(id: string): Promise<void> {
+    await apiClient.delete(`/orders/${id}`);
+  },
 
-    items[index] = updated;
-    mockStorage.setOrders(items);
-    return updated;
-  }
+  async exportCsv(params: OrderQueryParams = {}): Promise<Blob> {
+    const response = await apiClient.get('/orders/export', {
+      params: {
+        search: params.search,
+        orderStatus: params.orderStatus && params.orderStatus !== 'all' ? params.orderStatus : undefined,
+        paymentStatus: params.paymentStatus && params.paymentStatus !== 'all' ? params.paymentStatus : undefined,
+      },
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };

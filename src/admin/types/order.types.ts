@@ -1,33 +1,53 @@
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-export type PaymentStatus = 'paid' | 'pending' | 'failed' | 'refunded';
+export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
+
+export interface ShippingAddressInfo {
+  street: string;
+  city: string;
+  state: string;
+  country?: string;
+  pincode: string;
+}
 
 export interface OrderItem {
-  id: string;
   productId: string;
-  productName: string;
-  productImage: string;
-  price: number;
+  title: string;
   quantity: number;
+  price: number;
+  image?: string;
 }
 
 export interface AdminOrder {
   id: string;
   orderNumber: string;
-  customerId: string;
   customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
-  shippingAddress: string;
-  items: OrderItem[];
+  phone: string;
+  whatsapp: string;
+  shippingAddress: ShippingAddressInfo;
+  cartItems: OrderItem[];
   totalAmount: number;
-  status: OrderStatus;
+  orderDate: string;
+  orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
-  paymentMethod: string;
+  source: string;
+  orderNotes?: string;
+  generatedWhatsappMessage?: string;
   createdAt: string;
   updatedAt: string;
 }
 
+export interface CreateOrderDTO {
+  customerName: string;
+  phone: string;
+  whatsapp: string;
+  shippingAddress: ShippingAddressInfo;
+  cartItems: OrderItem[];
+  totalAmount: number;
+  source?: string;
+  orderNotes?: string;
+}
+
 export interface UpdateOrderStatusDTO {
-  status?: OrderStatus;
+  orderStatus?: OrderStatus;
   paymentStatus?: PaymentStatus;
 }
