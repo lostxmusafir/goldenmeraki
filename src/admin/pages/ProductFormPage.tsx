@@ -6,6 +6,11 @@ import { useCategories } from '../hooks/useCategories';
 import { productService } from '../services/product.service';
 import type { CreateProductDTO, InventoryStatusType } from '../types/product.types';
 
+interface WidthSizeConfig {
+  size: string;
+  price?: number;
+}
+
 export function ProductFormPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -24,7 +29,11 @@ export function ProductFormPage() {
   const [image, setImage] = useState('');
   const [badge, setBadge] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
-  const [selectedWidthSizes, setSelectedWidthSizes] = useState<string[]>([]);
+  const [selectedWidthSizes, setSelectedWidthSizes] = useState<string[]>(['8 mm', '10 mm']);
+  const [widthSizesConfig, setWidthSizesConfig] = useState<WidthSizeConfig[]>([
+    { size: '8 mm', price: undefined },
+    { size: '10 mm', price: undefined },
+  ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +71,13 @@ export function ProductFormPage() {
         setIsFeatured(Boolean(product.isFeatured));
         const rawSizes = product.widthSizes || [];
         const sizes = rawSizes.map((s) => (typeof s === 'string' ? s : s.size));
-        setSelectedWidthSizes(sizes);
+        const configs = rawSizes.map((s) =>
+          typeof s === 'string' ? { size: s, price: undefined } : { size: s.size, price: s.price },
+        );
+        setSelectedWidthSizes(sizes.length > 0 ? sizes : ['8 mm', '10 mm']);
+        if (configs.length > 0) {
+          setWidthSizesConfig(configs);
+        }
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load product');
@@ -84,6 +99,14 @@ export function ProductFormPage() {
     setError(null);
 
     try {
+      const activeWidthSizes = selectedWidthSizes.map((size) => {
+        const conf = widthSizesConfig.find((w) => w.size === size);
+        return {
+          size,
+          price: conf?.price != null && conf.price > 0 ? Number(conf.price) : Number(price),
+        };
+      });
+
       const dto: CreateProductDTO = {
         name,
         categoryId: selectedCatId || categories[0]?.id || '',
@@ -97,7 +120,7 @@ export function ProductFormPage() {
         images: image ? [image] : [],
         badge: badge || undefined,
         isFeatured,
-        widthSizes: isBraceletProduct ? selectedWidthSizes : [],
+        widthSizes: isBraceletProduct ? activeWidthSizes : [],
       };
 
       if (isEdit && id) {
@@ -168,39 +191,69 @@ export function ProductFormPage() {
         </div>
 
         {isBraceletProduct && (
-          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-4 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-2">
+          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-4 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-3">
             <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
-              Width Sizes (Bracelet Product)
+              Width Sizes & Differential Pricing (Bracelet Product)
             </label>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Select one or multiple width sizes available for this bracelet product:
+              Enable options and set individual prices for 8 mm vs 10 mm (if left empty, base selling price applies):
             </p>
-            <div className="flex flex-wrap gap-4 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               {['8 mm', '10 mm'].map((size) => {
                 const isSelected = selectedWidthSizes.includes(size);
+                const currentConfig = widthSizesConfig.find((w) => w.size === size);
+                const customPrice = currentConfig?.price;
+
                 return (
-                  <label
+                  <div
                     key={size}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition cursor-pointer ${
+                    className={`rounded-xl border p-3.5 transition space-y-2.5 ${
                       isSelected
-                        ? 'border-amber-500 bg-amber-500 text-white shadow-sm'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
+                        ? 'border-amber-500 bg-white dark:bg-slate-900 dark:border-amber-500/80 shadow-sm'
+                        : 'border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 opacity-75'
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedWidthSizes((prev) => [...prev, size]);
-                        } else {
-                          setSelectedWidthSizes((prev) => prev.filter((s) => s !== size));
-                        }
-                      }}
-                      className="sr-only"
-                    />
-                    <span>{isSelected ? '✓' : '○'} {size}</span>
-                  </label>
+                    <label className="inline-flex items-center gap-2 font-semibold text-sm text-slate-800 dark:text-slate-200 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedWidthSizes((prev) => [...prev, size]);
+                          } else {
+                            setSelectedWidthSizes((prev) => prev.filter((s) => s !== size));
+                          }
+                        }}
+                        className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                      />
+                      <span>{size} Option</span>
+                    </label>
+
+                    {isSelected && (
+                      <div className="pt-1">
+                        <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                          Price for {size} (₹)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder={`Base Selling Price (₹${price || 0})`}
+                          value={customPrice ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value ? Number(e.target.value) : undefined;
+                            setWidthSizesConfig((prev) => {
+                              const existing = prev.find((w) => w.size === size);
+                              if (existing) {
+                                return prev.map((w) => (w.size === size ? { ...w, price: val } : w));
+                              }
+                              return [...prev, { size, price: val }];
+                            });
+                          }}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                        />
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
