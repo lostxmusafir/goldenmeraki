@@ -9,7 +9,7 @@ import { NotifyMeModal } from '../NotifyMeModal';
 export interface ProductInfoProps {
   product: Product;
   wishlist: string[];
-  onToggleWishlist: (productId: string) => void;
+  onToggleWishlist: (productId: string, productName?: string) => void;
   onAddToCart: (product: Product) => void;
   onBuyNow: (product: Product) => void;
   quantity: number;
@@ -228,7 +228,7 @@ export function ProductInfo({
       <div className="flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
-          onClick={() => onToggleWishlist(product.id)}
+          onClick={() => onToggleWishlist(product.id, product.name)}
           className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 transition ${
             isWishlisted
               ? 'border-slate-950 bg-slate-950 text-white'

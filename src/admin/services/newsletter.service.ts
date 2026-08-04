@@ -1,11 +1,17 @@
+import { apiClient } from './apiClient';
 import type { Subscriber } from '../types/newsletter.types';
 import type { PaginatedResponse, PaginationParams } from '../types/common.types';
-import { mockStorage } from './mockData';
 
 export const newsletterService = {
   async getSubscribers(params: PaginationParams = {}): Promise<PaginatedResponse<Subscriber>> {
-    await new Promise((res) => setTimeout(res, 300));
-    let items = mockStorage.getSubscribers();
+    const response = await apiClient.get('/newsletter');
+    const payload = response.data?.data ?? response.data;
+    let items = (payload ?? []).map((item: any) => ({
+      id: item._id ?? item.id,
+      email: item.email,
+      status: item.isSubscribed ? 'active' : 'inactive',
+      createdAt: item.createdAt ?? new Date().toISOString()
+    }));
 
     if (params.search) {
       const q = params.search.toLowerCase();
@@ -30,9 +36,6 @@ export const newsletterService = {
   },
 
   async deleteSubscriber(id: string): Promise<void> {
-    await new Promise((res) => setTimeout(res, 300));
-    const items = mockStorage.getSubscribers();
-    const next = items.filter((s) => s.id !== id);
-    mockStorage.setSubscribers(next);
+    await apiClient.delete(`/newsletter/${id}`);
   }
 };
