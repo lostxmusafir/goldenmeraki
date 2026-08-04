@@ -16,7 +16,6 @@ import {
   User,
   LogOut,
   Menu,
-  Sparkles,
   ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -63,8 +62,8 @@ export function AdminLayout() {
         <div className="space-y-6">
           {/* Top Brand Logo */}
           <Link to={ADMIN_ROUTES.DASHBOARD} className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold shadow-sm shrink-0">
-              <Sparkles className="w-5 h-5 text-amber-400" />
+            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold shadow-sm shrink-0">
+              G
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-lg tracking-tight text-slate-900">GoldenMeraki</span>

@@ -42,7 +42,7 @@ function normalizeCategory(raw: any): CatalogCategory {
   return {
     id: slug,
     name: raw?.name ?? 'Category',
-    icon: raw?.icon ?? 'Sparkles',
+    icon: raw?.icon ?? 'LayoutGrid',
     color: raw?.color ?? 'from-slate-500 to-slate-700',
     slug,
     description: raw?.description ?? '',
