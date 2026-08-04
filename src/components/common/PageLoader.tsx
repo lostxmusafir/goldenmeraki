@@ -12,12 +12,14 @@ export function PageLoader() {
             src={getImageUrl('/golden-meraki-logo.png')}
             alt="Loading..."
             className="loader-logo base-logo"
+            draggable={false}
           />
           {/* Colored logo that wipes in */}
           <img
             src={getImageUrl('/golden-meraki-logo.png')}
             alt="Loading..."
             className="loader-logo colored-logo"
+            draggable={false}
           />
           {/* Shimmer sweep effect */}
           <div className="shimmer-sweep"></div>
