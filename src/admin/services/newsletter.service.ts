@@ -15,7 +15,7 @@ export const newsletterService = {
 
     if (params.search) {
       const q = params.search.toLowerCase();
-      items = items.filter((s) => s.email.toLowerCase().includes(q));
+      items = items.filter((s: Subscriber) => s.email.toLowerCase().includes(q));
     }
 
     const page = params.page || 1;

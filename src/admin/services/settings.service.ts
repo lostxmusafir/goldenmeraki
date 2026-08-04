@@ -12,14 +12,15 @@ export const settingsService = {
       return unwrapData<any>(response).value;
     } catch (error) {
       return {
-        storeName: 'GoldenMeraki',
-        storeEmail: 'contact@goldenmeraki.com',
-        supportPhone: '+91 99999 99999',
+        siteName: 'GoldenMeraki',
+        siteEmail: 'contact@goldenmeraki.com',
+        contactPhone: '+91 99999 99999',
         currency: 'INR',
-        taxRate: 18,
-        shippingFee: 100,
-        freeShippingThreshold: 1500,
-        maintenanceMode: false
+        metaTitle: 'GoldenMeraki - Crystal Trees & Natural Gemstones',
+        metaDescription: 'Discover beautifully handcrafted sacred crystal trees, raw gemstone clusters, energy bracelets, and silver jewelry at GoldenMeraki.',
+        socialInstagram: 'https://instagram.com/goldenmeraki',
+        socialFacebook: 'https://facebook.com/goldenmeraki',
+        socialPinterest: 'https://pinterest.com/goldenmeraki'
       };
     }
   },

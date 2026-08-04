@@ -24,7 +24,7 @@ export const blogService = {
 
     if (params.search) {
       const q = params.search.toLowerCase();
-      items = items.filter((b) => b.title.toLowerCase().includes(q) || b.excerpt.toLowerCase().includes(q));
+      items = items.filter((b: Blog) => b.title.toLowerCase().includes(q) || b.excerpt.toLowerCase().includes(q));
     }
 
     const page = params.page || 1;

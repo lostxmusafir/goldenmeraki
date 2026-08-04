@@ -20,7 +20,7 @@ export const contactService = {
     if (params.search) {
       const q = params.search.toLowerCase();
       items = items.filter(
-        (m) =>
+        (m: ContactMessage) =>
           m.name.toLowerCase().includes(q) ||
           m.email.toLowerCase().includes(q) ||
           m.subject.toLowerCase().includes(q) ||
