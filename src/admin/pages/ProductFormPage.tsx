@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, ShoppingBag } from 'lucide-react';
-import { ImageUpload } from '../components/common/ImageUpload';
+import { ProductImagesManager, type ProductImageItem } from '../components/common/ProductImagesManager';
 import { useCategories } from '../hooks/useCategories';
 import { productService } from '../services/product.service';
 import type { CreateProductDTO, InventoryStatusType } from '../types/product.types';
@@ -26,7 +26,7 @@ export function ProductFormPage() {
   const [inventoryStatus, setInventoryStatus] = useState<InventoryStatusType>('IN_STOCK');
   const [prodStatus, setProdStatus] = useState<'active' | 'draft'>('active');
   const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
+  const [images, setImages] = useState<ProductImageItem[]>([]);
   const [badge, setBadge] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
   const [selectedWidthSizes, setSelectedWidthSizes] = useState<string[]>(['8 mm', '10 mm']);
@@ -66,7 +66,7 @@ export function ProductFormPage() {
         setInventoryStatus(product.inventoryStatus || (product.stock > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK'));
         setProdStatus(product.status);
         setDescription(product.description || '');
-        setImage(product.images[0] || '');
+        setImages((product.images || []).map((url) => ({ id: url, url })));
         setBadge(product.badge || '');
         setIsFeatured(Boolean(product.isFeatured));
         const rawSizes = product.widthSizes || [];
@@ -117,16 +117,54 @@ export function ProductFormPage() {
         inventoryStatus,
         status: prodStatus,
         description,
-        images: image ? [image] : [],
+        images: images.map((img) => img.url),
         badge: badge || undefined,
         isFeatured,
         widthSizes: isBraceletProduct ? activeWidthSizes : [],
       };
 
       if (isEdit && id) {
+        const dto: CreateProductDTO = {
+          name,
+          categoryId: selectedCatId || categories[0]?.id || '',
+          price: Number(price),
+          originalPrice: originalPrice != null ? Number(originalPrice) : undefined,
+          discountPrice: discountPrice ? Number(discountPrice) : undefined,
+          stock: Number(stock),
+          inventoryStatus,
+          status: prodStatus,
+          description,
+          images: images.map((img) => img.url),
+          badge: badge || undefined,
+          isFeatured,
+          widthSizes: isBraceletProduct ? activeWidthSizes : [],
+        };
         await productService.updateProduct(id, dto);
       } else {
-        await productService.createProduct(dto);
+        const dto: CreateProductDTO = {
+          name,
+          categoryId: selectedCatId || categories[0]?.id || '',
+          price: Number(price),
+          originalPrice: originalPrice != null ? Number(originalPrice) : undefined,
+          discountPrice: discountPrice ? Number(discountPrice) : undefined,
+          stock: Number(stock),
+          inventoryStatus,
+          status: prodStatus,
+          description,
+          images: [], // start empty
+          badge: badge || undefined,
+          isFeatured,
+          widthSizes: isBraceletProduct ? activeWidthSizes : [],
+        };
+        const createdProduct = await productService.createProduct(dto);
+        const newProductId = createdProduct.id;
+
+        // Upload all local images sequentially
+        for (const item of images) {
+          if (item.file) {
+            await productService.uploadImage(newProductId, item.file);
+          }
+        }
       }
       navigate('/admin/products');
     } catch (err) {
@@ -368,7 +406,22 @@ export function ProductFormPage() {
           </div>
         </div>
 
-        <ImageUpload label="Product Main Image" value={image} onChange={setImage} />
+        <ProductImagesManager
+          productId={id}
+          images={images}
+          onChange={setImages}
+          onRefreshProduct={
+            id
+              ? () => {
+                  productService.getProductById(id).then((p) => {
+                    if (p) {
+                      setImages((p.images || []).map((url) => ({ id: url, url })));
+                    }
+                  });
+                }
+              : undefined
+          }
+        />
 
         <div>
           <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Product Description</label>

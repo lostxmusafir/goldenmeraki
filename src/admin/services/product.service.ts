@@ -138,4 +138,39 @@ export const productService = {
     const response = await apiClient.post(`/products/${productId}/notify`, data);
     return response.data;
   },
+
+  async uploadImage(id: string, file: File): Promise<AdminProduct> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post(`/products/${id}/images/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return mapProduct(unwrapData<any>(response));
+  },
+
+  async replaceImage(id: string, oldImageUrl: string, file: File): Promise<AdminProduct> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('oldImageUrl', oldImageUrl);
+    const response = await apiClient.put(`/products/${id}/images/replace`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return mapProduct(unwrapData<any>(response));
+  },
+
+  async reorderImages(id: string, images: string[]): Promise<AdminProduct> {
+    const response = await apiClient.put(`/products/${id}/images/reorder`, { images });
+    return mapProduct(unwrapData<any>(response));
+  },
+
+  async deleteImage(id: string, imageUrl: string): Promise<AdminProduct> {
+    const response = await apiClient.delete(`/products/${id}/images`, {
+      params: { imageUrl },
+    });
+    return mapProduct(unwrapData<any>(response));
+  },
 };
