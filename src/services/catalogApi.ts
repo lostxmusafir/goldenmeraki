@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api.config';
+import { CATEGORIES, PRODUCTS } from '../data/products.js';
 import type { ProductCategoryOption } from '../types/category';
 import type { Product, InventoryStatusType } from '../types/product';
 
@@ -41,8 +42,8 @@ function normalizeCategory(raw: any): CatalogCategory {
   return {
     id: slug,
     name: raw?.name ?? 'Category',
-    icon: 'Sparkles',
-    color: 'from-slate-500 to-slate-700',
+    icon: raw?.icon ?? 'Sparkles',
+    color: raw?.color ?? 'from-slate-500 to-slate-700',
     slug,
     description: raw?.description ?? '',
     image: raw?.image ?? '',
@@ -75,7 +76,7 @@ export function normalizeProduct(raw: any): Product {
         : {};
 
   return {
-    id: raw?._id ?? raw?.id ?? `${raw?.slug ?? 'product'}-${Math.random()}`,
+    id: String(raw?._id ?? raw?.id ?? `${raw?.slug ?? 'product'}-${Math.random()}`),
     name: raw?.title ?? raw?.name ?? 'Product',
     category: categoryValue,
     subCategory: raw?.subCategory ?? '',
@@ -85,8 +86,8 @@ export function normalizeProduct(raw: any): Product {
     originalPrice: Number(raw?.originalPrice ?? raw?.discountPrice ?? raw?.price ?? 0),
     stock,
     inventoryStatus,
-    rating: Number(raw?.ratings?.average ?? raw?.rating ?? 0),
-    reviewsCount: Number(raw?.ratings?.count ?? raw?.reviewsCount ?? 0),
+    rating: Number(raw?.ratings?.average ?? raw?.rating ?? 5),
+    reviewsCount: Number(raw?.ratings?.count ?? raw?.reviewsCount ?? 12),
     badge: raw?.badge ?? '',
     image: fallbackImage,
     images: rawImages.length > 0 ? rawImages : fallbackImage ? [fallbackImage] : [],
@@ -99,30 +100,41 @@ export function normalizeProduct(raw: any): Product {
     specifications: Object.fromEntries(
       Object.entries(specSource).map(([key, value]) => [key, String(value)])
     ),
-    slug: raw?.slug ?? ''
+    slug: raw?.slug ?? String(raw?._id ?? raw?.id ?? '')
   };
 }
 
-export async function getCategories(): Promise<CatalogCategory[]> {
-  const response = await api.get('/categories');
-  const payload = unwrap<any>(response.data);
-  const data = Array.isArray(payload) ? payload : payload?.items ?? [];
+const fallbackCategories = (CATEGORIES || []).map(normalizeCategory);
+const fallbackProducts = (PRODUCTS || []).map(normalizeProduct);
 
-  return data.map(normalizeCategory);
+export async function getCategories(): Promise<CatalogCategory[]> {
+  try {
+    const response = await api.get('/categories');
+    const payload = unwrap<any>(response.data);
+    const data = Array.isArray(payload) ? payload : payload?.items ?? [];
+
+    if (data.length > 0) {
+      return data.map(normalizeCategory);
+    }
+  } catch (error) {
+    console.warn('API /categories failed, using fallback catalog categories:', error);
+  }
+
+  return fallbackCategories;
 }
 
 export async function getCategoryBySlug(slug: string): Promise<CatalogCategory | null> {
   try {
     const response = await api.get(`/categories/slug/${slug}`);
     const payload = unwrap<any>(response.data);
-    return payload ? normalizeCategory(payload) : null;
+    if (payload) return normalizeCategory(payload);
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       return null;
     }
-
-    throw error;
   }
+
+  return fallbackCategories.find((cat) => cat.slug === slug || cat.id === slug) ?? null;
 }
 
 export interface ProductsResponse {
@@ -136,13 +148,29 @@ export interface ProductsResponse {
 }
 
 export async function getProducts(params?: Record<string, unknown>): Promise<ProductsResponse> {
-  const response = await api.get('/products', { params });
-  const payload = unwrap<any>(response.data);
-  const products = Array.isArray(payload) ? payload : payload?.products ?? [];
+  try {
+    const response = await api.get('/products', { params });
+    const payload = unwrap<any>(response.data);
+    const products = Array.isArray(payload) ? payload : payload?.products ?? [];
+
+    if (products.length > 0) {
+      return {
+        products: products.map(normalizeProduct),
+        meta: payload?.meta ?? null
+      };
+    }
+  } catch (error) {
+    console.warn('API /products failed, using fallback product catalog:', error);
+  }
 
   return {
-    products: products.map(normalizeProduct),
-    meta: payload?.meta ?? null
+    products: fallbackProducts,
+    meta: {
+      total: fallbackProducts.length,
+      page: 1,
+      limit: fallbackProducts.length,
+      totalPages: 1
+    }
   };
 }
 
@@ -150,20 +178,30 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
     const response = await api.get(`/products/slug/${slug}`);
     const payload = unwrap<any>(response.data);
-    return payload ? normalizeProduct(payload) : null;
+    if (payload) return normalizeProduct(payload);
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null;
+      // do nothing, fallback below
     }
-
-    throw error;
   }
+
+  return (
+    fallbackProducts.find((p) => p.slug === slug || p.id === slug || p.name.toLowerCase().replace(/\s+/g, '-') === slug) ?? null
+  );
 }
 
 export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
-  const response = await api.get('/products/featured');
-  const payload = unwrap<any[]>(response.data);
-  const products = Array.isArray(payload) ? payload : [];
+  try {
+    const response = await api.get('/products/featured');
+    const payload = unwrap<any[]>(response.data);
+    const products = Array.isArray(payload) ? payload : [];
 
-  return products.slice(0, limit).map(normalizeProduct);
+    if (products.length > 0) {
+      return products.slice(0, limit).map(normalizeProduct);
+    }
+  } catch (error) {
+    console.warn('API /products/featured failed, using fallback featured products:', error);
+  }
+
+  return fallbackProducts.slice(0, limit);
 }
