@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { apiClient } from './apiClient';
 import type { AdminUser, AuthResponse, LoginCredentials } from '../types/auth.types';
 import { tokenStorage } from '../utils/tokenStorage';
 
@@ -17,7 +17,7 @@ function normalizeUser(user: any): AdminUser {
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/login`, {
+    const response = await apiClient.post('/auth/login', {
       email: credentials.email,
       password: credentials.password
     });
@@ -44,11 +44,7 @@ export const authService = {
 
   async logout(): Promise<void> {
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/logout`, {}, {
-        headers: {
-          Authorization: `Bearer ${tokenStorage.getToken()}`
-        }
-      });
+      await apiClient.post('/auth/logout');
     } catch {
       // Ignore logout failures and clear local storage anyway.
     }
@@ -62,11 +58,7 @@ export const authService = {
       throw new Error('Unauthenticated');
     }
 
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await apiClient.get('/auth/me');
 
     const payload = response.data?.data ?? response.data;
     const user = normalizeUser(payload);
@@ -80,7 +72,7 @@ export const authService = {
       throw new Error('No refresh token available');
     }
 
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/refresh`, {
+    const response = await apiClient.post('/auth/refresh', {
       refreshToken
     });
 

@@ -1,13 +1,8 @@
 import axios from 'axios';
+import { API_CONFIG } from '../../config/api.config';
 import { tokenStorage } from '../utils/tokenStorage';
 
-export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  timeout: 15000
-});
+export const apiClient = axios.create(API_CONFIG);
 
 apiClient.interceptors.request.use(
   (config) => {

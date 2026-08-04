@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api.config';
 import type { ProductCategoryOption } from '../types/category';
 import type { Product, InventoryStatusType } from '../types/product';
-
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
