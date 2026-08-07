@@ -66,8 +66,7 @@ export function TopCategories() {
                 />
               </div>
               <div className="px-4 py-4">
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{(category.slug ?? category.id).replace('-', ' ')}</div>
-                <div className="mt-1 text-sm font-medium text-slate-950">{category.name}</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{category.name}</div>
               </div>
             </Link>
           ))}

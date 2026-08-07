@@ -80,12 +80,7 @@ export const MASTER_TAXONOMY: TaxonomyCategory[] = [
 ];
 
 export const CATEGORIES: ProductCategoryOption[] = [
-  { id: 'all', name: 'All Products', icon: 'LayoutGrid', color: 'from-violet-500 to-indigo-600' },
-  { id: 'bracelets', name: 'Energy Bracelets', icon: 'CircleDot', color: 'from-amber-400 to-emerald-500' },
-  { id: 'raw-stones', name: 'Raw Crystals & Clusters', icon: 'Gem', color: 'from-cyan-400 to-blue-600' },
-  { id: 'trees-decor', name: 'Gemstone Trees & Decor', icon: 'TreeEvergreen', color: 'from-emerald-400 to-teal-600' },
-  { id: 'malas-jewelry', name: 'Jaap Malas & Silver Jewelry', icon: 'Flame', color: 'from-purple-500 to-pink-500' },
-  { id: 'face-wellness', name: 'Facial Gua Sha & Wellness', icon: 'HeartHandshake', color: 'from-pink-400 to-rose-500' }
+  { id: 'all', name: 'All Products', icon: 'LayoutGrid', color: 'from-violet-500 to-indigo-600' }  
 ];
 
 export const INTENTIONS: IntentionOption[] = [

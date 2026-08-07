@@ -23,10 +23,6 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                 <img src={getImageUrl(product.image)} alt={product.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
               <div className="space-y-2 p-4">
-                <div className="flex items-center gap-1 text-sm text-amber-500">
-                  <Star className="h-4 w-4 fill-current" />
-                  <span className="font-medium text-slate-900">{product.rating}</span>
-                </div>
                 <div className="text-sm font-medium text-slate-950">{product.name}</div>
                 <div className="text-sm text-slate-600">{formatCurrency(product.price)}</div>
               </div>

@@ -11,34 +11,9 @@ export interface CategoryBannerProps {
 
 const CATEGORY_COPY: Record<string, { eyebrow: string; description: string; image: string }> = {
   all: {
-    eyebrow: 'All collections',
+    eyebrow: '',
     description: 'A refined overview of every crystal, bracelet, and ritual piece in the store.',
     image: '/images/pyrite_cluster.png'
-  },
-  bracelets: {
-    eyebrow: 'Bracelets',
-    description: 'Minimal gemstone bracelets designed to look polished and feel effortless.',
-    image: '/images/seven_chakra_bracelet.png'
-  },
-  'raw-stones': {
-    eyebrow: 'Raw stones',
-    description: 'Curated raw crystals, clusters, and grounding stones with an elevated presentation.',
-    image: '/images/pyrite_cluster.png'
-  },
-  'trees-decor': {
-    eyebrow: 'Home decor',
-    description: 'Sculptural objects that bring structure, ritual, and calm to the space around you.',
-    image: '/images/fengshui_crystal_tree.png'
-  },
-  'malas-jewelry': {
-    eyebrow: 'Jewelry',
-    description: 'A concise edit of malas and spiritual jewelry in a premium visual language.',
-    image: '/images/amethyst_jaap_mala.png'
-  },
-  'face-wellness': {
-    eyebrow: 'Wellness tools',
-    description: 'Facial and wellness objects selected for everyday self-care and gifting.',
-    image: '/images/rose_quartz_guasha.png'
   }
 };
 

@@ -63,7 +63,7 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
                 <Link to={`/product/${productSlug(product)}`} className="block">
                   <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
                     <img src={getImageUrl(product.image)} alt={product.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                    <button
+                    {/* <button
                       type="button"
                       onClick={(event) => {
                         event.preventDefault();
@@ -73,7 +73,7 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
                       aria-label="Toggle wishlist"
                     >
                       <Heart className={`h-4.5 w-4.5 ${isWishlisted ? 'fill-current text-rose-500' : ''}`} />
-                    </button>
+                    </button> */}
                     <div className="absolute left-3 top-3 rounded-full bg-slate-950 px-2.5 py-1 text-[11px] font-medium text-white">
                       Best seller
                     </div>
@@ -81,11 +81,6 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
                 </Link>
                 <div className="space-y-4 p-5">
                   <div>
-                    <div className="flex items-center gap-1 text-sm text-amber-500">
-                      <Star className="h-4 w-4 fill-current" />
-                      <span className="font-medium text-slate-900">{product.rating || 5}</span>
-                      <span className="text-slate-400">({product.reviewsCount || 0})</span>
-                    </div>
                     <Link to={`/product/${productSlug(product)}`} className="mt-2 block text-base font-medium leading-6 text-slate-950">
                       {product.name}
                     </Link>
