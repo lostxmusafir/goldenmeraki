@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { ADMIN_ROUTES } from '../constants/admin.constants';
 
 export function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -16,7 +16,7 @@ export function ProtectedRoute() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || user?.role !== 'admin') {
     return <Navigate to={ADMIN_ROUTES.LOGIN} replace />;
   }
 

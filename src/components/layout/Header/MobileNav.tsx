@@ -1,4 +1,4 @@
-import { Compass, Menu, Sparkles, X } from 'lucide-react';
+import { Compass, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { MASTER_TAXONOMY } from './data';
 import type { MobileNavProps } from './types';
@@ -63,7 +63,6 @@ export function MobileNav({ selectedCategory, setSelectedCategory, onOpenQuiz, o
               }}
               className="w-full flex items-center justify-center space-x-2 p-2.5 rounded-xl bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200"
             >
-              <Sparkles className="w-4 h-4 text-amber-600" />
               <span>Custom Bracelet Studio</span>
             </button>
           </div>

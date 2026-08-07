@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Lock, Mail, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { ADMIN_ROUTES } from '../constants/admin.constants';
 
@@ -39,9 +39,6 @@ export function Login() {
       <div className="relative w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
         {/* Brand header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/20">
-            <Sparkles className="w-7 h-7" />
-          </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">GoldenMeraki</h1>
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 mt-1">Admin Panel Access</p>
         </div>

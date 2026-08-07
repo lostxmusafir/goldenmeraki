@@ -7,7 +7,7 @@ import { getImageUrl } from '../../utils/image';
 export interface ProductGridProps {
   products: Product[];
   wishlist: string[];
-  onToggleWishlist: (productId: string) => void;
+  onToggleWishlist: (productId: string, productName?: string) => void;
   onAddToCart: (product: Product) => void;
 }
 
@@ -25,7 +25,7 @@ export function ProductGrid({ products, wishlist, onToggleWishlist, onAddToCart 
                   type="button"
                   onClick={(event) => {
                     event.preventDefault();
-                    onToggleWishlist(product.id);
+                    onToggleWishlist(product.id, product.name);
                   }}
                   className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm backdrop-blur-md transition-colors hover:text-rose-600"
                   aria-label="Toggle wishlist"

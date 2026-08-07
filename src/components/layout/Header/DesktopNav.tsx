@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Compass, ShieldCheck, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronRight, Compass, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import { MASTER_TAXONOMY } from './data';
 import { MegaMenu } from './MegaMenu';
@@ -108,7 +108,7 @@ export function DesktopNav({ selectedCategory, setSelectedCategory, onOpenBuilde
             onClick={onOpenBuilder}
             className="px-3 py-1.5 rounded-lg text-amber-800 font-extrabold hover:bg-amber-100 transition-colors"
           >
-            ✨ Custom Studio
+            Custom Studio
           </button>
         </div>
 

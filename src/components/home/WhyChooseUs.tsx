@@ -1,4 +1,4 @@
-import { ShieldCheck, Truck, Sparkles, Leaf } from 'lucide-react';
+import { ShieldCheck, Truck, Gift, Leaf } from 'lucide-react';
 
 const POINTS = [
   {
@@ -12,7 +12,7 @@ const POINTS = [
     description: 'A premium delivery experience with thoughtful packaging.'
   },
   {
-    icon: Sparkles,
+    icon: Gift,
     title: 'Refined gifting ready',
     description: 'Minimal presentation designed to feel elevated from the start.'
   },

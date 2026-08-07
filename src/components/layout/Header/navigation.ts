@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Gem, Gift, Globe2, Sparkles, BookOpen, Crown, Leaf } from 'lucide-react';
+import { Gem, Gift, Globe2, BookOpen, Crown, Leaf, Layers } from 'lucide-react';
 import type { ProductCategoryId } from '../../../types/product';
 
 export type NavigationItemType = 'link' | 'category' | 'mega';
@@ -67,7 +67,7 @@ export const MAIN_NAVIGATION: NavigationItem[] = [
     label: 'Collections',
     href: '#collections',
     type: 'mega',
-    icon: Sparkles,
+    icon: Layers,
     featured: {
       label: 'Featured Collection',
       title: 'The Golden Meridian Edit',

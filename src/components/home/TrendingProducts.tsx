@@ -8,7 +8,7 @@ import { getProducts } from '../../services/catalogApi';
 
 export interface TrendingProductsProps {
   onAddToCart: (product: Product) => void;
-  onToggleWishlist: (productId: string) => void;
+  onToggleWishlist: (productId: string, productName?: string) => void;
   wishlist: string[];
 }
 
@@ -67,7 +67,7 @@ export function TrendingProducts({ onAddToCart, onToggleWishlist, wishlist }: Tr
                       type="button"
                       onClick={(event) => {
                         event.preventDefault();
-                        onToggleWishlist(product.id);
+                        onToggleWishlist(product.id, product.name);
                       }}
                       className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm backdrop-blur-md transition-colors hover:text-rose-600"
                       aria-label="Toggle wishlist"

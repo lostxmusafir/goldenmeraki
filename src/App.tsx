@@ -7,7 +7,6 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { ThankYouPage } from './pages/ThankYouPage';
 import { HomePage } from './pages/HomePage';
 import { ProductPage } from './pages/ProductPage';
-import { PRODUCTS } from './data/products';
 import { PageLoader } from './components/common/PageLoader';
 import type { CartItem } from './types/cart';
 import type { Product } from './types/product';
@@ -37,7 +36,7 @@ interface AppShellProps {
   onSelectProduct: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   onBuyNow: (product: Product) => void;
-  onToggleWishlist: (productId: string) => void;
+  onToggleWishlist: (productId: string, productName?: string) => void;
   wishlist: string[];
   cartItems: CartItem[];
   onUpdateQuantity: (productId: string, quantity: number) => void;
@@ -74,7 +73,7 @@ function ThankYouRoute(props: AppShellProps) {
 export function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const products = useMemo(() => PRODUCTS as unknown as Product[], []);
+
 
   const [isAppLoading, setIsAppLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -151,15 +150,14 @@ export function App() {
     setCartItems([]);
   };
 
-  const handleToggleWishlist = (productId: string) => {
+  const handleToggleWishlist = (productId: string, productName?: string) => {
     setWishlist((prev) => {
       const exists = prev.includes(productId);
       const next = exists ? prev.filter((id) => id !== productId) : [...prev, productId];
-      const product = products.find((item) => item.id === productId);
 
       setToast({
         type: 'wishlist',
-        message: exists ? 'Removed from wishlist.' : `Saved ${product?.name ?? 'item'} to wishlist.`
+        message: exists ? 'Removed from wishlist.' : `Saved ${productName ?? 'item'} to wishlist.`
       });
 
       return next;

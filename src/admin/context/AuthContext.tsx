@@ -39,6 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const response = await authService.login(credentials);
+      if (response.user.role !== 'admin') {
+        tokenStorage.clear();
+        throw new Error('Access denied. Only administrators are allowed to access the admin panel.');
+      }
       setUser(response.user);
     } finally {
       setIsLoading(false);

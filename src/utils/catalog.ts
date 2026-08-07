@@ -1,5 +1,4 @@
 import { CATEGORIES } from '../data/navigation';
-import { PRODUCTS } from '../data/products';
 import type { Product, ProductCategoryId } from '../types/product';
 
 export function slugify(value: string): string {
@@ -19,10 +18,6 @@ export function categorySlug(categoryId: ProductCategoryId): string {
   return categoryId;
 }
 
-export function findProductBySlug(slug: string): Product | undefined {
-  return (PRODUCTS as any[]).find((product) => productSlug(product) === slug);
-}
-
 export function findCategoryBySlug(slug: string) {
   return CATEGORIES.find((category) => category.id === slug);
 }
@@ -30,27 +25,6 @@ export function findCategoryBySlug(slug: string) {
 export function getCategoryTitle(slug: string): string {
   const category = findCategoryBySlug(slug);
   return category?.name ?? 'Collection';
-}
-
-export function getBestSellers(limit = 8): Product[] {
-  return [...(PRODUCTS as any[])]
-    .sort((a, b) => (b.rating || 0) - (a.rating || 0) || (b.reviewsCount || 0) - (a.reviewsCount || 0))
-    .slice(0, limit);
-}
-
-export function getRelatedProducts(currentProduct: Product, limit = 4): Product[] {
-  return [...(PRODUCTS as any[])]
-    .filter(
-      (product) =>
-        product.id !== currentProduct.id &&
-        (product.category === currentProduct.category || (product.intention && product.intention === currentProduct.intention))
-    )
-    .slice(0, limit);
-}
-
-export function filterProductsByCategory(slug: string): Product[] {
-  if (slug === 'all') return PRODUCTS as any[];
-  return (PRODUCTS as any[]).filter((product) => product.category === slug);
 }
 
 export function formatCurrency(value: number): string {
