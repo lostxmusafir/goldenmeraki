@@ -22,18 +22,18 @@ import { useAuth } from '../hooks/useAuth';
 import { ADMIN_ROUTES } from '../constants/admin.constants';
 
 const NAVIGATION_ITEMS = [
-  { name: 'Dashboard', path: ADMIN_ROUTES.DASHBOARD, icon: LayoutDashboard },
+  // { name: 'Dashboard', path: ADMIN_ROUTES.DASHBOARD, icon: LayoutDashboard },
   { name: 'Categories', path: ADMIN_ROUTES.CATEGORIES, icon: Layers },
   { name: 'Products', path: ADMIN_ROUTES.PRODUCTS, icon: ShoppingBag },
-  { name: 'Orders', path: ADMIN_ROUTES.ORDERS, icon: ShoppingCart },
-  { name: 'Notifications', path: ADMIN_ROUTES.NOTIFICATIONS, icon: Bell },
-  { name: 'Abandoned Carts', path: ADMIN_ROUTES.ABANDONED_CARTS, icon: RefreshCcw },
-  { name: 'Customers', path: ADMIN_ROUTES.CUSTOMERS, icon: Users },
-  { name: 'Blogs', path: ADMIN_ROUTES.BLOGS, icon: FileText },
-  { name: 'Newsletter', path: ADMIN_ROUTES.NEWSLETTER, icon: Mail },
-  { name: 'Contact Messages', path: ADMIN_ROUTES.CONTACT, icon: MessageSquare },
-  { name: 'Banners', path: ADMIN_ROUTES.BANNERS, icon: ImageIcon },
-  { name: 'Settings', path: ADMIN_ROUTES.SETTINGS, icon: Settings },
+  // { name: 'Orders', path: ADMIN_ROUTES.ORDERS, icon: ShoppingCart },
+  // { name: 'Notifications', path: ADMIN_ROUTES.NOTIFICATIONS, icon: Bell },
+  // { name: 'Abandoned Carts', path: ADMIN_ROUTES.ABANDONED_CARTS, icon: RefreshCcw },
+  // { name: 'Customers', path: ADMIN_ROUTES.CUSTOMERS, icon: Users },
+  // { name: 'Blogs', path: ADMIN_ROUTES.BLOGS, icon: FileText },
+  // { name: 'Newsletter', path: ADMIN_ROUTES.NEWSLETTER, icon: Mail },
+  // { name: 'Contact Messages', path: ADMIN_ROUTES.CONTACT, icon: MessageSquare },
+  // { name: 'Banners', path: ADMIN_ROUTES.BANNERS, icon: ImageIcon },
+  // { name: 'Settings', path: ADMIN_ROUTES.SETTINGS, icon: Settings },
   { name: 'Profile', path: ADMIN_ROUTES.PROFILE, icon: User }
 ];
 
