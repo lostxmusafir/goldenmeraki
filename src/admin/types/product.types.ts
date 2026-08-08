@@ -17,6 +17,8 @@ export interface AdminProduct {
   badge?: string;
   isFeatured?: boolean;
   isActive?: boolean;
+  intention?: string;
+  chakra?: string;
   widthSizes?: (string | { size: string; price?: number; stock?: number })[];
   ratings?: {
     average: number;
@@ -41,6 +43,8 @@ export interface CreateProductDTO {
   badge?: string;
   isFeatured?: boolean;
   isActive?: boolean;
+  intention?: string;
+  chakra?: string;
   widthSizes?: (string | { size: string; price?: number; stock?: number })[];
 }
 

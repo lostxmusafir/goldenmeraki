@@ -56,7 +56,7 @@ export function AdminLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F4F5F7] text-slate-900 flex font-sans">
+    <div className="h-screen overflow-hidden bg-[#F4F5F7] text-slate-900 flex font-sans">
       {/* Single Clean Left Sidebar */}
       <aside className="w-64 bg-[#EBECEE] border-r border-slate-300/80 hidden lg:flex flex-col py-6 px-4 shrink-0 justify-between">
         <div className="space-y-6">
@@ -171,7 +171,7 @@ export function AdminLayout() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 pt-14 lg:pt-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden pt-14 lg:pt-0">
         {/* Simple Top Breadcrumb Header */}
         <header className="h-14 bg-white border-b border-slate-200 px-6 lg:px-10 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500">

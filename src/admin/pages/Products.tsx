@@ -7,7 +7,7 @@ import type { AdminProduct, InventoryStatusType } from '../types/product.types';
 
 export function Products() {
   const navigate = useNavigate();
-  const { categories } = useCategories();
+  const { categories } = useCategories({ initialLimit: 1000 });
 
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -33,6 +33,7 @@ export function Products() {
         inventoryStatus: inventoryFilter,
         page: 1,
         limit: 500,
+        includeInactive: true,
       })
       .then((res) => {
         setProducts(res.data);

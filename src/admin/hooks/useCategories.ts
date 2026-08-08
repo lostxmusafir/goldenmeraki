@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Category, CreateCategoryDTO, UpdateCategoryDTO } from '../types/category.types';
 import { categoryService } from '../services/category.service';
 
-export function useCategories() {
+export function useCategories({ initialLimit = 10 } = {}) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(initialLimit);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);

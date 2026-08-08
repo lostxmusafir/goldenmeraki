@@ -6,6 +6,7 @@ export interface ProductQueryParams extends PaginationParams {
   categoryId?: string;
   status?: string;
   inventoryStatus?: string;
+  includeInactive?: boolean;
 }
 
 const unwrapData = <T>(response: any): T => {
@@ -36,6 +37,8 @@ const mapProduct = (item: any): AdminProduct => {
     badge: item.badge ?? undefined,
     isFeatured: Boolean(item.isFeatured),
     isActive: item.isActive !== false,
+    intention: item.intention ?? '',
+    chakra: item.chakra ?? '',
     widthSizes: item.widthSizes ?? [],
     ratings: item.ratings ? { average: Number(item.ratings.average || 0), count: Number(item.ratings.count || 0) } : undefined,
     createdAt: item.createdAt ?? new Date().toISOString(),
@@ -53,6 +56,7 @@ export const productService = {
         category: params.categoryId && params.categoryId !== 'all' ? params.categoryId : undefined,
         inventoryStatus: params.inventoryStatus && params.inventoryStatus !== 'all' ? params.inventoryStatus : undefined,
         isActive: params.status && params.status !== 'all' ? (params.status === 'active') : undefined,
+        includeInactive: params.includeInactive,
       },
     });
 
@@ -87,6 +91,8 @@ export const productService = {
       images: dto.images ?? [],
       isFeatured: dto.isFeatured,
       isActive: dto.status !== 'draft',
+      intention: dto.intention,
+      chakra: dto.chakra,
       widthSizes: dto.widthSizes,
     });
 
@@ -107,6 +113,8 @@ export const productService = {
       images: dto.images ?? undefined,
       isFeatured: dto.isFeatured,
       isActive: dto.status !== undefined ? (dto.status !== 'draft') : undefined,
+      intention: dto.intention,
+      chakra: dto.chakra,
       widthSizes: dto.widthSizes,
     });
 

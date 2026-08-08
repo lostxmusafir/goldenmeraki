@@ -15,7 +15,7 @@ export function ProductFormPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id && id !== 'new');
-  const { categories, loading: categoriesLoading } = useCategories();
+  const { categories, loading: categoriesLoading } = useCategories({ initialLimit: 1000 });
 
   const [name, setName] = useState('');
   const [selectedCatId, setSelectedCatId] = useState('');
@@ -25,6 +25,8 @@ export function ProductFormPage() {
   const [stock, setStock] = useState<number>(10);
   const [inventoryStatus, setInventoryStatus] = useState<InventoryStatusType>('IN_STOCK');
   const [prodStatus, setProdStatus] = useState<'active' | 'draft'>('active');
+  const [intention, setIntention] = useState('');
+  const [chakra, setChakra] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState<ProductImageItem[]>([]);
   const [badge, setBadge] = useState('');
@@ -65,6 +67,8 @@ export function ProductFormPage() {
         setStock(product.stock);
         setInventoryStatus(product.inventoryStatus || (product.stock > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK'));
         setProdStatus(product.status);
+        setIntention(product.intention || '');
+        setChakra(product.chakra || '');
         setDescription(product.description || '');
         setImages((product.images || []).map((url) => ({ id: url, url })));
         setBadge(product.badge || '');
@@ -120,43 +124,16 @@ export function ProductFormPage() {
         images: images.map((img) => img.url),
         badge: badge || undefined,
         isFeatured,
+        intention: intention || undefined,
+        chakra: chakra || undefined,
         widthSizes: isBraceletProduct ? activeWidthSizes : [],
       };
 
       if (isEdit && id) {
-        const dto: CreateProductDTO = {
-          name,
-          categoryId: selectedCatId || categories[0]?.id || '',
-          price: Number(price),
-          originalPrice: originalPrice != null ? Number(originalPrice) : undefined,
-          discountPrice: discountPrice ? Number(discountPrice) : undefined,
-          stock: Number(stock),
-          inventoryStatus,
-          status: prodStatus,
-          description,
-          images: images.map((img) => img.url),
-          badge: badge || undefined,
-          isFeatured,
-          widthSizes: isBraceletProduct ? activeWidthSizes : [],
-        };
         await productService.updateProduct(id, dto);
       } else {
-        const dto: CreateProductDTO = {
-          name,
-          categoryId: selectedCatId || categories[0]?.id || '',
-          price: Number(price),
-          originalPrice: originalPrice != null ? Number(originalPrice) : undefined,
-          discountPrice: discountPrice ? Number(discountPrice) : undefined,
-          stock: Number(stock),
-          inventoryStatus,
-          status: prodStatus,
-          description,
-          images: [], // start empty
-          badge: badge || undefined,
-          isFeatured,
-          widthSizes: isBraceletProduct ? activeWidthSizes : [],
-        };
-        const createdProduct = await productService.createProduct(dto);
+        const createDto: CreateProductDTO = { ...dto, images: [] };
+        const createdProduct = await productService.createProduct(createDto);
         const newProductId = createdProduct.id;
 
         // Upload all local images sequentially
@@ -378,9 +355,41 @@ export function ProductFormPage() {
               <option value="draft">Draft</option>
             </select>
           </div>
-        </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Intention</label>
+            <select
+              value={intention}
+              onChange={(e) => setIntention(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+            >
+              <option value="">None / All</option>
+              <option value="wealth">Wealth & Abundance</option>
+              <option value="love">Love & Harmony</option>
+              <option value="peace">Inner Peace & Stress Relief</option>
+              <option value="protection">Protection & Anti-Negativity</option>
+              <option value="health">Vitality & Healing</option>
+            </select>
+          </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Chakra</label>
+            <select
+              value={chakra}
+              onChange={(e) => setChakra(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+            >
+              <option value="">None</option>
+              <option value="crown">Crown Chakra (Sahasrara)</option>
+              <option value="third-eye">Third Eye (Ajna)</option>
+              <option value="throat">Throat (Vishuddha)</option>
+              <option value="heart">Heart (Anahata)</option>
+              <option value="solar">Solar Plexus (Manipura)</option>
+              <option value="sacral">Sacral (Svadhishthana)</option>
+              <option value="root">Root Chakra (Muladhara)</option>
+            </select>
+          </div>
+
           <div>
             <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Badge</label>
             <input
@@ -391,19 +400,19 @@ export function ProductFormPage() {
               className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
             />
           </div>
+        </div>
 
-          <div className="flex items-center gap-2 pt-6">
-            <input
-              id="isFeatured"
-              type="checkbox"
-              checked={isFeatured}
-              onChange={(e) => setIsFeatured(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
-            />
-            <label htmlFor="isFeatured" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Featured Product
-            </label>
-          </div>
+        <div className="flex items-center gap-2">
+          <input
+            id="isFeatured"
+            type="checkbox"
+            checked={isFeatured}
+            onChange={(e) => setIsFeatured(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+          />
+          <label htmlFor="isFeatured" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            Featured Product (Displays on home page/featured lists)
+          </label>
         </div>
 
         <ProductImagesManager
