@@ -80,5 +80,21 @@ export const categoryService = {
 
   async deleteCategory(id: string): Promise<void> {
     await apiClient.delete(`/categories/${id}`);
+  },
+
+  async uploadImage(id: string, file: File): Promise<Category> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post(`/categories/${id}/image/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return mapCategory(unwrapData<any>(response));
+  },
+
+  async deleteImage(id: string): Promise<Category> {
+    const response = await apiClient.delete(`/categories/${id}/image`);
+    return mapCategory(unwrapData<any>(response));
   }
 };

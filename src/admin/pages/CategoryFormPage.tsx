@@ -15,12 +15,27 @@ export function CategoryFormPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageDeleted, setImageDeleted] = useState(false);
   const [categoryLabel, setCategoryLabel] = useState('');
   const [parentId, setParentId] = useState('');
   const [status, setStatus] = useState<'active' | 'inactive'>('active');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleImageChange = (url: string, file?: File) => {
+    setImage(url);
+    if (file) {
+      setImageFile(file);
+      setImageDeleted(false);
+    } else {
+      setImageFile(null);
+      if (url === '') {
+        setImageDeleted(true);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!isEdit || !id) return;
@@ -57,17 +72,28 @@ export function CategoryFormPage() {
       const dto: CreateCategoryDTO = {
         name,
         description,
-        image,
+        image: imageFile || imageDeleted ? '' : (isEdit ? image : undefined),
         category: categoryLabel || undefined,
         parent: parentId || undefined,
         status
       };
 
+      let categoryId = id;
       if (isEdit && id) {
         await categoryService.updateCategory(id, dto);
       } else {
-        await categoryService.createCategory(dto);
+        const created = await categoryService.createCategory(dto);
+        categoryId = created.id;
       }
+
+      if (categoryId) {
+        if (imageFile) {
+          await categoryService.uploadImage(categoryId, imageFile);
+        } else if (imageDeleted) {
+          await categoryService.deleteImage(categoryId);
+        }
+      }
+
       navigate('/admin/categories');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save category');
@@ -155,7 +181,7 @@ export function CategoryFormPage() {
           </div>
         </div>
 
-        <ImageUpload label="Category Banner / Thumbnail" value={image} onChange={setImage} />
+        <ImageUpload label="Category Banner / Thumbnail" value={image} onChange={handleImageChange} />
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">Status</label>

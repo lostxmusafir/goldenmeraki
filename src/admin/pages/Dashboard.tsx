@@ -30,26 +30,34 @@ export function Dashboard() {
   const deliveredCount = orders.filter((o) => o.orderStatus === 'DELIVERED').length;
   const inStockCount = products.filter((p) => p.stock > 0).length;
 
-  // Daily Chart Bar Data Mock Generator
-  const chartDays = [
-    { day: '1 May', leads: 75, revenue: 45000 },
-    { day: '2 May', leads: 40, revenue: 28000 },
-    { day: '3 May', leads: 55, revenue: 34000 },
-    { day: '4 May', leads: 30, revenue: 19000 },
-    { day: '5 May', leads: 68, revenue: 42000 },
-    { day: '6 May', leads: 22, revenue: 14000 },
-    { day: '7 May', leads: 82, revenue: 58000 },
-    { day: '8 May', leads: 45, revenue: 29000 },
-    { day: '9 May', leads: 78, revenue: 51000 },
-    { day: '10 May', leads: 38, revenue: 24000 },
-    { day: '11 May', leads: 65, revenue: 48000 },
-    { day: '12 May', leads: 50, revenue: 32000 },
-    { day: '13 May', leads: 42, revenue: 26000 },
-    { day: '14 May', leads: 35, revenue: 22000 },
-    { day: '15 May', leads: 48, revenue: 31000 },
-    { day: '16 May', leads: 52, revenue: 36000 },
-    { day: '17 May', leads: 41, revenue: 27000 }
-  ];
+  // Group actual orders by day
+  const ordersByDay = orders.reduce((acc: Record<string, { leads: number; revenue: number }>, order) => {
+    if (!order.createdAt) return acc;
+    const dateObj = new Date(order.createdAt);
+    const dayStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); // e.g. "10 Aug"
+    if (!acc[dayStr]) {
+      acc[dayStr] = { leads: 0, revenue: 0 };
+    }
+    acc[dayStr].leads += 1;
+    acc[dayStr].revenue += order.totalAmount || 0;
+    return acc;
+  }, {});
+
+  // Generate the last 15 days dynamically to display in the chart
+  const last15Days = Array.from({ length: 15 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (14 - i));
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  });
+
+  const chartDays = last15Days.map(day => ({
+    day,
+    leads: ordersByDay[day]?.leads || 0,
+    revenue: ordersByDay[day]?.revenue || 0
+  }));
+
+  const maxLeadsValue = Math.max(...chartDays.map(item => item.leads), 0);
+  const maxLeads = maxLeadsValue > 0 ? maxLeadsValue : 10;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -241,19 +249,19 @@ export function Dashboard() {
           {/* Y Axis Labels and Horizontal Grid Lines */}
           <div className="absolute inset-x-0 top-8 bottom-10 flex flex-col justify-between pointer-events-none text-[10px] text-slate-400 font-bold">
             <div className="border-b border-slate-200 w-full flex items-center justify-between">
-              <span>100</span>
+              <span>{Math.round(maxLeads)}</span>
             </div>
             <div className="border-b border-slate-200 w-full flex items-center justify-between">
-              <span>80</span>
+              <span>{Math.round(maxLeads * 0.8)}</span>
             </div>
             <div className="border-b border-slate-200 w-full flex items-center justify-between">
-              <span>60</span>
+              <span>{Math.round(maxLeads * 0.6)}</span>
             </div>
             <div className="border-b border-slate-200 w-full flex items-center justify-between">
-              <span>40</span>
+              <span>{Math.round(maxLeads * 0.4)}</span>
             </div>
             <div className="border-b border-slate-200 w-full flex items-center justify-between">
-              <span>20</span>
+              <span>{Math.round(maxLeads * 0.2)}</span>
             </div>
             <div className="border-b border-slate-300 w-full flex items-center justify-between">
               <span>0</span>
@@ -278,7 +286,7 @@ export function Dashboard() {
                 {/* Vertical Dark Bar */}
                 <div
                   className="w-3.5 bg-slate-900 rounded-full transition-all duration-200 group-hover:bg-amber-500 group-hover:scale-110"
-                  style={{ height: `${(item.leads / 100) * 100}%` }}
+                  style={{ height: `${(item.leads / maxLeads) * 100}%` }}
                 />
               </div>
             ))}
