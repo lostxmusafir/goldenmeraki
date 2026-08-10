@@ -9,6 +9,8 @@ export interface RelatedProductsProps {
 }
 
 export function RelatedProducts({ products }: RelatedProductsProps) {
+  if (!products || products.length === 0) return null;
+
   return (
     <section className="py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
