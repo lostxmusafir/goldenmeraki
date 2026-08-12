@@ -1,5 +1,17 @@
 export type InventoryStatusType = 'IN_STOCK' | 'OUT_OF_STOCK' | 'COMING_SOON' | 'DISCONTINUED';
 
+/**
+ * Structured size variant for per-size pricing and stock.
+ */
+export interface SizeVariant {
+  size: string;
+  price: number;
+  originalPrice?: number;
+  discountPrice?: number;
+  stock: number;
+  isActive: boolean;
+}
+
 export interface AdminProduct {
   id: string;
   name: string;
@@ -19,6 +31,9 @@ export interface AdminProduct {
   isActive?: boolean;
   intention?: string;
   chakra?: string;
+  sizes?: SizeVariant[];
+  video?: string;
+  /** @deprecated — use sizes instead */
   widthSizes?: (string | { size: string; price?: number; stock?: number })[];
   ratings?: {
     average: number;
@@ -45,6 +60,9 @@ export interface CreateProductDTO {
   isActive?: boolean;
   intention?: string;
   chakra?: string;
+  sizes?: SizeVariant[];
+  video?: string;
+  /** @deprecated — use sizes instead */
   widthSizes?: (string | { size: string; price?: number; stock?: number })[];
 }
 

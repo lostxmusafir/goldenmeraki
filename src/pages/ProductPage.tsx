@@ -143,7 +143,7 @@ export function ProductPage({
           </nav>
 
           <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
-            <Gallery product={product} />
+            <Gallery images={product.images} productName={product.name} video={product.video} />
             <ProductInfo
               product={product}
               wishlist={wishlist}

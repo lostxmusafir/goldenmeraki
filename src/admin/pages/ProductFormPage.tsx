@@ -1,15 +1,12 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, useRef, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Save, ShoppingBag, Plus, Trash2, Video, Upload, X, Play } from 'lucide-react';
 import { ProductImagesManager, type ProductImageItem } from '../components/common/ProductImagesManager';
 import { useCategories } from '../hooks/useCategories';
 import { productService } from '../services/product.service';
-import type { CreateProductDTO, InventoryStatusType } from '../types/product.types';
+import type { CreateProductDTO, InventoryStatusType, SizeVariant } from '../types/product.types';
 
-interface WidthSizeConfig {
-  size: string;
-  price?: number;
-}
+const DEFAULT_SIZES = ['8mm', '10mm'];
 
 export function ProductFormPage() {
   const navigate = useNavigate();
@@ -31,11 +28,19 @@ export function ProductFormPage() {
   const [images, setImages] = useState<ProductImageItem[]>([]);
   const [badge, setBadge] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
-  const [selectedWidthSizes, setSelectedWidthSizes] = useState<string[]>(['8 mm', '10 mm']);
-  const [widthSizesConfig, setWidthSizesConfig] = useState<WidthSizeConfig[]>([
-    { size: '8 mm', price: undefined },
-    { size: '10 mm', price: undefined },
-  ]);
+
+  // Size Variants State
+  const [sizes, setSizes] = useState<SizeVariant[]>([]);
+  const [newSizeInput, setNewSizeInput] = useState('');
+
+  // Video State
+  const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | undefined>(undefined);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,14 +78,16 @@ export function ProductFormPage() {
         setImages((product.images || []).map((url) => ({ id: url, url })));
         setBadge(product.badge || '');
         setIsFeatured(Boolean(product.isFeatured));
-        const rawSizes = product.widthSizes || [];
-        const sizes = rawSizes.map((s) => (typeof s === 'string' ? s : s.size));
-        const configs = rawSizes.map((s) =>
-          typeof s === 'string' ? { size: s, price: undefined } : { size: s.size, price: s.price },
-        );
-        setSelectedWidthSizes(sizes.length > 0 ? sizes : ['8 mm', '10 mm']);
-        if (configs.length > 0) {
-          setWidthSizesConfig(configs);
+
+        // Load sizes
+        if (product.sizes && product.sizes.length > 0) {
+          setSizes(product.sizes);
+        }
+
+        // Load video
+        if (product.video) {
+          setVideoUrl(product.video);
+          setVideoPreviewUrl(product.video);
         }
       })
       .catch((err) => {
@@ -95,6 +102,101 @@ export function ProductFormPage() {
     }
   }, [categories, selectedCatId]);
 
+  // Auto-add default sizes when a bracelet category is selected and no sizes exist
+  useEffect(() => {
+    if (isBraceletProduct && sizes.length === 0 && !isEdit) {
+      setSizes(
+        DEFAULT_SIZES.map((size) => ({
+          size,
+          price: price || 0,
+          originalPrice: originalPrice,
+          stock: stock || 0,
+          isActive: true,
+        })),
+      );
+    }
+  }, [isBraceletProduct]);
+
+  const handleAddSize = () => {
+    const sizeLabel = newSizeInput.trim();
+    if (!sizeLabel) return;
+    if (sizes.some((s) => s.size.toLowerCase() === sizeLabel.toLowerCase())) return;
+
+    setSizes((prev) => [
+      ...prev,
+      {
+        size: sizeLabel,
+        price: price || 0,
+        originalPrice: originalPrice,
+        stock: 0,
+        isActive: true,
+      },
+    ]);
+    setNewSizeInput('');
+  };
+
+  const handleRemoveSize = (index: number) => {
+    setSizes((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSizeFieldChange = (index: number, field: keyof SizeVariant, value: any) => {
+    setSizes((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
+    );
+  };
+
+  // Video handling
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVideoError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Client-side validation
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    if (!ext || !['mp4', 'webm'].includes(ext)) {
+      setVideoError('Only MP4 and WebM video formats are allowed.');
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      setVideoError(`Video file exceeds 50 MB limit. Size: ${Math.round(file.size / (1024 * 1024))} MB`);
+      return;
+    }
+
+    setVideoFile(file);
+    setVideoPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleUploadVideoNow = async () => {
+    if (!videoFile || !id) return;
+    setIsUploadingVideo(true);
+    setVideoError(null);
+    try {
+      const updated = await productService.uploadVideo(id, videoFile);
+      setVideoUrl(updated.video);
+      setVideoPreviewUrl(updated.video);
+      setVideoFile(null);
+    } catch (err: any) {
+      setVideoError(err.response?.data?.message || err.message || 'Failed to upload video');
+    } finally {
+      setIsUploadingVideo(false);
+    }
+  };
+
+  const handleDeleteVideo = async () => {
+    setVideoError(null);
+    if (isEdit && id && videoUrl) {
+      try {
+        await productService.deleteVideo(id);
+      } catch (err: any) {
+        setVideoError(err.response?.data?.message || err.message || 'Failed to delete video');
+        return;
+      }
+    }
+    setVideoUrl(undefined);
+    setVideoPreviewUrl(undefined);
+    setVideoFile(null);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -103,13 +205,14 @@ export function ProductFormPage() {
     setError(null);
 
     try {
-      const activeWidthSizes = selectedWidthSizes.map((size) => {
-        const conf = widthSizesConfig.find((w) => w.size === size);
-        return {
-          size,
-          price: conf?.price != null && conf.price > 0 ? Number(conf.price) : Number(price),
-        };
-      });
+      const activeSizes = sizes.map((s) => ({
+        size: s.size,
+        price: Number(s.price),
+        originalPrice: s.originalPrice != null ? Number(s.originalPrice) : undefined,
+        discountPrice: s.discountPrice != null ? Number(s.discountPrice) : undefined,
+        stock: Number(s.stock),
+        isActive: s.isActive !== false,
+      }));
 
       const dto: CreateProductDTO = {
         name,
@@ -126,11 +229,17 @@ export function ProductFormPage() {
         isFeatured,
         intention: intention || undefined,
         chakra: chakra || undefined,
-        widthSizes: isBraceletProduct ? activeWidthSizes : [],
+        sizes: activeSizes.length > 0 ? activeSizes : [],
+        video: videoUrl,
       };
 
       if (isEdit && id) {
         await productService.updateProduct(id, dto);
+
+        // Upload video file if selected but not yet uploaded
+        if (videoFile) {
+          await productService.uploadVideo(id, videoFile);
+        }
       } else {
         const createDto: CreateProductDTO = { ...dto, images: [] };
         const createdProduct = await productService.createProduct(createDto);
@@ -141,6 +250,11 @@ export function ProductFormPage() {
           if (item.file) {
             await productService.uploadImage(newProductId, item.file);
           }
+        }
+
+        // Upload video if selected
+        if (videoFile) {
+          await productService.uploadVideo(newProductId, videoFile);
         }
       }
       navigate('/admin/products');
@@ -185,7 +299,7 @@ export function ProductFormPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Golden Meraki Silk Sari"
+              placeholder="e.g. Terahertz Bracelet"
               className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
             />
           </div>
@@ -205,72 +319,134 @@ export function ProductFormPage() {
           </div>
         </div>
 
-        {isBraceletProduct && (
-          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-4 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-3">
-            <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
-              Width Sizes & Differential Pricing (Bracelet Product)
-            </label>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Enable options and set individual prices for 8 mm vs 10 mm (if left empty, base selling price applies):
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-              {['8 mm', '10 mm'].map((size) => {
-                const isSelected = selectedWidthSizes.includes(size);
-                const currentConfig = widthSizesConfig.find((w) => w.size === size);
-                const customPrice = currentConfig?.price;
+        {/* ===== SIZE VARIANTS SECTION ===== */}
+        {(isBraceletProduct || sizes.length > 0) && (
+          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-5 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                Size Variants & Differential Pricing
+              </label>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Configure per-size pricing, original price, stock, and active status. Each size can have different values.
+              </p>
+            </div>
 
-                return (
-                  <div
-                    key={size}
-                    className={`rounded-xl border p-3.5 transition space-y-2.5 ${
-                      isSelected
-                        ? 'border-amber-500 bg-white dark:bg-slate-900 dark:border-amber-500/80 shadow-sm'
-                        : 'border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 opacity-75'
-                    }`}
-                  >
-                    <label className="inline-flex items-center gap-2 font-semibold text-sm text-slate-800 dark:text-slate-200 cursor-pointer">
+            {sizes.map((sizeItem, index) => (
+              <div
+                key={`${sizeItem.size}-${index}`}
+                className={`rounded-xl border p-4 transition space-y-3 ${
+                  sizeItem.isActive
+                    ? 'border-amber-400 bg-white dark:bg-slate-900 dark:border-amber-500/80 shadow-sm'
+                    : 'border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 opacity-60'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <label className="inline-flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={isSelected}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedWidthSizes((prev) => [...prev, size]);
-                          } else {
-                            setSelectedWidthSizes((prev) => prev.filter((s) => s !== size));
-                          }
-                        }}
+                        checked={sizeItem.isActive}
+                        onChange={(e) => handleSizeFieldChange(index, 'isActive', e.target.checked)}
                         className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
                       />
-                      <span>{size} Option</span>
+                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{sizeItem.size}</span>
                     </label>
-
-                    {isSelected && (
-                      <div className="pt-1">
-                        <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                          Price for {size} (₹)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          placeholder={`Base Selling Price (₹${price || 0})`}
-                          value={customPrice ?? ''}
-                          onChange={(e) => {
-                            const val = e.target.value ? Number(e.target.value) : undefined;
-                            setWidthSizesConfig((prev) => {
-                              const existing = prev.find((w) => w.size === size);
-                              if (existing) {
-                                return prev.map((w) => (w.size === size ? { ...w, price: val } : w));
-                              }
-                              return [...prev, { size, price: val }];
-                            });
-                          }}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-                        />
-                      </div>
+                    {!sizeItem.isActive && (
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                        Inactive
+                      </span>
                     )}
                   </div>
-                );
-              })}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSize(index)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
+                    title="Remove size"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                      Selling Price (₹) *
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={sizeItem.price}
+                      onChange={(e) => handleSizeFieldChange(index, 'price', Number(e.target.value))}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                      Original Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={sizeItem.originalPrice ?? ''}
+                      onChange={(e) => handleSizeFieldChange(index, 'originalPrice', e.target.value ? Number(e.target.value) : undefined)}
+                      placeholder="MRP"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                      Discount Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={sizeItem.discountPrice ?? ''}
+                      onChange={(e) => handleSizeFieldChange(index, 'discountPrice', e.target.value ? Number(e.target.value) : undefined)}
+                      placeholder="Optional"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                      Stock *
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={sizeItem.stock}
+                      onChange={(e) => handleSizeFieldChange(index, 'stock', Number(e.target.value))}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Add new size */}
+            <div className="flex items-end gap-2 pt-1">
+              <div className="flex-1">
+                <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                  Add New Size
+                </label>
+                <input
+                  type="text"
+                  value={newSizeInput}
+                  onChange={(e) => setNewSizeInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSize(); } }}
+                  placeholder="e.g. 12mm"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleAddSize}
+                className="flex items-center gap-1 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition"
+              >
+                <Plus className="w-3 h-3" />
+                Add
+              </button>
             </div>
           </div>
         )}
@@ -433,6 +609,89 @@ export function ProductFormPage() {
               : undefined
           }
         />
+
+        {/* ===== PRODUCT VIDEO SECTION ===== */}
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Product Video</label>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Upload an optional product video (MP4 or WebM). Max size: 50 MB.
+            </p>
+          </div>
+
+          {videoError && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
+              {videoError}
+            </div>
+          )}
+
+          {videoPreviewUrl ? (
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50 dark:bg-slate-950">
+              <div className="relative aspect-video w-full max-w-md">
+                <video
+                  src={videoPreviewUrl}
+                  controls
+                  className="w-full h-full object-contain bg-black rounded-t-2xl"
+                  preload="metadata"
+                />
+              </div>
+              <div className="flex items-center gap-2 p-3 border-t border-slate-200 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => videoInputRef.current?.click()}
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  Replace
+                </button>
+                {isEdit && id && videoFile && (
+                  <button
+                    type="button"
+                    onClick={handleUploadVideoNow}
+                    disabled={isUploadingVideo}
+                    className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition disabled:opacity-50"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    {isUploadingVideo ? 'Uploading...' : 'Upload Now'}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleDeleteVideo}
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Remove
+                </button>
+                {videoFile && (
+                  <span className="text-[10px] text-amber-600 font-medium">
+                    New file selected — will upload on save
+                  </span>
+                )}
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => videoInputRef.current?.click()}
+              className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[100px] hover:bg-slate-50 dark:hover:bg-slate-800/30 w-full max-w-md"
+            >
+              <Video className="w-8 h-8 text-amber-500 mb-2" />
+              <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                Click to upload a product video
+              </p>
+              <p className="text-[10px] text-slate-400 mt-1">MP4, WebM • Max 50 MB</p>
+            </button>
+          )}
+
+          <input
+            type="file"
+            ref={videoInputRef}
+            accept="video/mp4,video/webm,.mp4,.webm"
+            onChange={handleVideoSelect}
+            className="hidden"
+          />
+        </div>
 
         <div>
           <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Product Description</label>

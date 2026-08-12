@@ -2,7 +2,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config/api.config';
 
 import type { ProductCategoryOption } from '../types/category';
-import type { Product, InventoryStatusType } from '../types/product';
+import type { Product, InventoryStatusType, SizeVariant } from '../types/product';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -51,6 +51,49 @@ function normalizeCategory(raw: any): CatalogCategory {
   };
 }
 
+/**
+ * Normalize sizes from API response.
+ * Handles new `sizes` field and legacy `widthSizes` fallback.
+ */
+function normalizeSizes(raw: any): SizeVariant[] {
+  // Prefer new structured sizes
+  if (Array.isArray(raw?.sizes) && raw.sizes.length > 0) {
+    return raw.sizes.map((s: any) => ({
+      size: s.size || '',
+      price: Number(s.price ?? 0),
+      originalPrice: s.originalPrice != null ? Number(s.originalPrice) : undefined,
+      discountPrice: s.discountPrice != null ? Number(s.discountPrice) : undefined,
+      stock: Number(s.stock ?? 0),
+      isActive: s.isActive !== false,
+    }));
+  }
+
+  // Fallback: legacy widthSizes
+  if (Array.isArray(raw?.widthSizes) && raw.widthSizes.length > 0) {
+    return raw.widthSizes.map((ws: any) => {
+      if (typeof ws === 'string') {
+        return {
+          size: ws,
+          price: Number(raw.price ?? 0),
+          originalPrice: raw.originalPrice != null ? Number(raw.originalPrice) : undefined,
+          stock: Number(raw.stock ?? 0),
+          isActive: true,
+        };
+      }
+      return {
+        size: ws.size || '',
+        price: Number(ws.price ?? raw.price ?? 0),
+        originalPrice: ws.originalPrice != null ? Number(ws.originalPrice) : (raw.originalPrice != null ? Number(raw.originalPrice) : undefined),
+        discountPrice: ws.discountPrice != null ? Number(ws.discountPrice) : undefined,
+        stock: Number(ws.stock ?? raw.stock ?? 0),
+        isActive: ws.isActive !== false,
+      };
+    });
+  }
+
+  return [];
+}
+
 export function normalizeProduct(raw: any): Product {
   const rawCategory = raw?.category;
   const categoryValue =
@@ -74,6 +117,8 @@ export function normalizeProduct(raw: any): Product {
       : raw?.attributes && typeof raw.attributes === 'object' && !Array.isArray(raw.attributes)
         ? raw.attributes
         : {};
+
+  const sizes = normalizeSizes(raw);
 
   return {
     id: String(raw?._id ?? raw?.id ?? `${raw?.slug ?? 'product'}-${Math.random()}`),
@@ -100,7 +145,9 @@ export function normalizeProduct(raw: any): Product {
     specifications: Object.fromEntries(
       Object.entries(specSource).map(([key, value]) => [key, String(value)])
     ),
-    slug: raw?.slug ?? String(raw?._id ?? raw?.id ?? '')
+    slug: raw?.slug ?? String(raw?._id ?? raw?.id ?? ''),
+    sizes,
+    video: raw?.video || undefined,
   };
 }
 

@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import type { AdminProduct, CreateProductDTO, UpdateProductDTO, InventoryStatusType } from '../types/product.types';
+import type { AdminProduct, CreateProductDTO, UpdateProductDTO, InventoryStatusType, SizeVariant } from '../types/product.types';
 import type { PaginatedResponse, PaginationParams } from '../types/common.types';
 
 export interface ProductQueryParams extends PaginationParams {
@@ -11,6 +11,48 @@ export interface ProductQueryParams extends PaginationParams {
 
 const unwrapData = <T>(response: any): T => {
   return response.data?.data !== undefined ? response.data.data : response.data;
+};
+
+/**
+ * Normalize raw sizes from API — handles both new `sizes` and legacy `widthSizes`.
+ */
+const normalizeSizes = (item: any): SizeVariant[] => {
+  // Prefer the new `sizes` field
+  if (Array.isArray(item.sizes) && item.sizes.length > 0) {
+    return item.sizes.map((s: any) => ({
+      size: s.size || '',
+      price: Number(s.price ?? 0),
+      originalPrice: s.originalPrice != null ? Number(s.originalPrice) : undefined,
+      discountPrice: s.discountPrice != null ? Number(s.discountPrice) : undefined,
+      stock: Number(s.stock ?? 0),
+      isActive: s.isActive !== false,
+    }));
+  }
+
+  // Fall back to legacy widthSizes
+  if (Array.isArray(item.widthSizes) && item.widthSizes.length > 0) {
+    return item.widthSizes.map((ws: any) => {
+      if (typeof ws === 'string') {
+        return {
+          size: ws,
+          price: Number(item.price ?? 0),
+          originalPrice: item.originalPrice != null ? Number(item.originalPrice) : undefined,
+          stock: Number(item.stock ?? 0),
+          isActive: true,
+        };
+      }
+      return {
+        size: ws.size || '',
+        price: Number(ws.price ?? item.price ?? 0),
+        originalPrice: ws.originalPrice != null ? Number(ws.originalPrice) : undefined,
+        discountPrice: ws.discountPrice != null ? Number(ws.discountPrice) : undefined,
+        stock: Number(ws.stock ?? item.stock ?? 0),
+        isActive: ws.isActive !== false,
+      };
+    });
+  }
+
+  return [];
 };
 
 const mapProduct = (item: any): AdminProduct => {
@@ -39,6 +81,8 @@ const mapProduct = (item: any): AdminProduct => {
     isActive: item.isActive !== false,
     intention: item.intention ?? '',
     chakra: item.chakra ?? '',
+    sizes: normalizeSizes(item),
+    video: item.video || undefined,
     widthSizes: item.widthSizes ?? [],
     ratings: item.ratings ? { average: Number(item.ratings.average || 0), count: Number(item.ratings.count || 0) } : undefined,
     createdAt: item.createdAt ?? new Date().toISOString(),
@@ -93,7 +137,8 @@ export const productService = {
       isActive: dto.status !== 'draft',
       intention: dto.intention,
       chakra: dto.chakra,
-      widthSizes: dto.widthSizes,
+      sizes: dto.sizes,
+      video: dto.video,
     });
 
     return mapProduct(unwrapData<any>(response));
@@ -115,7 +160,8 @@ export const productService = {
       isActive: dto.status !== undefined ? (dto.status !== 'draft') : undefined,
       intention: dto.intention,
       chakra: dto.chakra,
-      widthSizes: dto.widthSizes,
+      sizes: dto.sizes,
+      video: dto.video,
     });
 
     return mapProduct(unwrapData<any>(response));
@@ -147,6 +193,7 @@ export const productService = {
     return response.data;
   },
 
+  // --- Image APIs ---
   async uploadImage(id: string, file: File): Promise<AdminProduct> {
     const formData = new FormData();
     formData.append('file', file);
@@ -179,6 +226,24 @@ export const productService = {
     const response = await apiClient.delete(`/products/${id}/images`, {
       params: { imageUrl },
     });
+    return mapProduct(unwrapData<any>(response));
+  },
+
+  // --- Video APIs ---
+  async uploadVideo(id: string, file: File): Promise<AdminProduct> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post(`/products/${id}/video/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 120000, // 2 min timeout for large videos
+    });
+    return mapProduct(unwrapData<any>(response));
+  },
+
+  async deleteVideo(id: string): Promise<AdminProduct> {
+    const response = await apiClient.delete(`/products/${id}/video`);
     return mapProduct(unwrapData<any>(response));
   },
 };

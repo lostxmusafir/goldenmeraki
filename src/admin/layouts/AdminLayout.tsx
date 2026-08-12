@@ -56,9 +56,9 @@ export function AdminLayout() {
   );
 
   return (
-    <div className="h-screen overflow-hidden bg-[#F4F5F7] text-slate-900 flex font-sans">
+    <div className="h-screen overflow-hidden bg-[#F4F5F7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-sans">
       {/* Single Clean Left Sidebar */}
-      <aside className="w-64 bg-[#EBECEE] border-r border-slate-300/80 hidden lg:flex flex-col py-6 px-4 shrink-0 justify-between">
+      <aside className="w-64 bg-[#EBECEE] dark:bg-slate-900 border-r border-slate-300/80 dark:border-slate-800 hidden lg:flex flex-col py-6 px-4 shrink-0 justify-between">
         <div className="space-y-6">
           {/* Top Brand Logo */}
           <Link to={ADMIN_ROUTES.DASHBOARD} className="flex items-center gap-3 px-2">
@@ -66,12 +66,12 @@ export function AdminLayout() {
               G
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">GoldenMeraki</span>
+              <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-slate-100">GoldenMeraki</span>
               <span className="text-[10px] font-bold tracking-widest text-amber-600 uppercase">Admin Panel</span>
             </div>
           </Link>
 
-          <div className="border-b border-slate-300/70" />
+          <div className="border-b border-slate-300/70 dark:border-slate-800" />
 
           {/* Navigation Links */}
           <nav className="space-y-1">
@@ -87,8 +87,8 @@ export function AdminLayout() {
                   to={item.path}
                   className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs tracking-wide transition-all ${
                     isActive
-                      ? 'bg-slate-900 text-white shadow-sm'
-                      : 'text-slate-600 hover:bg-slate-300/50 hover:text-slate-900'
+                      ? 'bg-slate-900 dark:bg-slate-800 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-300/50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 >
                   <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-500'}`} />
@@ -101,7 +101,7 @@ export function AdminLayout() {
 
         {/* User Profile & Sign Out Footer */}
         {user && (
-          <div className="pt-4 border-t border-slate-300/70 space-y-3">
+          <div className="pt-4 border-t border-slate-300/70 dark:border-slate-800 space-y-3">
             <div className="flex items-center gap-3 px-2">
               <img
                 src={
@@ -109,10 +109,10 @@ export function AdminLayout() {
                   'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80'
                 }
                 alt={user.name}
-                className="w-9 h-9 rounded-full object-cover shrink-0 ring-2 ring-slate-300"
+                className="w-9 h-9 rounded-full object-cover shrink-0 ring-2 ring-slate-300 dark:ring-slate-700"
               />
               <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-bold text-slate-900 truncate">{user.name}</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{user.name}</span>
                 <span className="text-[10px] text-slate-500 truncate">{user.email}</span>
               </div>
             </div>
@@ -129,14 +129,14 @@ export function AdminLayout() {
       </aside>
 
       {/* Mobile Top Navbar */}
-      <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 w-full fixed top-0 left-0 z-30">
+      <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 w-full fixed top-0 left-0 z-30">
         <div className="flex items-center gap-3">
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-slate-700">
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-slate-700 dark:text-slate-300">
             <Menu className="w-6 h-6" />
           </button>
-          <span className="font-bold text-base text-slate-900">GoldenMeraki Admin</span>
+          <span className="font-bold text-base text-slate-900 dark:text-slate-100">GoldenMeraki Admin</span>
         </div>
-        <button onClick={handleLogout} className="p-2 text-rose-600">
+        <button onClick={handleLogout} className="p-2 text-rose-600 dark:text-rose-400">
           <LogOut className="w-5 h-5" />
         </button>
       </div>
@@ -145,15 +145,15 @@ export function AdminLayout() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          <div className="relative w-64 max-w-xs bg-[#EBECEE] p-5 flex flex-col z-50 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900">GoldenMeraki</h2>
+          <div className="relative w-64 max-w-xs bg-[#EBECEE] dark:bg-slate-900 p-5 flex flex-col z-50 space-y-4">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">GoldenMeraki</h2>
             <div className="space-y-1 overflow-y-auto flex-1">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-300 text-slate-800"
+                  className="block px-3 py-2 text-xs font-semibold rounded-lg hover:bg-slate-300 text-slate-800 dark:text-slate-300"
                 >
                   {item.name}
                 </Link>
@@ -173,15 +173,15 @@ export function AdminLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden pt-14 lg:pt-0">
         {/* Simple Top Breadcrumb Header */}
-        <header className="h-14 bg-white border-b border-slate-200 px-6 lg:px-10 flex items-center justify-between">
+        <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 lg:px-10 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
             <span>Admin</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-900">{currentItem ? currentItem.name : 'Dashboard'}</span>
+            <span className="text-slate-900 dark:text-slate-100">{currentItem ? currentItem.name : 'Dashboard'}</span>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 bg-[#FAFBFD]">
+        <main className="flex-1 h-screen overflow-y-auto bg-[#F4F5F7] dark:bg-slate-950 p-4 lg:p-8 pt-20 lg:pt-8 w-full relative">
           <Outlet />
         </main>
       </div>
