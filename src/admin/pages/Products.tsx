@@ -122,7 +122,7 @@ export function Products() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Products Catalog</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Products Catalog</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Manage your store inventory, pricing, and bulk product attributes.
           </p>

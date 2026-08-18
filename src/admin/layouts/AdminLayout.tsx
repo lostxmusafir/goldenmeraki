@@ -177,7 +177,7 @@ export function AdminLayout() {
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
             <span>Admin</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-900 dark:text-slate-100">{currentItem ? currentItem.name : 'Dashboard'}</span>
+            <span className="text-slate-900">{currentItem ? currentItem.name : 'Dashboard'}</span>
           </div>
         </header>
 
