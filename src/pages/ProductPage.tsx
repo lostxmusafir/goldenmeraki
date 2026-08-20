@@ -13,8 +13,8 @@ import { getProductBySlug, getProducts } from '../services/catalogApi';
 
 export interface ProductPageProps extends CommonPageProps {
   slug: string;
-  onAddToCart: (product: Product) => void;
-  onBuyNow: (product: Product) => void;
+  onAddToCart: (product: Product, quantity?: number) => void;
+  onBuyNow: (product: Product, quantity?: number) => void;
   onToggleWishlist: (productId: string) => void;
   wishlist: string[];
 }

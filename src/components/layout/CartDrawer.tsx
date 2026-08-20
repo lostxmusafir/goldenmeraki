@@ -135,7 +135,10 @@ export function CartDrawer({
                           <button
                             type="button"
                             onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1), item.selectedWidthSize)}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950"
+                            disabled={item.quantity <= 1}
+                            className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                              item.quantity <= 1 ? 'opacity-40 cursor-not-allowed text-slate-300' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-950'
+                            }`}
                             aria-label={`Decrease quantity of ${item.name}`}
                           >
                             <ChevronDown className="h-4 w-4" />
@@ -144,7 +147,10 @@ export function CartDrawer({
                           <button
                             type="button"
                             onClick={() => onUpdateQuantity(item.id, item.quantity + 1, item.selectedWidthSize)}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950"
+                            disabled={item.stock != null && item.quantity >= item.stock}
+                            className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                              item.stock != null && item.quantity >= item.stock ? 'opacity-40 cursor-not-allowed text-slate-300' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-950'
+                            }`}
                             aria-label={`Increase quantity of ${item.name}`}
                           >
                             <ChevronUp className="h-4 w-4" />

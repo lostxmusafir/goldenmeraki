@@ -104,21 +104,37 @@ export function CartPage({
                         <p className="text-sm text-slate-500">{formatCurrency(item.price)}</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1), item.selectedWidthSize)}
-                          className="h-9 w-9 rounded-full border border-slate-200"
-                        >
-                          -
-                        </button>
-                        <span className="min-w-10 text-center text-sm">{item.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1, item.selectedWidthSize)}
-                          className="h-9 w-9 rounded-full border border-slate-200"
-                        >
-                          +
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1), item.selectedWidthSize)}
+                            disabled={item.quantity <= 1}
+                            className={`h-9 w-9 rounded-full border border-slate-200 transition ${
+                              item.quantity <= 1 ? 'opacity-40 cursor-not-allowed text-slate-300' : 'hover:bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            -
+                          </button>
+                          <span className="min-w-10 text-center text-sm font-medium">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1, item.selectedWidthSize)}
+                            disabled={item.stock != null && item.quantity >= item.stock}
+                            className={`h-9 w-9 rounded-full border border-slate-200 transition ${
+                              item.stock != null && item.quantity >= item.stock
+                                ? 'opacity-40 cursor-not-allowed text-slate-300'
+                                : 'hover:bg-slate-100 text-slate-700'
+                            }`}
+                            title={item.stock != null && item.quantity >= item.stock ? `Max stock limit (${item.stock}) reached` : 'Increase quantity'}
+                          >
+                            +
+                          </button>
+                        </div>
+                        {item.stock != null && item.quantity >= item.stock && (
+                          <span className="text-xs font-medium text-amber-600">
+                            Max stock ({item.stock})
+                          </span>
+                        )}
                         <button
                           type="button"
                           onClick={() => onRemoveItem(item.id, item.selectedWidthSize)}

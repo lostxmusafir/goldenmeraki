@@ -103,40 +103,84 @@ export function App() {
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, quantityToAdd = 1) => {
+    const availableStock = Number(product.stock ?? 10);
+    let limitReached = false;
+    let addedQty = quantityToAdd;
+
     setCartItems((prev) => {
       const existing = prev.find(
         (item) => item.id === product.id && item.selectedWidthSize === product.selectedWidthSize,
       );
 
+      const existingQty = existing ? existing.quantity : 0;
+      const desiredQty = existingQty + quantityToAdd;
+
+      if (desiredQty > availableStock) {
+        limitReached = true;
+        const addable = Math.max(0, availableStock - existingQty);
+        addedQty = addable;
+
+        if (existing) {
+          return prev.map((item) =>
+            item.id === product.id && item.selectedWidthSize === product.selectedWidthSize
+              ? { ...item, quantity: availableStock, stock: availableStock }
+              : item,
+          );
+        }
+        if (addable > 0) {
+          return [...prev, { ...product, quantity: addable, stock: availableStock }];
+        }
+        return prev;
+      }
+
       if (existing) {
         return prev.map((item) =>
           item.id === product.id && item.selectedWidthSize === product.selectedWidthSize
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: desiredQty, stock: availableStock }
             : item,
         );
       }
 
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: quantityToAdd, stock: availableStock }];
     });
 
     const sizeSuffix = product.selectedWidthSize ? ` (${product.selectedWidthSize})` : '';
-    setToast({ type: 'cart', message: `Added ${product.name}${sizeSuffix} to cart.` });
+    if (limitReached) {
+      setToast({
+        type: 'cart',
+        message: addedQty > 0
+          ? `Only ${availableStock} in stock. Added ${addedQty} x ${product.name}${sizeSuffix} to cart.`
+          : `Cannot add more. Maximum available stock (${availableStock}) already in cart.`,
+      });
+    } else {
+      setToast({ type: 'cart', message: `Added ${quantityToAdd} x ${product.name}${sizeSuffix} to cart.` });
+    }
     setIsCartDrawerOpen(true);
   };
 
-  const handleBuyNow = (product: Product) => {
-    handleAddToCart(product);
+  const handleBuyNow = (product: Product, quantityToAdd = 1) => {
+    handleAddToCart(product, quantityToAdd);
     navigate('/checkout');
   };
 
   const handleUpdateQuantity = (productId: string, quantity: number, selectedWidthSize?: string) => {
     setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === productId && (selectedWidthSize ? item.selectedWidthSize === selectedWidthSize : true)
-          ? { ...item, quantity }
-          : item,
-      ),
+      prev.map((item) => {
+        const isMatch = item.id === productId && (selectedWidthSize ? item.selectedWidthSize === selectedWidthSize : true);
+        if (isMatch) {
+          const maxStock = Number(item.stock ?? 10);
+          if (quantity > maxStock) {
+            setToast({
+              type: 'cart',
+              message: `Only ${maxStock} unit(s) available in stock.`,
+            });
+            return { ...item, quantity: maxStock };
+          }
+          return { ...item, quantity: Math.max(1, quantity) };
+        }
+        return item;
+      }),
     );
   };
 

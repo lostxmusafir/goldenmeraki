@@ -10,8 +10,8 @@ export interface ProductInfoProps {
   product: Product;
   wishlist: string[];
   onToggleWishlist: (productId: string, productName?: string) => void;
-  onAddToCart: (product: Product) => void;
-  onBuyNow: (product: Product) => void;
+  onAddToCart: (product: Product, quantity?: number) => void;
+  onBuyNow: (product: Product, quantity?: number) => void;
   quantity: number;
   setQuantity: (quantity: number) => void;
 }
@@ -101,6 +101,13 @@ export function ProductInfo({
       : currentPrice;
   const currentStock = hasActiveSizes ? (currentSizeObj?.stock ?? 0) : product.stock;
 
+  // Auto-adjust quantity if currentStock decreases below current quantity
+  useEffect(() => {
+    if (currentStock > 0 && quantity > currentStock) {
+      setQuantity(currentStock);
+    }
+  }, [currentStock, selectedSize]);
+
   const isWishlisted = wishlist.includes(product.id);
 
   // Per-size stock check for sized products; product-level for non-sized
@@ -124,7 +131,7 @@ export function ProductInfo({
       originalPrice: currentOriginalPrice,
       stock: currentStock,
       selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
-    });
+    }, quantity);
   };
 
   const handleBuyNow = () => {
@@ -134,7 +141,7 @@ export function ProductInfo({
       originalPrice: currentOriginalPrice,
       stock: currentStock,
       selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
-    });
+    }, quantity);
   };
 
   return (
@@ -255,26 +262,43 @@ export function ProductInfo({
             </p>
 
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-              <div className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-white p-1">
-                <button
-                  type="button"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-slate-100"
-                >
-                  -
-                </button>
+              <div className="flex flex-col gap-1">
+                <div className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-white p-1">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1 || currentStock <= 0}
+                    className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
+                      quantity <= 1 || currentStock <= 0
+                        ? 'opacity-40 cursor-not-allowed text-slate-300'
+                        : 'hover:bg-slate-100 text-slate-700 cursor-pointer'
+                    }`}
+                  >
+                    -
+                  </button>
 
-                <span className="min-w-10 px-3 text-center font-medium">
-                  {quantity}
-                </span>
+                  <span className="min-w-10 px-3 text-center font-medium">
+                    {quantity}
+                  </span>
 
-                <button
-                  type="button"
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-slate-100"
-                >
-                  +
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+                    disabled={quantity >= currentStock || currentStock <= 0}
+                    className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
+                      quantity >= currentStock || currentStock <= 0
+                        ? 'opacity-40 cursor-not-allowed text-slate-300'
+                        : 'hover:bg-slate-100 text-slate-700 cursor-pointer'
+                    }`}
+                  >
+                    +
+                  </button>
+                </div>
+                {quantity >= currentStock && currentStock > 0 && (
+                  <span className="text-[11px] font-medium text-amber-600">
+                    Max available stock ({currentStock}) reached
+                  </span>
+                )}
               </div>
 
               <div className="flex w-full flex-col gap-3 sm:flex-row">
