@@ -388,20 +388,24 @@ export function ProductFormPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={loadTreePreset}
-                className="rounded-lg border border-amber-300 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-200 transition dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
-              >
-                + Load Tree Beads (100, 160, 300, 500)
-              </button>
-              <button
-                type="button"
-                onClick={loadBraceletPreset}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-              >
-                + Load Bracelet Sizes (8mm, 10mm)
-              </button>
+              {!isBraceletProduct && (
+                <button
+                  type="button"
+                  onClick={loadTreePreset}
+                  className="rounded-lg border border-amber-300 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-200 transition dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+                >
+                  + Load Tree Beads (100, 160, 300, 500)
+                </button>
+              )}
+              {!isTreeProduct && (
+                <button
+                  type="button"
+                  onClick={loadBraceletPreset}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                >
+                  + Load Bracelet Sizes (8mm, 10mm)
+                </button>
+              )}
             </div>
             </div>
 
