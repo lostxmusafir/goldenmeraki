@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, Heart, ShoppingBag, Zap } from 'lucide-react';
 import type { Product, SizeVariant } from '../../types/product';
 import { Button } from '../common/Button';
@@ -27,24 +27,84 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
 
-  // Use the new structured sizes array from the API
-  const activeSizes = (product.sizes || []).filter((s) => s.isActive);
+  // Check if product is a bracelet or has size configurations
+  const isBracelet =
+    product.name?.toLowerCase().includes('bracelet') ||
+    product.category?.toLowerCase().includes('bracelet') ||
+    (product.sizes && product.sizes.some((s) => s.size.toLowerCase().includes('mm')));
 
-  const [selectedSize, setSelectedSize] = useState<string>(activeSizes[0]?.size || '');
+  const standardSizes = ['8mm', '10mm'];
+  const rawSizes = product.sizes || [];
 
-  const currentSizeObj: SizeVariant | undefined = activeSizes.find((s) => s.size === selectedSize) || activeSizes[0];
-  const hasSizes = activeSizes.length > 0;
+  // Determine complete list of size options to display
+  const displaySizeList = (() => {
+    if (rawSizes.length === 0 && !isBracelet) {
+      return [];
+    }
 
-  // Derive current values from the selected size or product defaults
-  const currentPrice = currentSizeObj?.price ?? product.price;
-  const currentOriginalPrice = currentSizeObj?.originalPrice ?? product.originalPrice ?? currentPrice;
-  const currentDiscountPrice = currentSizeObj?.discountPrice ?? product.discountPrice;
-  const currentStock = hasSizes ? (currentSizeObj?.stock ?? 0) : product.stock;
+    const sizeLabels = new Set<string>();
+    if (isBracelet || rawSizes.some((s) => standardSizes.includes(s.size.toLowerCase()))) {
+      standardSizes.forEach((sz) => sizeLabels.add(sz));
+    }
+    rawSizes.forEach((s) => sizeLabels.add(s.size));
+
+    return Array.from(sizeLabels).map((label) => {
+      const found = rawSizes.find((s) => s.size.toLowerCase() === label.toLowerCase());
+      if (found && found.isActive !== false) {
+        return {
+          size: found.size || label,
+          price: Number(found.price ?? 0),
+          originalPrice: found.originalPrice != null ? Number(found.originalPrice) : undefined,
+          discountPrice: found.discountPrice != null ? Number(found.discountPrice) : undefined,
+          stock: Number(found.stock ?? 0),
+          isActive: true,
+          isAvailable: true,
+        };
+      }
+      return {
+        size: label,
+        price: 0,
+        stock: 0,
+        isActive: false,
+        isAvailable: false,
+      };
+    });
+  })();
+
+  const availableSizes = displaySizeList.filter((s) => s.isAvailable);
+  const hasActiveSizes = availableSizes.length > 0;
+
+  // Selected size state - auto selects first active available size
+  const [selectedSize, setSelectedSize] = useState<string>(() => availableSizes[0]?.size || '');
+
+  // Keep selected size in sync when product or sizes update
+  useEffect(() => {
+    if (availableSizes.length > 0) {
+      if (!selectedSize || !availableSizes.some((s) => s.size === selectedSize)) {
+        setSelectedSize(availableSizes[0].size);
+      }
+    } else {
+      setSelectedSize('');
+    }
+  }, [product.id, product.sizes]);
+
+  const currentSizeObj = availableSizes.find((s) => s.size === selectedSize) || availableSizes[0];
+
+  // Price calculations
+  const currentPrice =
+    currentSizeObj?.price && currentSizeObj.price > 0 ? currentSizeObj.price : product.price;
+  const currentOriginalPrice =
+    currentSizeObj?.originalPrice && currentSizeObj.originalPrice > 0
+      ? currentSizeObj.originalPrice
+      : product.originalPrice && product.originalPrice > currentPrice
+      ? product.originalPrice
+      : currentPrice;
+  const currentStock = hasActiveSizes ? (currentSizeObj?.stock ?? 0) : product.stock;
 
   const isWishlisted = wishlist.includes(product.id);
 
   // Per-size stock check for sized products; product-level for non-sized
-  const isOutOfStock = hasSizes
+  const isOutOfStock = hasActiveSizes
     ? currentStock <= 0
     : product.inventoryStatus === 'OUT_OF_STOCK' || product.stock <= 0;
   const isComingSoon = product.inventoryStatus === 'COMING_SOON';
@@ -55,29 +115,27 @@ export function ProductInfo({
       ? Math.round(((currentOriginalPrice - currentPrice) / currentOriginalPrice) * 100)
       : 0;
 
+  const activeSizeLabel = selectedSize || currentSizeObj?.size || '';
+
   const handleAddToCart = () => {
-    if (hasSizes && !selectedSize) return; // Should not happen since we auto-select first
     onAddToCart({
       ...product,
       price: currentPrice,
       originalPrice: currentOriginalPrice,
       stock: currentStock,
-      selectedWidthSize: hasSizes ? (selectedSize || currentSizeObj?.size) : undefined,
+      selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
     });
   };
 
   const handleBuyNow = () => {
-    if (hasSizes && !selectedSize) return;
     onBuyNow({
       ...product,
       price: currentPrice,
       originalPrice: currentOriginalPrice,
       stock: currentStock,
-      selectedWidthSize: hasSizes ? (selectedSize || currentSizeObj?.size) : undefined,
+      selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
     });
   };
-
-  const activeSize = selectedSize || currentSizeObj?.size || '';
 
   return (
     <div className="w-full min-w-0 space-y-6 overflow-hidden">
@@ -121,39 +179,69 @@ export function ProductInfo({
       </div>
 
       {/* Size Selection */}
-      {hasSizes && (
+      {displaySizeList.length > 0 && (
         <div className="space-y-2.5 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-          <p className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-700">
-            Size
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-700">
+              Select Bead Size
+            </p>
+            {hasActiveSizes && (
+              <span className="text-xs font-medium text-amber-600">
+                Selected: {activeSizeLabel}
+              </span>
+            )}
+          </div>
+
           <div className="flex flex-wrap gap-3">
-            {activeSizes.map((sizeItem) => {
-              const isSelected = sizeItem.size === activeSize;
-              const sizeOutOfStock = sizeItem.stock <= 0;
+            {displaySizeList.map((sizeItem) => {
+              const isSelected = sizeItem.size === activeSizeLabel && sizeItem.isAvailable;
+              const isDisabled = !sizeItem.isAvailable;
+              const sizeOutOfStock = sizeItem.isAvailable && sizeItem.stock <= 0;
+
               return (
                 <button
                   key={sizeItem.size}
                   type="button"
-                  onClick={() => setSelectedSize(sizeItem.size)}
-                  disabled={sizeOutOfStock}
-                  className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition cursor-pointer ${
-                    sizeOutOfStock
-                      ? 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed opacity-60 line-through'
+                  onClick={() => {
+                    if (!isDisabled) {
+                      setSelectedSize(sizeItem.size);
+                    }
+                  }}
+                  disabled={isDisabled || sizeOutOfStock}
+                  className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
+                    isDisabled
+                      ? 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed opacity-50 line-through'
+                      : sizeOutOfStock
+                      ? 'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed opacity-60 line-through'
                       : isSelected
-                      ? 'border-amber-500 bg-amber-500 text-white shadow-sm ring-2 ring-amber-500/30'
-                      : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300'
+                      ? 'border-amber-500 bg-amber-500 text-white shadow-sm ring-2 ring-amber-500/30 cursor-pointer'
+                      : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300 cursor-pointer'
                   }`}
+                  title={
+                    isDisabled
+                      ? `${sizeItem.size} size is currently disabled`
+                      : sizeOutOfStock
+                      ? `${sizeItem.size} is out of stock`
+                      : `Select ${sizeItem.size}`
+                  }
                 >
-                  <span className="text-xs">{sizeOutOfStock ? '✕' : isSelected ? '●' : '○'}</span>
+                  <span className="text-xs">
+                    {isDisabled ? '✕' : sizeOutOfStock ? '✕' : isSelected ? '●' : '○'}
+                  </span>
                   <span>{sizeItem.size}</span>
-                  <span className="text-xs opacity-80">(₹{sizeItem.price})</span>
+                  {sizeItem.isAvailable ? (
+                    <span className="text-xs opacity-90">(₹{sizeItem.price})</span>
+                  ) : (
+                    <span className="text-[10px] uppercase opacity-75">(Disabled)</span>
+                  )}
                 </button>
               );
             })}
           </div>
-          {hasSizes && isOutOfStock && (
+
+          {hasActiveSizes && currentStock <= 0 && (
             <p className="text-xs text-rose-500 font-medium mt-1">
-              {activeSize} is currently out of stock
+              {activeSizeLabel} is currently out of stock
             </p>
           )}
         </div>
@@ -264,10 +352,10 @@ export function ProductInfo({
       <NotifyMeModal
         productId={product.id}
         productTitle={product.name}
-        selectedWidthSize={activeSize}
+        selectedWidthSize={activeSizeLabel}
         isOpen={isNotifyModalOpen}
         onClose={() => setIsNotifyModalOpen(false)}
       />
     </div>
   );
-}
+}

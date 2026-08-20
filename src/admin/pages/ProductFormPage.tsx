@@ -214,10 +214,13 @@ export function ProductFormPage() {
         isActive: s.isActive !== false,
       }));
 
+      const firstActivePrice = activeSizes.find((s) => s.isActive && s.price > 0)?.price;
+      const computedPrice = Number(price) > 0 ? Number(price) : (firstActivePrice || 0);
+
       const dto: CreateProductDTO = {
         name,
         categoryId: selectedCatId || categories[0]?.id || '',
-        price: Number(price),
+        price: computedPrice,
         originalPrice: originalPrice != null ? Number(originalPrice) : undefined,
         discountPrice: discountPrice ? Number(discountPrice) : undefined,
         stock: Number(stock),

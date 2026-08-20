@@ -119,6 +119,17 @@ export function normalizeProduct(raw: any): Product {
         : {};
 
   const sizes = normalizeSizes(raw);
+  const activeSizesWithPrice = sizes.filter((s) => s.isActive && s.price > 0);
+
+  let price = Number(raw?.price ?? 0);
+  let originalPrice = Number(raw?.originalPrice ?? raw?.discountPrice ?? raw?.price ?? 0);
+
+  if (price === 0 && activeSizesWithPrice.length > 0) {
+    price = activeSizesWithPrice[0].price;
+    if (activeSizesWithPrice[0].originalPrice) {
+      originalPrice = activeSizesWithPrice[0].originalPrice;
+    }
+  }
 
   return {
     id: String(raw?._id ?? raw?.id ?? `${raw?.slug ?? 'product'}-${Math.random()}`),
@@ -127,8 +138,8 @@ export function normalizeProduct(raw: any): Product {
     subCategory: raw?.subCategory ?? '',
     intention: raw?.intention ?? '',
     chakra: raw?.chakra ?? '',
-    price: Number(raw?.price ?? 0),
-    originalPrice: Number(raw?.originalPrice ?? raw?.discountPrice ?? raw?.price ?? 0),
+    price,
+    originalPrice,
     stock,
     inventoryStatus,
     rating: Number(raw?.ratings?.average ?? raw?.rating ?? 5),
