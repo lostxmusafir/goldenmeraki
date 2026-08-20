@@ -158,6 +158,12 @@ export function CartDrawer({
                         </div>
                         <div className="text-sm font-medium text-slate-950">{formatCurrency(item.price * item.quantity)}</div>
                       </div>
+                      
+                      {item.stock != null && item.quantity >= item.stock && item.stock > 0 && (
+                        <div className="mt-1.5 text-[11px] font-medium text-amber-600">
+                          Max available stock ({item.stock}) reached
+                        </div>
+                      )}
                     </div>
                   </div>
                 </article>

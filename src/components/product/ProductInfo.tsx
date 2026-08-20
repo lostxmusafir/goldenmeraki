@@ -265,50 +265,6 @@ export function ProductInfo({
       <div className="space-y-3">
         {!isOutOfStock && !isComingSoon && !isDiscontinued ? (
           <>
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Quantity
-            </p>
-
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-              <div className="flex flex-col gap-1">
-                <div className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-white p-1">
-                  <button
-                    type="button"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1 || currentStock <= 0}
-                    className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
-                      quantity <= 1 || currentStock <= 0
-                        ? 'opacity-40 cursor-not-allowed text-slate-300'
-                        : 'hover:bg-slate-100 text-slate-700 cursor-pointer'
-                    }`}
-                  >
-                    -
-                  </button>
-
-                  <span className="min-w-10 px-3 text-center font-medium">
-                    {quantity}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-                    disabled={quantity >= currentStock || currentStock <= 0}
-                    className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
-                      quantity >= currentStock || currentStock <= 0
-                        ? 'opacity-40 cursor-not-allowed text-slate-300'
-                        : 'hover:bg-slate-100 text-slate-700 cursor-pointer'
-                    }`}
-                  >
-                    +
-                  </button>
-                </div>
-                {quantity >= currentStock && currentStock > 0 && (
-                  <span className="text-[11px] font-medium text-amber-600">
-                    Max available stock ({currentStock}) reached
-                  </span>
-                )}
-              </div>
-
               <div className="flex w-full flex-col gap-3 sm:flex-row">
                 <Button
                   className="w-full bg-slate-950 py-3 text-white sm:flex-1 hover:bg-slate-800"
@@ -325,7 +281,6 @@ export function ProductInfo({
                   Buy now
                 </Button>
               </div>
-            </div>
           </>
         ) : (
           <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 space-y-3">
