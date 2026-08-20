@@ -503,60 +503,64 @@ export function ProductFormPage() {
             </div>
           </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Selling Price (₹) *</label>
-            <input
-              type="number"
-              required
-              min="0"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-            />
+        {(!isTreeProduct && !isBraceletProduct && sizes.length === 0) && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Selling Price (₹) *</label>
+              <input
+                type="number"
+                required
+                min="0"
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Original Price (₹)</label>
+              <input
+                type="number"
+                min="0"
+                value={originalPrice ?? ''}
+                onChange={(e) => setOriginalPrice(e.target.value ? Number(e.target.value) : undefined)}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Discount Price (₹)</label>
+              <input
+                type="number"
+                min="0"
+                value={discountPrice ?? ''}
+                onChange={(e) => setDiscountPrice(e.target.value ? Number(e.target.value) : undefined)}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+              />
+            </div>
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Original Price (₹)</label>
-            <input
-              type="number"
-              min="0"
-              value={originalPrice ?? ''}
-              onChange={(e) => setOriginalPrice(e.target.value ? Number(e.target.value) : undefined)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Discount Price (₹)</label>
-            <input
-              type="number"
-              min="0"
-              value={discountPrice ?? ''}
-              onChange={(e) => setDiscountPrice(e.target.value ? Number(e.target.value) : undefined)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-            />
-          </div>
-        </div>
+        )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Stock Quantity *</label>
-            <input
-              type="number"
-              required
-              min="0"
-              value={stock}
-              onChange={(e) => {
-                const newStock = Number(e.target.value);
-                setStock(newStock);
-                if (newStock === 0 && inventoryStatus === 'IN_STOCK') {
-                  setInventoryStatus('OUT_OF_STOCK');
-                } else if (newStock > 0 && inventoryStatus === 'OUT_OF_STOCK') {
-                  setInventoryStatus('IN_STOCK');
-                }
-              }}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-            />
-          </div>
+        <div className={`grid grid-cols-1 gap-4 sm:grid-cols-${(!isTreeProduct && !isBraceletProduct && sizes.length === 0) ? '3' : '2'}`}>
+          {(!isTreeProduct && !isBraceletProduct && sizes.length === 0) && (
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Stock Quantity *</label>
+              <input
+                type="number"
+                required
+                min="0"
+                value={stock}
+                onChange={(e) => {
+                  const newStock = Number(e.target.value);
+                  setStock(newStock);
+                  if (newStock === 0 && inventoryStatus === 'IN_STOCK') {
+                    setInventoryStatus('OUT_OF_STOCK');
+                  } else if (newStock > 0 && inventoryStatus === 'OUT_OF_STOCK') {
+                    setInventoryStatus('IN_STOCK');
+                  }
+                }}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+              />
+            </div>
+          )}
 
           <div>
             <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Inventory Status *</label>
