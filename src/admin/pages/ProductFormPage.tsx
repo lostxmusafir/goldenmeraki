@@ -7,6 +7,7 @@ import { productService } from '../services/product.service';
 import type { CreateProductDTO, InventoryStatusType, SizeVariant } from '../types/product.types';
 
 const DEFAULT_SIZES = ['8mm', '10mm'];
+const DEFAULT_TREE_SIZES = ['100 Beads', '160 Beads', '300 Beads', '500 Beads'];
 
 export function ProductFormPage() {
   const navigate = useNavigate();
@@ -51,6 +52,14 @@ export function ProductFormPage() {
       (selectedCategoryObj.name.toLowerCase().includes('bracelet') ||
         selectedCategoryObj.slug.toLowerCase().includes('bracelet') ||
         selectedCategoryObj.id.toLowerCase().includes('bracelet')),
+  );
+
+  const isTreeProduct = Boolean(
+    (selectedCategoryObj &&
+      (selectedCategoryObj.name.toLowerCase().includes('tree') ||
+        selectedCategoryObj.slug.toLowerCase().includes('tree') ||
+        selectedCategoryObj.id.toLowerCase().includes('tree'))) ||
+      name.toLowerCase().includes('tree'),
   );
 
   useEffect(() => {
@@ -102,20 +111,32 @@ export function ProductFormPage() {
     }
   }, [categories, selectedCatId]);
 
-  // Auto-add default sizes when a bracelet category is selected and no sizes exist
+  // Auto-add default sizes when a bracelet or tree category is selected and no sizes exist
   useEffect(() => {
-    if (isBraceletProduct && sizes.length === 0 && !isEdit) {
-      setSizes(
-        DEFAULT_SIZES.map((size) => ({
-          size,
-          price: price || 0,
-          originalPrice: originalPrice,
-          stock: stock || 0,
-          isActive: true,
-        })),
-      );
+    if (sizes.length === 0 && !isEdit) {
+      if (isTreeProduct) {
+        setSizes(
+          DEFAULT_TREE_SIZES.map((size) => ({
+            size,
+            price: price || 0,
+            originalPrice: originalPrice,
+            stock: stock || 0,
+            isActive: true,
+          })),
+        );
+      } else if (isBraceletProduct) {
+        setSizes(
+          DEFAULT_SIZES.map((size) => ({
+            size,
+            price: price || 0,
+            originalPrice: originalPrice,
+            stock: stock || 0,
+            isActive: true,
+          })),
+        );
+      }
     }
-  }, [isBraceletProduct]);
+  }, [isBraceletProduct, isTreeProduct]);
 
   const handleAddSize = () => {
     const sizeLabel = newSizeInput.trim();
@@ -322,15 +343,15 @@ export function ProductFormPage() {
           </div>
         </div>
 
-        {/* ===== SIZE VARIANTS SECTION ===== */}
-        {(isBraceletProduct || sizes.length > 0) && (
+        {/* ===== SIZE / BEAD VARIANTS SECTION ===== */}
+        {(isBraceletProduct || isTreeProduct || sizes.length > 0) && (
           <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-5 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
-                Size Variants & Differential Pricing
+                {isTreeProduct ? 'Tree Bead Count Variants & Pricing (100 Beads, 160 Beads, 300 Beads, 500 Beads)' : 'Size Variants & Differential Pricing'}
               </label>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Configure per-size pricing, original price, stock, and active status. Each size can have different values.
+                Configure per-variant pricing, original price, stock, and active status. Each option can have different values.
               </p>
             </div>
 

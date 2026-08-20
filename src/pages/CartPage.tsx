@@ -98,7 +98,7 @@ export function CartPage({
                         <h2 className="text-base font-medium text-slate-950">{item.name}</h2>
                         {item.selectedWidthSize ? (
                           <p className="text-xs font-semibold text-amber-600 dark:text-amber-500">
-                            Width Size: {item.selectedWidthSize}
+                            {item.selectedWidthSize.toLowerCase().includes('bead') ? 'Bead Count' : 'Size'}: {item.selectedWidthSize}
                           </p>
                         ) : null}
                         <p className="text-sm text-slate-500">{formatCurrency(item.price)}</p>

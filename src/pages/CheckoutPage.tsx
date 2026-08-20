@@ -236,7 +236,7 @@ export function CheckoutPage({
                   <span className="font-semibold text-slate-900">{item.name}</span> (x{item.quantity})
                   {item.selectedWidthSize ? (
                     <p className="text-[11px] font-semibold text-amber-600">
-                      Width Size: {item.selectedWidthSize}
+                      {item.selectedWidthSize.toLowerCase().includes('bead') ? 'Bead Count' : 'Option'}: {item.selectedWidthSize}
                     </p>
                   ) : null}
                 </div>

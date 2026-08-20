@@ -27,24 +27,32 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
 
-  // Check if product is a bracelet or has size configurations
+  // Check if product is a tree or bracelet or has size configurations
   const isBracelet =
     product.name?.toLowerCase().includes('bracelet') ||
     product.category?.toLowerCase().includes('bracelet') ||
     (product.sizes && product.sizes.some((s) => s.size.toLowerCase().includes('mm')));
 
-  const standardSizes = ['8mm', '10mm'];
+  const isTree =
+    product.name?.toLowerCase().includes('tree') ||
+    product.category?.toLowerCase().includes('tree') ||
+    (product.sizes && product.sizes.some((s) => s.size.toLowerCase().includes('bead')));
+
+  const standardBraceletSizes = ['8mm', '10mm'];
+  const standardTreeSizes = ['100 Beads', '160 Beads', '300 Beads', '500 Beads'];
   const rawSizes = product.sizes || [];
 
   // Determine complete list of size options to display
   const displaySizeList = (() => {
-    if (rawSizes.length === 0 && !isBracelet) {
+    if (rawSizes.length === 0 && !isBracelet && !isTree) {
       return [];
     }
 
     const sizeLabels = new Set<string>();
-    if (isBracelet || rawSizes.some((s) => standardSizes.includes(s.size.toLowerCase()))) {
-      standardSizes.forEach((sz) => sizeLabels.add(sz));
+    if (isTree || rawSizes.some((s) => s.size.toLowerCase().includes('bead'))) {
+      standardTreeSizes.forEach((sz) => sizeLabels.add(sz));
+    } else if (isBracelet || rawSizes.some((s) => standardBraceletSizes.includes(s.size.toLowerCase()))) {
+      standardBraceletSizes.forEach((sz) => sizeLabels.add(sz));
     }
     rawSizes.forEach((s) => sizeLabels.add(s.size));
 
@@ -185,12 +193,12 @@ export function ProductInfo({
         </div>
       </div>
 
-      {/* Size Selection */}
+      {/* Size / Bead Count Selection */}
       {displaySizeList.length > 0 && (
         <div className="space-y-2.5 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-700">
-              Select Bead Size
+              {isTree ? 'Select Bead Count' : 'Select Bead Size'}
             </p>
             {hasActiveSizes && (
               <span className="text-xs font-medium text-amber-600">
