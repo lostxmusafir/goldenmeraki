@@ -22,10 +22,10 @@ import { useAuth } from '../hooks/useAuth';
 import { ADMIN_ROUTES } from '../constants/admin.constants';
 
 const NAVIGATION_ITEMS = [
-  // { name: 'Dashboard', path: ADMIN_ROUTES.DASHBOARD, icon: LayoutDashboard },
+  { name: 'Dashboard', path: ADMIN_ROUTES.DASHBOARD, icon: LayoutDashboard },
   { name: 'Categories', path: ADMIN_ROUTES.CATEGORIES, icon: Layers },
   { name: 'Products', path: ADMIN_ROUTES.PRODUCTS, icon: ShoppingBag },
-  // { name: 'Orders', path: ADMIN_ROUTES.ORDERS, icon: ShoppingCart },
+  { name: 'Orders', path: ADMIN_ROUTES.ORDERS, icon: ShoppingCart },
   // { name: 'Notifications', path: ADMIN_ROUTES.NOTIFICATIONS, icon: Bell },
   // { name: 'Abandoned Carts', path: ADMIN_ROUTES.ABANDONED_CARTS, icon: RefreshCcw },
   // { name: 'Customers', path: ADMIN_ROUTES.CUSTOMERS, icon: Users },
