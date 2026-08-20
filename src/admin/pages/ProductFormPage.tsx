@@ -448,18 +448,18 @@ export function ProductFormPage() {
               </div>
             ))}
 
-            {/* Add new size */}
+            {/* Add new size / bead count */}
             <div className="flex items-end gap-2 pt-1">
               <div className="flex-1">
                 <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Add New Size
+                  {isTreeProduct ? 'Add Custom Bead Count' : 'Add New Size'}
                 </label>
                 <input
                   type="text"
                   value={newSizeInput}
                   onChange={(e) => setNewSizeInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSize(); } }}
-                  placeholder="e.g. 12mm"
+                  placeholder={isTreeProduct ? 'e.g. 200 Beads, 750 Beads, 1000 Beads' : 'e.g. 12mm'}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                 />
               </div>
