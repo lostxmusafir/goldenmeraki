@@ -52,7 +52,7 @@ export function NotifyMeModal({
         (email.trim() ? `*Email:* ${email.trim()}\n` : '') +
         `\nPlease notify me when this product is back in stock! Thank you.`;
 
-      const businessPhone = '919876543210';
+      const businessPhone = '919667290056';
       const whatsappUrl = `https://wa.me/${businessPhone}?text=${encodeURIComponent(message)}`;
 
       // 3. Open WhatsApp chat for customer
