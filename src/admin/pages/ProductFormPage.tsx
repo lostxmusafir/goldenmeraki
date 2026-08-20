@@ -139,32 +139,7 @@ export function ProductFormPage() {
     }
   }, [categories, selectedCatId]);
 
-  // Auto-add default sizes when a bracelet or tree category is selected and no sizes exist
-  useEffect(() => {
-    if (sizes.length === 0 && !isEdit) {
-      if (isTreeProduct) {
-        setSizes(
-          DEFAULT_TREE_SIZES.map((size) => ({
-            size,
-            price: price || 0,
-            originalPrice: originalPrice,
-            stock: stock || 0,
-            isActive: true,
-          })),
-        );
-      } else if (isBraceletProduct) {
-        setSizes(
-          DEFAULT_SIZES.map((size) => ({
-            size,
-            price: price || 0,
-            originalPrice: originalPrice,
-            stock: stock || 0,
-            isActive: true,
-          })),
-        );
-      }
-    }
-  }, [isBraceletProduct, isTreeProduct]);
+
 
   const handleAddSize = () => {
     const sizeLabel = newSizeInput.trim();
