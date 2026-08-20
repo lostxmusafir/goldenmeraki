@@ -285,8 +285,10 @@ export function ProductFormPage() {
         }
       }
       navigate('/admin/products');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save product');
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message;
+      const msgStr = Array.isArray(errMsg) ? errMsg.join(', ') : errMsg;
+      setError(msgStr || err.message || 'Failed to save product');
     } finally {
       setIsSubmitting(false);
     }
