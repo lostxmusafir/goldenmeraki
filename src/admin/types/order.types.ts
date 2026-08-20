@@ -51,4 +51,5 @@ export interface CreateOrderDTO {
 export interface UpdateOrderStatusDTO {
   orderStatus?: OrderStatus;
   paymentStatus?: PaymentStatus;
+  restoreStock?: boolean;
 }

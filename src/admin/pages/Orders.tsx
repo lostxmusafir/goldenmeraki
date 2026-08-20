@@ -42,12 +42,13 @@ export function Orders() {
     fetchOrders();
   }, [search, statusFilter, paymentFilter, page]);
 
-  const handleUpdateStatus = async (id: string, newOrderStatus?: OrderStatus, newPaymentStatus?: PaymentStatus) => {
+  const handleUpdateStatus = async (id: string, newOrderStatus?: OrderStatus, newPaymentStatus?: PaymentStatus, restoreStock?: boolean) => {
     setIsUpdating(true);
     try {
       const updated = await orderService.updateOrderStatus(id, {
         orderStatus: newOrderStatus,
         paymentStatus: newPaymentStatus,
+        restoreStock,
       });
       setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
       if (selectedOrder && selectedOrder.id === id) {
@@ -356,6 +357,28 @@ export function Orders() {
                 </select>
               </div>
             </div>
+
+            {/* Order Actions */}
+            {(selectedOrder.orderStatus === 'PENDING' || selectedOrder.orderStatus === 'PROCESSING') && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-4 dark:border-rose-900/40 dark:bg-rose-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="text-sm font-bold text-rose-800 dark:text-rose-300">Decline Order</h4>
+                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">Cancel this order and automatically restore the stock for its items.</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={isUpdating}
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to decline this order and restore stock?')) {
+                      handleUpdateStatus(selectedOrder.id, 'CANCELLED', undefined, true);
+                    }
+                  }}
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm disabled:opacity-50 whitespace-nowrap"
+                >
+                  Decline & Restore Stock
+                </button>
+              </div>
+            )}
 
             {/* Itemized list */}
             <div>

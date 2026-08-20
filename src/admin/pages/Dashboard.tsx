@@ -1,24 +1,30 @@
 import { useState } from 'react';
-import { CheckSquare, Building2, Tag, ChevronDown } from 'lucide-react';
+import { CheckSquare, Building2, Tag, ChevronDown, AlertCircle, Edit, ArrowRight } from 'lucide-react';
 import { useOrders } from '../hooks/useOrders';
 import { useProducts } from '../hooks/useProducts';
+import { useDashboard } from '../hooks/useDashboard';
 import { formatCurrency } from '../utils/formatters';
+import { useNavigate } from 'react-router-dom';
 
 export function Dashboard() {
   const { orders } = useOrders();
   const { products } = useProducts();
+  const { stats, loading } = useDashboard();
+  const navigate = useNavigate();
 
   const [countryFilter, setCountryFilter] = useState('India');
   const [timeFilter, setTimeFilter] = useState('This month');
   const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(10);
 
-  // Calculations
-  const totalSales = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+  // Stats Calculations
+  const totalSales = stats?.overview?.totalRevenue || 0;
+  const totalOrders = stats?.overview?.totalOrders || 0;
+  
   const totalUnitsSold = orders.reduce(
     (sum, o) => sum + (o.cartItems || []).reduce((iSum: number, item: any) => iSum + (item.quantity || 0), 0),
     0
   );
-  const avgOrderValue = orders.length > 0 ? Math.round(totalSales / orders.length) : 0;
+  const avgOrderValue = totalOrders > 0 ? Math.round(totalSales / totalOrders) : 0;
 
   const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
   const catalogTotalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
@@ -34,7 +40,7 @@ export function Dashboard() {
   const ordersByDay = orders.reduce((acc: Record<string, { leads: number; revenue: number }>, order) => {
     if (!order.createdAt) return acc;
     const dateObj = new Date(order.createdAt);
-    const dayStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); // e.g. "10 Aug"
+    const dayStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
     if (!acc[dayStr]) {
       acc[dayStr] = { leads: 0, revenue: 0 };
     }
@@ -59,10 +65,14 @@ export function Dashboard() {
   const maxLeadsValue = Math.max(...chartDays.map(item => item.leads), 0);
   const maxLeads = maxLeadsValue > 0 ? maxLeadsValue : 10;
 
+  if (loading) {
+    return <div className="flex h-64 items-center justify-center text-slate-500">Loading Dashboard...</div>;
+  }
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Main Heading */}
-      <div className="border-b border-slate-300 pb-4">
+      <div className="border-b border-slate-300 pb-4 flex justify-between items-center">
         <h1 className="text-3xl font-black tracking-tight text-slate-900">Dashboard</h1>
       </div>
 
@@ -207,6 +217,69 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* OUT OF STOCK ALERTS */}
+      {stats?.lowStockProducts && stats.lowStockProducts.length > 0 && (
+        <div className="p-6 rounded-2xl bg-white border border-rose-200 shadow-sm space-y-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-full bg-rose-500" />
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="p-2 bg-rose-100 text-rose-600 rounded-lg">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">Inventory Alerts</h3>
+              <p className="text-xs text-slate-500 font-medium">Products that are out of stock or running low and need to be refilled.</p>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                  <th className="p-3">Product Name</th>
+                  <th className="p-3">SKU</th>
+                  <th className="p-3 text-right">Price</th>
+                  <th className="p-3 text-center">Current Stock</th>
+                  <th className="p-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-sm">
+                {stats.lowStockProducts.map(product => {
+                  const isOutOfStock = product.stock <= 0;
+                  return (
+                    <tr key={product._id} className="hover:bg-slate-50/50 transition">
+                      <td className="p-3 font-semibold text-slate-900">{product.title}</td>
+                      <td className="p-3 text-slate-500 text-xs">{product.sku || 'N/A'}</td>
+                      <td className="p-3 text-right text-slate-900 font-medium">{formatCurrency(product.price)}</td>
+                      <td className="p-3 text-center">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                          isOutOfStock ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
+                        }`}>
+                          {isOutOfStock ? 'Out of Stock (0)' : `Low Stock (${product.stock})`}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right">
+                        <button
+                          onClick={() => navigate(`/admin/products/${product._id}`)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 hover:text-slate-900 transition"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                          Refill Stock
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="pt-2 flex justify-end">
+             <button onClick={() => navigate('/admin/products')} className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1">
+               View All Products <ArrowRight className="w-3.5 h-3.5" />
+             </button>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Section: Total Leads / Sales by Day Bar Chart */}
       <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-6">
