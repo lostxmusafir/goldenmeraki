@@ -46,21 +46,49 @@ export function ProductFormPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedCategoryObj = categories.find((c) => c.id === selectedCatId);
+  const selectedCategoryObj = categories.find(
+    (c) => c.id === selectedCatId || c.slug === selectedCatId || (c as any)._id === selectedCatId,
+  );
+
   const isBraceletProduct = Boolean(
-    selectedCategoryObj &&
-      (selectedCategoryObj.name.toLowerCase().includes('bracelet') ||
-        selectedCategoryObj.slug.toLowerCase().includes('bracelet') ||
-        selectedCategoryObj.id.toLowerCase().includes('bracelet')),
+    name.toLowerCase().includes('bracelet') ||
+      (selectedCategoryObj &&
+        (selectedCategoryObj.name.toLowerCase().includes('bracelet') ||
+          selectedCategoryObj.slug.toLowerCase().includes('bracelet') ||
+          selectedCategoryObj.id.toLowerCase().includes('bracelet'))),
   );
 
   const isTreeProduct = Boolean(
-    (selectedCategoryObj &&
-      (selectedCategoryObj.name.toLowerCase().includes('tree') ||
-        selectedCategoryObj.slug.toLowerCase().includes('tree') ||
-        selectedCategoryObj.id.toLowerCase().includes('tree'))) ||
-      name.toLowerCase().includes('tree'),
+    name.toLowerCase().includes('tree') ||
+      (selectedCategoryObj &&
+        (selectedCategoryObj.name.toLowerCase().includes('tree') ||
+          selectedCategoryObj.slug.toLowerCase().includes('tree') ||
+          selectedCategoryObj.id.toLowerCase().includes('tree'))),
   );
+
+  const loadTreePreset = () => {
+    setSizes(
+      DEFAULT_TREE_SIZES.map((size) => ({
+        size,
+        price: price || 0,
+        originalPrice: originalPrice,
+        stock: stock || 10,
+        isActive: true,
+      })),
+    );
+  };
+
+  const loadBraceletPreset = () => {
+    setSizes(
+      DEFAULT_SIZES.map((size) => ({
+        size,
+        price: price || 0,
+        originalPrice: originalPrice,
+        stock: stock || 10,
+        isActive: true,
+      })),
+    );
+  };
 
   useEffect(() => {
     if (!isEdit || !id) return;
@@ -344,15 +372,37 @@ export function ProductFormPage() {
         </div>
 
         {/* ===== SIZE / BEAD VARIANTS SECTION ===== */}
-        {(isBraceletProduct || isTreeProduct || sizes.length > 0) && (
-          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-5 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-4">
+        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-5 dark:border-amber-900/40 dark:bg-amber-950/20 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
-                {isTreeProduct ? 'Tree Bead Count Variants & Pricing (100 Beads, 160 Beads, 300 Beads, 500 Beads)' : 'Size Variants & Differential Pricing'}
+                {isTreeProduct
+                  ? 'Tree Bead Count Variants & Pricing (100, 160, 300, 500 Beads)'
+                  : isBraceletProduct
+                  ? 'Bracelet Bead Size Variants & Pricing (8mm, 10mm)'
+                  : 'Size / Variant Pricing & Inventory'}
               </label>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Configure per-variant pricing, original price, stock, and active status. Each option can have different values.
+                Configure per-variant pricing, original price, stock, and active status for each bead count / size option.
               </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={loadTreePreset}
+                className="rounded-lg border border-amber-300 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-200 transition dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+              >
+                + Load Tree Beads (100, 160, 300, 500)
+              </button>
+              <button
+                type="button"
+                onClick={loadBraceletPreset}
+                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+              >
+                + Load Bracelet Sizes (8mm, 10mm)
+              </button>
+            </div>
             </div>
 
             {sizes.map((sizeItem, index) => (
