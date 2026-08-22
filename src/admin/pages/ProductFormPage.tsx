@@ -606,7 +606,7 @@ export function ProductFormPage() {
           )}
         </div>
 
-        {(variantCategory === 'general' && sizes.length === 0) && (
+        {sizes.length === 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Selling Price (₹) *</label>
@@ -642,8 +642,8 @@ export function ProductFormPage() {
           </div>
         )}
 
-        <div className={`grid grid-cols-1 gap-4 sm:grid-cols-${(variantCategory === 'general' && sizes.length === 0) ? '3' : '2'}`}>
-          {(variantCategory === 'general' && sizes.length === 0) && (
+        <div className={`grid grid-cols-1 gap-4 sm:grid-cols-${sizes.length === 0 ? '3' : '2'}`}>
+          {sizes.length === 0 && (
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Stock Quantity *</label>
               <input
