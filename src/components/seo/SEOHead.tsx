@@ -54,7 +54,8 @@ export function SEOHead({
       element.setAttribute('href', href);
     };
 
-    // 2. Primary Meta Tags
+    // 2. Primary Meta Tags & Google Verification Tag
+    setMetaTag('meta[name="google-site-verification"]', 'name', 'google-site-verification', 'QU_Cd7OuZf23_fTZU_GW1Re0TwPVwNDNNcNLjmPracI');
     setMetaTag('meta[name="description"]', 'name', 'description', description);
     if (keywords) {
       setMetaTag('meta[name="keywords"]', 'name', 'keywords', keywords);
