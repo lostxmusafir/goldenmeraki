@@ -333,13 +333,18 @@ export function ProductFormPage() {
       const firstActivePrice = activeSizes.find((s) => s.isActive && s.price > 0)?.price;
       const computedPrice = Number(price) > 0 ? Number(price) : (firstActivePrice || 0);
 
+      const computedStock =
+        activeSizes.length > 0
+          ? activeSizes.reduce((sum, s) => sum + (s.isActive ? Number(s.stock || 0) : 0), 0)
+          : Number(stock);
+
       const dto: CreateProductDTO = {
         name,
         categoryId: selectedCatId || categories[0]?.id || '',
         price: computedPrice,
         originalPrice: originalPrice != null ? Number(originalPrice) : undefined,
         discountPrice: discountPrice ? Number(discountPrice) : undefined,
-        stock: Number(stock),
+        stock: computedStock,
         inventoryStatus,
         status: prodStatus,
         description,

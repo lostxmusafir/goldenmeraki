@@ -56,7 +56,12 @@ const normalizeSizes = (item: any): SizeVariant[] => {
 };
 
 const mapProduct = (item: any): AdminProduct => {
-  const stock = Number(item.stock ?? 0);
+  const sizes = normalizeSizes(item);
+  let stock = Number(item.stock ?? 0);
+  if (sizes.length > 0) {
+    stock = sizes.reduce((sum, s) => sum + (s.isActive !== false ? Number(s.stock || 0) : 0), 0);
+  }
+
   let inventoryStatus: InventoryStatusType = item.inventoryStatus;
   if (!inventoryStatus) {
     inventoryStatus = stock > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK';
