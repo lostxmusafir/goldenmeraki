@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /product/
+Allow: /category/
+Disallow: /admin/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /thank-you
+Disallow: /loader
+
+Sitemap: https://goldenmerakigems.com/sitemap.xml

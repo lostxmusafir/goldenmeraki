@@ -5,6 +5,7 @@ import { Footer } from '../components/layout/Footer/Footer';
 import { Button } from '../components/common/Button';
 import { orderService } from '../admin/services/order.service';
 import type { CommonPageProps } from './HomePage';
+import { SEOHead } from '../components/seo/SEOHead';
 
 export function ThankYouPage({
   cartCount,
@@ -44,6 +45,7 @@ export function ThankYouPage({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col justify-between">
+      <SEOHead title="Thank You For Your Order" description="Order confirmation at Golden Meraki Gems." noIndex={true} />
       <Header
         cartCount={cartCount}
         wishlistCount={wishlistCount}

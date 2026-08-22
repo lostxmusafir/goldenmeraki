@@ -9,6 +9,7 @@ import { orderService } from '../admin/services/order.service';
 import { abandonedCartService } from '../admin/services/abandoned-cart.service';
 import type { CartItem } from '../types/cart';
 import type { CommonPageProps } from './HomePage';
+import { SEOHead } from '../components/seo/SEOHead';
 
 export interface CheckoutPageProps extends CommonPageProps {
   cartItems: CartItem[];
@@ -152,6 +153,7 @@ export function CheckoutPage({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
+      <SEOHead title="Checkout" description="Complete your crystal order at Golden Meraki Gems." noIndex={true} />
       <Header
         cartCount={cartCount}
         wishlistCount={wishlistCount}

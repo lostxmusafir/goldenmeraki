@@ -10,6 +10,9 @@ import type { Product } from '../types/product';
 import type { CommonPageProps } from './HomePage';
 import { useEffect, useState } from 'react';
 import { getProductBySlug, getProducts } from '../services/catalogApi';
+import { SEOHead } from '../components/seo/SEOHead';
+import { getBreadcrumbSchema, getProductSchema } from '../utils/seoSchemas';
+import { getImageUrl } from '../utils/image';
 
 export interface ProductPageProps extends CommonPageProps {
   slug: string;
@@ -112,8 +115,36 @@ export function ProductPage({
     return <Navigate to="/category/all" replace />;
   }
 
+  const canonicalUrl = `https://goldenmerakigems.com/product/${slug}`;
+  const categoryName = typeof product.category === 'string' ? product.category : (product.category as any)?.name || 'Crystals';
+
+  const seoTitle = product.seoTitle || `${product.name} | Natural ${categoryName} | Golden Meraki Gems`;
+  const seoDesc =
+    product.seoDescription ||
+    (product.description && product.description.length > 10
+      ? product.description.slice(0, 155).trim() + '...'
+      : `Buy certified natural ${product.name} gemstone at Golden Meraki Gems. Pure energetic crystal for manifestation, intention & protection.`);
+  const ogImg = product.images && product.images.length > 0 ? getImageUrl(product.images[0]) : undefined;
+
+  const breadcrumbs = [
+    { name: 'Home', url: '/' },
+    { name: categoryName, url: `/category/${categorySlug(product.category)}` },
+    { name: product.name, url: `/product/${slug}` },
+  ];
+
+  const productSchemas = [getProductSchema(product, canonicalUrl), getBreadcrumbSchema(breadcrumbs)];
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
+      <SEOHead
+        title={seoTitle}
+        description={seoDesc}
+        keywords={product.seoKeywords || `${product.name}, ${categoryName}, natural crystal, healing gemstone`}
+        canonicalUrl={canonicalUrl}
+        ogType="product"
+        ogImage={ogImg}
+        jsonLd={productSchemas}
+      />
       <Header
         cartCount={cartCount}
         wishlistCount={wishlistCount}

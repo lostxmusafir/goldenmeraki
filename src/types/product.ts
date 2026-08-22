@@ -41,7 +41,9 @@ export interface Product extends BaseEntity {
   benefits?: string[];
   specifications?: Record<string, string> | any;
   isFeatured?: boolean;
-  isActive?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
   /** New structured size variants */
   sizes?: SizeVariant[];
   /** Optional product video URL */

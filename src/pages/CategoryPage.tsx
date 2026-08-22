@@ -13,6 +13,8 @@ import { categorySlug } from '../utils/catalog';
 import type { Product } from '../types/product';
 import type { CommonPageProps } from './HomePage';
 import { getCategories, getProducts, type CatalogCategory } from '../services/catalogApi';
+import { SEOHead } from '../components/seo/SEOHead';
+import { getBreadcrumbSchema } from '../utils/seoSchemas';
 
 export interface CategoryPageProps extends CommonPageProps {
   onAddToCart: (product: Product) => void;
@@ -129,8 +131,29 @@ export function CategoryPage({
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);
 
+  const categoryName = category?.name ?? (slug === 'all' ? 'All Natural Crystals & Gemstones' : slug);
+  const canonicalUrl = `https://goldenmerakigems.com/category/${slug}`;
+
+  const seoTitle = (category as any)?.seoTitle || `${categoryName} | Natural Crystals & Gemstones | Golden Meraki Gems`;
+  const seoDesc =
+    (category as any)?.seoDescription ||
+    category?.description ||
+    `Explore certified ${categoryName} at Golden Meraki Gems. Handpicked natural healing crystals, 7 chakra gemstone bracelets, raw clusters & intention jewelry.`;
+
+  const breadcrumbs = [
+    { name: 'Home', url: '/' },
+    { name: categoryName, url: `/category/${slug}` },
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
+      <SEOHead
+        title={seoTitle}
+        description={seoDesc}
+        keywords={`${categoryName}, natural crystals, gemstones, crystal healing, golden meraki`}
+        canonicalUrl={canonicalUrl}
+        jsonLd={getBreadcrumbSchema(breadcrumbs)}
+      />
       <Header
         cartCount={cartCount}
         wishlistCount={wishlistCount}

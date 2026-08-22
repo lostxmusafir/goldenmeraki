@@ -20,9 +20,12 @@ import { Banners } from '../pages/Banners';
 import { Settings } from '../pages/Settings';
 import { Profile } from '../pages/Profile';
 
+import { SEOHead } from '../../components/seo/SEOHead';
+
 export function AdminRoutes() {
   return (
     <AuthProvider>
+      <SEOHead title="Golden Meraki Admin Panel" noIndex={true} />
       <Routes>
         {/* Unprotected Login */}
         <Route path="login" element={<Login />} />

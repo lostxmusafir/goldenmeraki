@@ -7,6 +7,7 @@ import { formatCurrency } from '../utils/catalog';
 import type { CartItem } from '../types/cart';
 import type { CommonPageProps } from './HomePage';
 import { getImageUrl } from '../utils/image';
+import { SEOHead } from '../components/seo/SEOHead';
 
 export interface CartPageProps extends CommonPageProps {
   cartItems: CartItem[];
@@ -56,6 +57,7 @@ export function CartPage({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
+      <SEOHead title="Shopping Cart" description="View and manage items in your shopping cart at Golden Meraki Gems." noIndex={true} />
       <Header
         cartCount={cartCount}
         wishlistCount={wishlistCount}

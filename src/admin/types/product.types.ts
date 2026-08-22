@@ -31,6 +31,9 @@ export interface AdminProduct {
   isActive?: boolean;
   intention?: string;
   chakra?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
   sizes?: SizeVariant[];
   video?: string;
   /** @deprecated — use sizes instead */
@@ -60,6 +63,9 @@ export interface CreateProductDTO {
   isActive?: boolean;
   intention?: string;
   chakra?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
   sizes?: SizeVariant[];
   video?: string;
   /** @deprecated — use sizes instead */

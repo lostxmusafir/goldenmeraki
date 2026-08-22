@@ -8,6 +8,8 @@ import { TrendingProducts } from '../components/home/TrendingProducts';
 import { WhyChooseUs } from '../components/home/WhyChooseUs';
 import { Testimonials } from '../components/home/Testimonials';
 import { Newsletter } from '../components/home/Newsletter';
+import { SEOHead } from '../components/seo/SEOHead';
+import { getOrganizationSchema, getWebSiteSchema } from '../utils/seoSchemas';
 import type { Product } from '../types/product';
 
 export interface CommonPageProps {
@@ -52,6 +54,12 @@ export function HomePage({
 }: HomePageProps) {
   return (
     <div className="min-h-screen bg-white text-slate-950">
+      <SEOHead
+        title="Golden Meraki Gems | Natural Crystals, Gemstones & Healing Products"
+        description="Discover certified natural healing crystals, 7 chakra gemstone bracelets, raw quartz clusters, feng shui trees & custom intention jewelry at Golden Meraki Gems."
+        canonicalUrl="https://goldenmerakigems.com/"
+        jsonLd={[getOrganizationSchema(), getWebSiteSchema()]}
+      />
       <Header
         cartCount={cartCount}
         wishlistCount={wishlistCount}
