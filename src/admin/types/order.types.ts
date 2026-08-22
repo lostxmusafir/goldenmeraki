@@ -1,4 +1,13 @@
-export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus =
+  | 'AWAITING_WHATSAPP'
+  | 'CONFIRMED'
+  | 'EXPIRED'
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED';
+
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 
 export interface ShippingAddressInfo {
@@ -16,6 +25,8 @@ export interface OrderItem {
   price: number;
   image?: string;
   selectedWidthSize?: string;
+  stock?: number;
+  reservedStock?: number;
 }
 
 export interface AdminOrder {
@@ -33,6 +44,11 @@ export interface AdminOrder {
   source: string;
   orderNotes?: string;
   generatedWhatsappMessage?: string;
+  whatsappHandoffAt?: string;
+  awaitingWhatsappExpiresAt?: string;
+  confirmedAt?: string;
+  cancelledAt?: string;
+  expiredAt?: string;
   createdAt: string;
   updatedAt: string;
 }

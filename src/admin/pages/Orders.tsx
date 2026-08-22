@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Download, Eye, MessageSquare, Search, Trash2, X } from 'lucide-react';
+import { CheckCircle2, Download, Eye, MessageSquare, Search, Trash2, X, XCircle } from 'lucide-react';
 import { orderService } from '../services/order.service';
 import type { AdminOrder, OrderStatus, PaymentStatus } from '../types/order.types';
 
@@ -41,6 +41,38 @@ export function Orders() {
   useEffect(() => {
     fetchOrders();
   }, [search, statusFilter, paymentFilter, page]);
+
+  const handleConfirmOrder = async (id: string) => {
+    if (!window.confirm('Confirm this order and finalize permanent stock deduction?')) return;
+    setIsUpdating(true);
+    try {
+      const updated = await orderService.confirmOrder(id);
+      setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
+      if (selectedOrder && selectedOrder.id === id) {
+        setSelectedOrder(updated);
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to confirm order');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCancelOrder = async (id: string) => {
+    if (!window.confirm('Cancel this order and release reserved stock?')) return;
+    setIsUpdating(true);
+    try {
+      const updated = await orderService.cancelOrder(id);
+      setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
+      if (selectedOrder && selectedOrder.id === id) {
+        setSelectedOrder(updated);
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to cancel order');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleUpdateStatus = async (id: string, newOrderStatus?: OrderStatus, newPaymentStatus?: PaymentStatus, restoreStock?: boolean) => {
     setIsUpdating(true);
@@ -91,13 +123,66 @@ export function Orders() {
     }
   };
 
+  const renderStatusBadge = (status: OrderStatus) => {
+    switch (status) {
+      case 'AWAITING_WHATSAPP':
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-950 dark:text-amber-300">
+            Awaiting WhatsApp
+          </span>
+        );
+      case 'CONFIRMED':
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300">
+            Confirmed
+          </span>
+        );
+      case 'EXPIRED':
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 dark:bg-slate-800 dark:text-slate-300">
+            WhatsApp Expired
+          </span>
+        );
+      case 'CANCELLED':
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-300">
+            Cancelled
+          </span>
+        );
+      case 'SHIPPED':
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            Shipped
+          </span>
+        );
+      case 'DELIVERED':
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+            Delivered
+          </span>
+        );
+      case 'PROCESSING':
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            Processing
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200">
+            {status}
+          </span>
+        );
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Order Management</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Track all website and WhatsApp customer orders in real time.
+            Track website checkouts, WhatsApp handoffs, stock reservations, and order confirmations.
           </p>
         </div>
 
@@ -137,6 +222,9 @@ export function Orders() {
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
           >
             <option value="all">All Order Statuses</option>
+            <option value="AWAITING_WHATSAPP">AWAITING_WHATSAPP</option>
+            <option value="CONFIRMED">CONFIRMED</option>
+            <option value="EXPIRED">EXPIRED</option>
             <option value="PENDING">PENDING</option>
             <option value="PROCESSING">PROCESSING</option>
             <option value="SHIPPED">SHIPPED</option>
@@ -205,21 +293,7 @@ export function Orders() {
                   <td className="p-4 text-slate-600 dark:text-slate-300">{order.cartItems.length} item(s)</td>
                   <td className="p-4 font-bold text-slate-900 dark:text-slate-100">₹{order.totalAmount.toLocaleString('en-IN')}</td>
                   <td className="p-4">
-                    <span
-                      className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        order.orderStatus === 'DELIVERED'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : order.orderStatus === 'SHIPPED'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : order.orderStatus === 'PROCESSING'
-                          ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                          : order.orderStatus === 'CANCELLED'
-                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                          : 'bg-amber-50 text-amber-700 border border-amber-200'
-                      }`}
-                    >
-                      {order.orderStatus}
-                    </span>
+                    {renderStatusBadge(order.orderStatus)}
                   </td>
                   <td className="p-4">
                     <span
@@ -236,6 +310,16 @@ export function Orders() {
                   </td>
                   <td className="p-4 text-xs text-slate-500">{new Date(order.orderDate).toLocaleDateString()}</td>
                   <td className="p-4 text-right space-x-1">
+                    {order.orderStatus === 'AWAITING_WHATSAPP' && (
+                      <button
+                        type="button"
+                        onClick={() => handleConfirmOrder(order.id)}
+                        title="Confirm Order & Deduct Stock"
+                        className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition shadow-sm"
+                      >
+                        Confirm
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => setSelectedOrder(order)}
@@ -299,10 +383,45 @@ export function Orders() {
               <div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <span>Order #{selectedOrder.orderNumber}</span>
+                  {renderStatusBadge(selectedOrder.orderStatus)}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Placed on {new Date(selectedOrder.orderDate).toLocaleString()}</p>
               </div>
             </div>
+
+            {/* AWAITING_WHATSAPP Primary Action Box */}
+            {selectedOrder.orderStatus === 'AWAITING_WHATSAPP' && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-4 dark:border-amber-900/40 dark:bg-amber-950/30 space-y-3">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                    Awaiting WhatsApp Confirmation
+                  </h4>
+                  <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
+                    Stock is currently reserved for this order. Confirming will permanently deduct actual stock and finalize the order.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={isUpdating}
+                    onClick={() => handleConfirmOrder(selectedOrder.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    Confirm Order (Deduct Stock)
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isUpdating}
+                    onClick={() => handleCancelOrder(selectedOrder.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Decline & Release Reservation
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950 space-y-1.5 text-xs">
@@ -325,6 +444,15 @@ export function Orders() {
               </div>
             </div>
 
+            {/* Timestamps & Lifecycle Metadata */}
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-300">
+              <p><strong>WhatsApp Handoff At:</strong> {selectedOrder.whatsappHandoffAt ? new Date(selectedOrder.whatsappHandoffAt).toLocaleString() : 'Not initiated'}</p>
+              <p><strong>Expiration Window:</strong> {selectedOrder.awaitingWhatsappExpiresAt ? new Date(selectedOrder.awaitingWhatsappExpiresAt).toLocaleString() : 'N/A'}</p>
+              {selectedOrder.confirmedAt && <p><strong>Confirmed At:</strong> {new Date(selectedOrder.confirmedAt).toLocaleString()}</p>}
+              {selectedOrder.cancelledAt && <p><strong>Cancelled At:</strong> {new Date(selectedOrder.cancelledAt).toLocaleString()}</p>}
+              {selectedOrder.expiredAt && <p><strong>Expired At:</strong> {new Date(selectedOrder.expiredAt).toLocaleString()}</p>}
+            </div>
+
             {/* Quick Status Update Controls */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 rounded-xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
               <div>
@@ -335,6 +463,9 @@ export function Orders() {
                   onChange={(e) => handleUpdateStatus(selectedOrder.id, e.target.value as OrderStatus, undefined)}
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                 >
+                  <option value="AWAITING_WHATSAPP">AWAITING_WHATSAPP</option>
+                  <option value="CONFIRMED">CONFIRMED</option>
+                  <option value="EXPIRED">EXPIRED</option>
                   <option value="PENDING">PENDING</option>
                   <option value="PROCESSING">PROCESSING</option>
                   <option value="SHIPPED">SHIPPED</option>
@@ -357,28 +488,6 @@ export function Orders() {
                 </select>
               </div>
             </div>
-
-            {/* Order Actions */}
-            {(selectedOrder.orderStatus === 'PENDING' || selectedOrder.orderStatus === 'PROCESSING') && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-4 dark:border-rose-900/40 dark:bg-rose-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h4 className="text-sm font-bold text-rose-800 dark:text-rose-300">Decline Order</h4>
-                  <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">Cancel this order and automatically restore the stock for its items.</p>
-                </div>
-                <button
-                  type="button"
-                  disabled={isUpdating}
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to decline this order and restore stock?')) {
-                      handleUpdateStatus(selectedOrder.id, 'CANCELLED', undefined, true);
-                    }
-                  }}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm disabled:opacity-50 whitespace-nowrap"
-                >
-                  Decline & Restore Stock
-                </button>
-              </div>
-            )}
 
             {/* Itemized list */}
             <div>

@@ -127,21 +127,17 @@ export function CheckoutPage({
         recoveryStatus: 'Recovered',
       }).catch(() => null);
 
-      // Step 2: Open generated WhatsApp link in new tab (Requirement #10)
-      if (result.whatsappUrl) {
-        window.open(result.whatsappUrl, '_blank', 'noopener,noreferrer');
-      }
-
-      // Step 3: Checkout Completion & Reset (Requirement #11)
+      // Step 2: Checkout Completion & Reset
       if (onClearCart) {
         onClearCart();
       }
       localStorage.removeItem('gm_cart');
       localStorage.removeItem('gm_abandoned_cart_id');
 
-      // Step 4: Redirect to Thank You Page (Requirement #11)
+      // Step 3: Redirect to Thank You Page where customer can continue to WhatsApp
       navigate('/thank-you', {
         state: {
+          orderId: result.order.id,
           orderNumber: result.order.orderNumber,
           whatsappUrl: result.whatsappUrl,
           totalAmount: total,
