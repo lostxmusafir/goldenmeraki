@@ -27,57 +27,30 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
 
-  // Check if product is a tree or bracelet or has size configurations
-  const isBracelet =
-    product.name?.toLowerCase().includes('bracelet') ||
-    product.category?.toLowerCase().includes('bracelet') ||
-    (product.sizes && product.sizes.some((s) => s.size.toLowerCase().includes('mm')));
+  const isPyrite =
+    product.name?.toLowerCase().includes('pyrite') ||
+    product.category?.toLowerCase().includes('pyrite') ||
+    (product.sizes && product.sizes.some((s) => s.size.toLowerCase().includes('gram')));
 
   const isTree =
     product.name?.toLowerCase().includes('tree') ||
     product.category?.toLowerCase().includes('tree') ||
     (product.sizes && product.sizes.some((s) => s.size.toLowerCase().includes('bead')));
 
-  const standardBraceletSizes = ['8mm', '10mm'];
-  const standardTreeSizes = ['100 Beads', '160 Beads', '300 Beads', '500 Beads'];
   const rawSizes = product.sizes || [];
 
-  // Determine complete list of size options to display
-  const displaySizeList = (() => {
-    if (rawSizes.length === 0 && !isBracelet && !isTree) {
-      return [];
-    }
-
-    const sizeLabels = new Set<string>();
-    if (isTree || rawSizes.some((s) => s.size.toLowerCase().includes('bead'))) {
-      standardTreeSizes.forEach((sz) => sizeLabels.add(sz));
-    } else if (isBracelet || rawSizes.some((s) => standardBraceletSizes.includes(s.size.toLowerCase()))) {
-      standardBraceletSizes.forEach((sz) => sizeLabels.add(sz));
-    }
-    rawSizes.forEach((s) => sizeLabels.add(s.size));
-
-    return Array.from(sizeLabels).map((label) => {
-      const found = rawSizes.find((s) => s.size.toLowerCase() === label.toLowerCase());
-      if (found && found.isActive !== false) {
-        return {
-          size: found.size || label,
-          price: Number(found.price ?? 0),
-          originalPrice: found.originalPrice != null ? Number(found.originalPrice) : undefined,
-          discountPrice: found.discountPrice != null ? Number(found.discountPrice) : undefined,
-          stock: Number(found.stock ?? 0),
-          isActive: true,
-          isAvailable: true,
-        };
-      }
-      return {
-        size: label,
-        price: 0,
-        stock: 0,
-        isActive: false,
-        isAvailable: false,
-      };
-    });
-  })();
+  // Display only active size variants configured in database for this product
+  const displaySizeList = rawSizes
+    .filter((s) => s.isActive !== false)
+    .map((s) => ({
+      size: s.size,
+      price: Number(s.price ?? 0),
+      originalPrice: s.originalPrice != null ? Number(s.originalPrice) : undefined,
+      discountPrice: s.discountPrice != null ? Number(s.discountPrice) : undefined,
+      stock: Number(s.stock ?? 0),
+      isActive: true,
+      isAvailable: true,
+    }));
 
   const availableSizes = displaySizeList.filter((s) => s.isAvailable);
   const hasActiveSizes = availableSizes.length > 0;
@@ -133,23 +106,29 @@ export function ProductInfo({
   const activeSizeLabel = selectedSize || currentSizeObj?.size || '';
 
   const handleAddToCart = () => {
-    onAddToCart({
-      ...product,
-      price: currentPrice,
-      originalPrice: currentOriginalPrice,
-      stock: currentStock,
-      selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
-    }, quantity);
+    onAddToCart(
+      {
+        ...product,
+        price: currentPrice,
+        originalPrice: currentOriginalPrice,
+        stock: currentStock,
+        selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
+      },
+      quantity,
+    );
   };
 
   const handleBuyNow = () => {
-    onBuyNow({
-      ...product,
-      price: currentPrice,
-      originalPrice: currentOriginalPrice,
-      stock: currentStock,
-      selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
-    }, quantity);
+    onBuyNow(
+      {
+        ...product,
+        price: currentPrice,
+        originalPrice: currentOriginalPrice,
+        stock: currentStock,
+        selectedWidthSize: hasActiveSizes ? (selectedSize || currentSizeObj?.size) : undefined,
+      },
+      quantity,
+    );
   };
 
   return (
@@ -198,7 +177,7 @@ export function ProductInfo({
         <div className="space-y-2.5 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-700">
-              {isTree ? 'Select Bead Count' : 'Select Bead Size'}
+              {isPyrite ? 'Select Weight (Gram)' : isTree ? 'Select Bead Count' : 'Select Size'}
             </p>
             {hasActiveSizes && (
               <span className="text-xs font-medium text-amber-600">
@@ -265,22 +244,22 @@ export function ProductInfo({
       <div className="space-y-3">
         {!isOutOfStock && !isComingSoon && !isDiscontinued ? (
           <>
-              <div className="flex w-full flex-col gap-3 sm:flex-row">
-                <Button
-                  className="w-full bg-slate-950 py-3 text-white sm:flex-1 hover:bg-slate-800"
-                  onClick={handleAddToCart}
-                >
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  Add to cart
-                </Button>
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <Button
+                className="w-full bg-slate-950 py-3 text-white sm:flex-1 hover:bg-slate-800"
+                onClick={handleAddToCart}
+              >
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                Add to cart
+              </Button>
 
-                <Button
-                  className="w-full border border-slate-200 bg-white py-3 text-slate-900 sm:flex-1 hover:bg-slate-50"
-                  onClick={handleBuyNow}
-                >
-                  Buy now
-                </Button>
-              </div>
+              <Button
+                className="w-full border border-slate-200 bg-white py-3 text-slate-900 sm:flex-1 hover:bg-slate-50"
+                onClick={handleBuyNow}
+              >
+                Buy now
+              </Button>
+            </div>
           </>
         ) : (
           <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 space-y-3">
@@ -345,4 +324,4 @@ export function ProductInfo({
       />
     </div>
   );
-}
+}

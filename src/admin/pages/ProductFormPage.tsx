@@ -1,13 +1,55 @@
 import { useEffect, useState, useRef, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, ShoppingBag, Plus, Trash2, Video, Upload, X, Play } from 'lucide-react';
+import { ArrowLeft, Save, ShoppingBag, Plus, Trash2, Video, Upload } from 'lucide-react';
 import { ProductImagesManager, type ProductImageItem } from '../components/common/ProductImagesManager';
 import { useCategories } from '../hooks/useCategories';
 import { productService } from '../services/product.service';
 import type { CreateProductDTO, InventoryStatusType, SizeVariant } from '../types/product.types';
 
-const DEFAULT_SIZES = ['8mm', '10mm'];
-const DEFAULT_TREE_SIZES = ['100 Beads', '160 Beads', '300 Beads', '500 Beads'];
+export type VariantCategoryType = 'pyrite' | 'tree' | 'bracelet' | 'general';
+
+export function getVariantCategoryType(
+  categoryObj?: { name?: string; slug?: string; id?: string },
+  productName: string = '',
+): VariantCategoryType {
+  const catName = (categoryObj?.name || '').toLowerCase();
+  const catSlug = (categoryObj?.slug || '').toLowerCase();
+  const catId = (categoryObj?.id || '').toLowerCase();
+  const nameLower = productName.toLowerCase();
+
+  if (
+    catName.includes('pyrite') ||
+    catSlug.includes('pyrite') ||
+    catId.includes('pyrite') ||
+    nameLower.includes('pyrite')
+  ) {
+    return 'pyrite';
+  }
+
+  if (
+    catName.includes('tree') ||
+    catSlug.includes('tree') ||
+    catId.includes('tree') ||
+    nameLower.includes('tree')
+  ) {
+    return 'tree';
+  }
+
+  if (
+    catName.includes('bracelet') ||
+    catSlug.includes('bracelet') ||
+    catId.includes('bracelet') ||
+    catName.includes('kada') ||
+    catSlug.includes('kada') ||
+    nameLower.includes('bracelet')
+  ) {
+    return 'bracelet';
+  }
+
+  return 'general';
+}
+
+const BRACELET_DEFAULT_SIZES = ['8mm', '10mm'];
 
 export function ProductFormPage() {
   const navigate = useNavigate();
@@ -50,45 +92,36 @@ export function ProductFormPage() {
     (c) => c.id === selectedCatId || c.slug === selectedCatId || (c as any)._id === selectedCatId,
   );
 
-  const isBraceletProduct = Boolean(
-    name.toLowerCase().includes('bracelet') ||
-      (selectedCategoryObj &&
-        (selectedCategoryObj.name.toLowerCase().includes('bracelet') ||
-          selectedCategoryObj.slug.toLowerCase().includes('bracelet') ||
-          selectedCategoryObj.id.toLowerCase().includes('bracelet'))),
-  );
+  const variantCategory = getVariantCategoryType(selectedCategoryObj, name);
 
-  const isTreeProduct = Boolean(
-    name.toLowerCase().includes('tree') ||
-      (selectedCategoryObj &&
-        (selectedCategoryObj.name.toLowerCase().includes('tree') ||
-          selectedCategoryObj.slug.toLowerCase().includes('tree') ||
-          selectedCategoryObj.id.toLowerCase().includes('tree'))),
-  );
+  // Synchronize/initialize variants when category or product change
+  useEffect(() => {
+    if (variantCategory === 'bracelet') {
+      setSizes((prevSizes) => {
+        const existing8mm = prevSizes.find((s) => s.size.toLowerCase() === '8mm');
+        const existing10mm = prevSizes.find((s) => s.size.toLowerCase() === '10mm');
 
-  const loadTreePreset = () => {
-    setSizes(
-      DEFAULT_TREE_SIZES.map((size) => ({
-        size,
-        price: price || 0,
-        originalPrice: originalPrice,
-        stock: stock || 10,
-        isActive: true,
-      })),
-    );
-  };
-
-  const loadBraceletPreset = () => {
-    setSizes(
-      DEFAULT_SIZES.map((size) => ({
-        size,
-        price: price || 0,
-        originalPrice: originalPrice,
-        stock: stock || 10,
-        isActive: true,
-      })),
-    );
-  };
+        return [
+          {
+            size: '8mm',
+            price: existing8mm ? existing8mm.price : 0,
+            originalPrice: existing8mm ? existing8mm.originalPrice : undefined,
+            discountPrice: existing8mm ? existing8mm.discountPrice : undefined,
+            stock: existing8mm ? existing8mm.stock : 0,
+            isActive: existing8mm ? existing8mm.isActive !== false : true,
+          },
+          {
+            size: '10mm',
+            price: existing10mm ? existing10mm.price : 0,
+            originalPrice: existing10mm ? existing10mm.originalPrice : undefined,
+            discountPrice: existing10mm ? existing10mm.discountPrice : undefined,
+            stock: existing10mm ? existing10mm.stock : 0,
+            isActive: existing10mm ? existing10mm.isActive !== false : true,
+          },
+        ];
+      });
+    }
+  }, [variantCategory]);
 
   useEffect(() => {
     if (!isEdit || !id) return;
@@ -139,13 +172,36 @@ export function ProductFormPage() {
     }
   }, [categories, selectedCatId]);
 
-
-
   const handleAddSize = () => {
-    const sizeLabel = newSizeInput.trim();
+    let sizeLabel = newSizeInput.trim();
     if (!sizeLabel) return;
+
+    if (variantCategory === 'pyrite') {
+      // Validate Pyrite: no beads or mm allowed
+      if (sizeLabel.toLowerCase().includes('bead') || sizeLabel.toLowerCase().includes('mm')) {
+        setError('Pyrite category only supports Gram variants (e.g. 10 Gram, 20 Gram).');
+        return;
+      }
+      if (!sizeLabel.toLowerCase().includes('gram') && !sizeLabel.toLowerCase().endsWith('g')) {
+        sizeLabel = `${sizeLabel} Gram`;
+      }
+    } else if (variantCategory === 'tree') {
+      // Validate Crystal Tree: no gram or mm allowed
+      if (sizeLabel.toLowerCase().includes('gram') || sizeLabel.toLowerCase().includes('mm')) {
+        setError('Crystal Tree category only supports Bead count variants (e.g. 100 Beads, 160 Beads).');
+        return;
+      }
+      if (!sizeLabel.toLowerCase().includes('bead')) {
+        sizeLabel = `${sizeLabel} Beads`;
+      }
+    } else if (variantCategory === 'bracelet') {
+      setError('Bracelets only support 8mm and 10mm sizes.');
+      return;
+    }
+
     if (sizes.some((s) => s.size.toLowerCase() === sizeLabel.toLowerCase())) return;
 
+    setError(null);
     setSizes((prev) => [
       ...prev,
       {
@@ -160,7 +216,11 @@ export function ProductFormPage() {
   };
 
   const handleRemoveSize = (index: number) => {
-    setSizes((prev) => prev.filter((_, i) => i !== index));
+    if (variantCategory === 'bracelet') {
+      setSizes((prev) => prev.map((s, i) => (i === index ? { ...s, isActive: false } : s)));
+    } else {
+      setSizes((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   const handleSizeFieldChange = (index: number, field: keyof SizeVariant, value: any) => {
@@ -175,7 +235,6 @@ export function ProductFormPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Client-side validation
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (!ext || !['mp4', 'webm'].includes(ext)) {
       setVideoError('Only MP4 and WebM video formats are allowed.');
@@ -229,7 +288,21 @@ export function ProductFormPage() {
     setError(null);
 
     try {
-      const activeSizes = sizes.map((s) => ({
+      // Filter out sizes invalid for the current category
+      let filteredSizes = sizes;
+      if (variantCategory === 'pyrite') {
+        filteredSizes = sizes.filter(
+          (s) => !s.size.toLowerCase().includes('bead') && !s.size.toLowerCase().includes('mm'),
+        );
+      } else if (variantCategory === 'tree') {
+        filteredSizes = sizes.filter(
+          (s) => !s.size.toLowerCase().includes('gram') && !s.size.toLowerCase().includes('mm'),
+        );
+      } else if (variantCategory === 'bracelet') {
+        filteredSizes = sizes.filter((s) => BRACELET_DEFAULT_SIZES.includes(s.size.toLowerCase()));
+      }
+
+      const activeSizes = filteredSizes.map((s) => ({
         size: s.size,
         price: Number(s.price),
         originalPrice: s.originalPrice != null ? Number(s.originalPrice) : undefined,
@@ -263,7 +336,6 @@ export function ProductFormPage() {
       if (isEdit && id) {
         await productService.updateProduct(id, dto);
 
-        // Upload video file if selected but not yet uploaded
         if (videoFile) {
           await productService.uploadVideo(id, videoFile);
         }
@@ -272,14 +344,12 @@ export function ProductFormPage() {
         const createdProduct = await productService.createProduct(createDto);
         const newProductId = createdProduct.id;
 
-        // Upload all local images sequentially
         for (const item of images) {
           if (item.file) {
             await productService.uploadImage(newProductId, item.file);
           }
         }
 
-        // Upload video if selected
         if (videoFile) {
           await productService.uploadVideo(newProductId, videoFile);
         }
@@ -353,144 +423,151 @@ export function ProductFormPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
-                {isTreeProduct
-                  ? 'Tree Bead Count Variants & Pricing (100, 160, 300, 500 Beads)'
-                  : isBraceletProduct
+                {variantCategory === 'pyrite'
+                  ? 'Pyrite Weight Variants & Pricing (Gram)'
+                  : variantCategory === 'tree'
+                  ? 'Tree Bead Count Variants & Pricing (Beads)'
+                  : variantCategory === 'bracelet'
                   ? 'Bracelet Bead Size Variants & Pricing (8mm, 10mm)'
                   : 'Size / Variant Pricing & Inventory'}
               </label>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Configure per-variant pricing, original price, stock, and active status for each bead count / size option.
+                {variantCategory === 'pyrite'
+                  ? 'Add custom gram weight variants for Pyrite (e.g. 10 Gram, 20 Gram, 50 Gram, 100 Gram).'
+                  : variantCategory === 'tree'
+                  ? 'Add custom bead count variants for Crystal Energy Trees (e.g. 100 Beads, 160 Beads, 300 Beads, 500 Beads).'
+                  : variantCategory === 'bracelet'
+                  ? 'Enter pricing and inventory values for 8mm and 10mm bracelet sizes.'
+                  : 'Configure per-variant pricing, original price, stock, and active status.'}
               </p>
             </div>
+          </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              {!isBraceletProduct && (
-                <button
-                  type="button"
-                  onClick={loadTreePreset}
-                  className="rounded-lg border border-amber-300 bg-amber-100/80 px-2.5 py-1 text-[11px] font-semibold text-amber-900 hover:bg-amber-200 transition dark:border-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
-                >
-                  + Load Tree Beads (100, 160, 300, 500)
-                </button>
-              )}
-              {!isTreeProduct && (
-                <button
-                  type="button"
-                  onClick={loadBraceletPreset}
-                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-                >
-                  + Load Bracelet Sizes (8mm, 10mm)
-                </button>
-              )}
-            </div>
-            </div>
-
-            {sizes.map((sizeItem, index) => (
-              <div
-                key={`${sizeItem.size}-${index}`}
-                className={`rounded-xl border p-4 transition space-y-3 ${
-                  sizeItem.isActive
-                    ? 'border-amber-400 bg-white dark:bg-slate-900 dark:border-amber-500/80 shadow-sm'
-                    : 'border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 opacity-60'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <label className="inline-flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={sizeItem.isActive}
-                        onChange={(e) => handleSizeFieldChange(index, 'isActive', e.target.checked)}
-                        className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
-                      />
-                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{sizeItem.size}</span>
-                    </label>
-                    {!sizeItem.isActive && (
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                        Inactive
-                      </span>
-                    )}
-                  </div>
+          {sizes.map((sizeItem, index) => (
+            <div
+              key={`${sizeItem.size}-${index}`}
+              className={`rounded-xl border p-4 transition space-y-3 ${
+                sizeItem.isActive
+                  ? 'border-amber-400 bg-white dark:bg-slate-900 dark:border-amber-500/80 shadow-sm'
+                  : 'border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 opacity-60'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={sizeItem.isActive}
+                      onChange={(e) => handleSizeFieldChange(index, 'isActive', e.target.checked)}
+                      className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                    />
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{sizeItem.size}</span>
+                  </label>
+                  {!sizeItem.isActive && (
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                      Inactive
+                    </span>
+                  )}
+                </div>
+                {variantCategory !== 'bracelet' && (
                   <button
                     type="button"
                     onClick={() => handleRemoveSize(index)}
                     className="p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
-                    title="Remove size"
+                    title="Remove variant"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
-                </div>
+                )}
+              </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                      Selling Price (₹) *
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      required
-                      value={sizeItem.price}
-                      onChange={(e) => handleSizeFieldChange(index, 'price', Number(e.target.value))}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                      Original Price (₹)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={sizeItem.originalPrice ?? ''}
-                      onChange={(e) => handleSizeFieldChange(index, 'originalPrice', e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="MRP"
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                      Discount Price (₹)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={sizeItem.discountPrice ?? ''}
-                      onChange={(e) => handleSizeFieldChange(index, 'discountPrice', e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Optional"
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                      Stock *
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      required
-                      value={sizeItem.stock}
-                      onChange={(e) => handleSizeFieldChange(index, 'stock', Number(e.target.value))}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
-                    />
-                  </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                    Selling Price (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    value={sizeItem.price || ''}
+                    placeholder="e.g. 500"
+                    onChange={(e) => handleSizeFieldChange(index, 'price', Number(e.target.value))}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                    Original Price (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={sizeItem.originalPrice ?? ''}
+                    onChange={(e) => handleSizeFieldChange(index, 'originalPrice', e.target.value ? Number(e.target.value) : undefined)}
+                    placeholder="MRP"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                    Discount Price (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={sizeItem.discountPrice ?? ''}
+                    onChange={(e) => handleSizeFieldChange(index, 'discountPrice', e.target.value ? Number(e.target.value) : undefined)}
+                    placeholder="Optional"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                    Stock *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    value={sizeItem.stock || ''}
+                    placeholder="e.g. 10"
+                    onChange={(e) => handleSizeFieldChange(index, 'stock', Number(e.target.value))}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                  />
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
 
-            {/* Add new size / bead count */}
+          {/* Add new gram / bead count for Pyrite or Tree or General */}
+          {variantCategory !== 'bracelet' && (
             <div className="flex items-end gap-2 pt-1">
               <div className="flex-1">
                 <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  {isTreeProduct ? 'Add Custom Bead Count' : 'Add New Size'}
+                  {variantCategory === 'pyrite'
+                    ? 'Add Gram Variant'
+                    : variantCategory === 'tree'
+                    ? 'Add Bead Count Variant'
+                    : 'Add Variant'}
                 </label>
                 <input
                   type="text"
                   value={newSizeInput}
                   onChange={(e) => setNewSizeInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSize(); } }}
-                  placeholder={isTreeProduct ? 'e.g. 200 Beads, 750 Beads, 1000 Beads' : 'e.g. 12mm'}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddSize();
+                    }
+                  }}
+                  placeholder={
+                    variantCategory === 'pyrite'
+                      ? 'e.g. 10 Gram, 20 Gram, 50 Gram, 100 Gram'
+                      : variantCategory === 'tree'
+                      ? 'e.g. 100 Beads, 160 Beads, 300 Beads, 500 Beads'
+                      : 'e.g. 12mm'
+                  }
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                 />
               </div>
@@ -500,12 +577,17 @@ export function ProductFormPage() {
                 className="flex items-center gap-1 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition"
               >
                 <Plus className="w-3 h-3" />
-                Add
+                {variantCategory === 'pyrite'
+                  ? '+ Add Gram'
+                  : variantCategory === 'tree'
+                  ? '+ Add Beads'
+                  : 'Add'}
               </button>
             </div>
-          </div>
+          )}
+        </div>
 
-        {(!isTreeProduct && !isBraceletProduct && sizes.length === 0) && (
+        {(variantCategory === 'general' && sizes.length === 0) && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Selling Price (₹) *</label>
@@ -541,8 +623,8 @@ export function ProductFormPage() {
           </div>
         )}
 
-        <div className={`grid grid-cols-1 gap-4 sm:grid-cols-${(!isTreeProduct && !isBraceletProduct && sizes.length === 0) ? '3' : '2'}`}>
-          {(!isTreeProduct && !isBraceletProduct && sizes.length === 0) && (
+        <div className={`grid grid-cols-1 gap-4 sm:grid-cols-${(variantCategory === 'general' && sizes.length === 0) ? '3' : '2'}`}>
+          {(variantCategory === 'general' && sizes.length === 0) && (
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">Stock Quantity *</label>
               <input
