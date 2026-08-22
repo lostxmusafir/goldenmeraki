@@ -105,7 +105,7 @@ export function CartDrawer({
                           <h3 className="truncate text-sm font-medium text-slate-950">{item.name}</h3>
                           {item.selectedWidthSize ? (
                             <p className="text-xs font-semibold text-amber-600 dark:text-amber-500">
-                              Width Size: {item.selectedWidthSize}
+                              Variant: {item.selectedWidthSize}
                             </p>
                           ) : null}
                           <p className="mt-0.5 text-xs text-slate-500">{formatCurrency(item.price)}</p>

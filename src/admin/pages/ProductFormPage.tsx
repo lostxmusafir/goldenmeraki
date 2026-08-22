@@ -4,9 +4,18 @@ import { ArrowLeft, Save, ShoppingBag, Plus, Trash2, Video, Upload } from 'lucid
 import { ProductImagesManager, type ProductImageItem } from '../components/common/ProductImagesManager';
 import { useCategories } from '../hooks/useCategories';
 import { productService } from '../services/product.service';
-import type { CreateProductDTO, InventoryStatusType, SizeVariant } from '../types/product.types';
+import type { CreateProductDTO, InventoryStatusType } from '../types/product.types';
 
 export type VariantCategoryType = 'pyrite' | 'tree' | 'bracelet' | 'general';
+
+export interface FormSizeVariant {
+  size: string;
+  price: number | '' | undefined;
+  originalPrice: number | '' | undefined;
+  discountPrice: number | '' | undefined;
+  stock: number | '' | undefined;
+  isActive: boolean;
+}
 
 export function getVariantCategoryType(
   categoryObj?: { name?: string; slug?: string; id?: string },
@@ -72,9 +81,10 @@ export function ProductFormPage() {
   const [badge, setBadge] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
 
-  // Size Variants State
-  const [sizes, setSizes] = useState<SizeVariant[]>([]);
+  // Size Variants State — uses FormSizeVariant allowing numeric values and blank string ''
+  const [sizes, setSizes] = useState<FormSizeVariant[]>([]);
   const [newSizeInput, setNewSizeInput] = useState('');
+  const isLoadedRef = useRef(false);
 
   // Video State
   const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
@@ -94,35 +104,7 @@ export function ProductFormPage() {
 
   const variantCategory = getVariantCategoryType(selectedCategoryObj, name);
 
-  // Synchronize/initialize variants when category or product change
-  useEffect(() => {
-    if (variantCategory === 'bracelet') {
-      setSizes((prevSizes) => {
-        const existing8mm = prevSizes.find((s) => s.size.toLowerCase() === '8mm');
-        const existing10mm = prevSizes.find((s) => s.size.toLowerCase() === '10mm');
-
-        return [
-          {
-            size: '8mm',
-            price: existing8mm ? existing8mm.price : 0,
-            originalPrice: existing8mm ? existing8mm.originalPrice : undefined,
-            discountPrice: existing8mm ? existing8mm.discountPrice : undefined,
-            stock: existing8mm ? existing8mm.stock : 0,
-            isActive: existing8mm ? existing8mm.isActive !== false : true,
-          },
-          {
-            size: '10mm',
-            price: existing10mm ? existing10mm.price : 0,
-            originalPrice: existing10mm ? existing10mm.originalPrice : undefined,
-            discountPrice: existing10mm ? existing10mm.discountPrice : undefined,
-            stock: existing10mm ? existing10mm.stock : 0,
-            isActive: existing10mm ? existing10mm.isActive !== false : true,
-          },
-        ];
-      });
-    }
-  }, [variantCategory]);
-
+  // Load existing product data when editing
   useEffect(() => {
     if (!isEdit || !id) return;
 
@@ -149,12 +131,20 @@ export function ProductFormPage() {
         setBadge(product.badge || '');
         setIsFeatured(Boolean(product.isFeatured));
 
-        // Load sizes
+        // Hydrate existing variant data directly from DB
         if (product.sizes && product.sizes.length > 0) {
-          setSizes(product.sizes);
+          const loadedSizes: FormSizeVariant[] = product.sizes.map((s) => ({
+            size: s.size,
+            price: s.price != null ? Number(s.price) : '',
+            originalPrice: s.originalPrice != null ? Number(s.originalPrice) : '',
+            discountPrice: s.discountPrice != null ? Number(s.discountPrice) : '',
+            stock: s.stock != null ? Number(s.stock) : '',
+            isActive: s.isActive !== false,
+          }));
+          setSizes(loadedSizes);
         }
+        isLoadedRef.current = true;
 
-        // Load video
         if (product.video) {
           setVideoUrl(product.video);
           setVideoPreviewUrl(product.video);
@@ -166,18 +156,28 @@ export function ProductFormPage() {
       .finally(() => setIsLoading(false));
   }, [id, isEdit]);
 
+  // Default category selection if not set
   useEffect(() => {
     if (!selectedCatId && categories.length) {
       setSelectedCatId(categories[0].id);
     }
   }, [categories, selectedCatId]);
 
+  // Bracelet category initialization for NEW products or when switching to bracelet category
+  useEffect(() => {
+    if (variantCategory === 'bracelet' && !isEdit && sizes.length === 0) {
+      setSizes([
+        { size: '8mm', price: '', originalPrice: '', discountPrice: '', stock: '', isActive: true },
+        { size: '10mm', price: '', originalPrice: '', discountPrice: '', stock: '', isActive: true },
+      ]);
+    }
+  }, [variantCategory, isEdit, sizes.length]);
+
   const handleAddSize = () => {
     let sizeLabel = newSizeInput.trim();
     if (!sizeLabel) return;
 
     if (variantCategory === 'pyrite') {
-      // Validate Pyrite: no beads or mm allowed
       if (sizeLabel.toLowerCase().includes('bead') || sizeLabel.toLowerCase().includes('mm')) {
         setError('Pyrite category only supports Gram variants (e.g. 10 Gram, 20 Gram).');
         return;
@@ -186,7 +186,6 @@ export function ProductFormPage() {
         sizeLabel = `${sizeLabel} Gram`;
       }
     } else if (variantCategory === 'tree') {
-      // Validate Crystal Tree: no gram or mm allowed
       if (sizeLabel.toLowerCase().includes('gram') || sizeLabel.toLowerCase().includes('mm')) {
         setError('Crystal Tree category only supports Bead count variants (e.g. 100 Beads, 160 Beads).');
         return;
@@ -202,13 +201,15 @@ export function ProductFormPage() {
     if (sizes.some((s) => s.size.toLowerCase() === sizeLabel.toLowerCase())) return;
 
     setError(null);
+    // Newly added variant gets a 100% EMPTY pricing and inventory state
     setSizes((prev) => [
       ...prev,
       {
         size: sizeLabel,
-        price: price || 0,
-        originalPrice: originalPrice,
-        stock: 0,
+        price: '',
+        originalPrice: '',
+        discountPrice: '',
+        stock: '',
         isActive: true,
       },
     ]);
@@ -223,9 +224,15 @@ export function ProductFormPage() {
     }
   };
 
-  const handleSizeFieldChange = (index: number, field: keyof SizeVariant, value: any) => {
+  const handleSizeFieldChange = (index: number, field: keyof FormSizeVariant, rawValue: any) => {
     setSizes((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
+      prev.map((s, i) => {
+        if (i !== index) return s;
+        if (field === 'isActive') return { ...s, isActive: Boolean(rawValue) };
+        const valStr = String(rawValue).trim();
+        const numVal = valStr === '' ? '' : Number(valStr);
+        return { ...s, [field]: isNaN(numVal as number) ? '' : numVal };
+      }),
     );
   };
 
@@ -288,7 +295,7 @@ export function ProductFormPage() {
     setError(null);
 
     try {
-      // Filter out sizes invalid for the current category
+      // Filter sizes by category
       let filteredSizes = sizes;
       if (variantCategory === 'pyrite') {
         filteredSizes = sizes.filter(
@@ -302,12 +309,24 @@ export function ProductFormPage() {
         filteredSizes = sizes.filter((s) => BRACELET_DEFAULT_SIZES.includes(s.size.toLowerCase()));
       }
 
+      // Validate active variants: Selling Price and Stock must be valid non-negative numbers
+      for (const s of filteredSizes) {
+        if (s.isActive) {
+          if (s.price === '' || s.price === undefined || isNaN(Number(s.price)) || Number(s.price) < 0) {
+            throw new Error(`Please enter a valid Selling Price for active variant "${s.size}".`);
+          }
+          if (s.stock === '' || s.stock === undefined || isNaN(Number(s.stock)) || Number(s.stock) < 0) {
+            throw new Error(`Please enter a valid Stock quantity for active variant "${s.size}".`);
+          }
+        }
+      }
+
       const activeSizes = filteredSizes.map((s) => ({
         size: s.size,
-        price: Number(s.price),
-        originalPrice: s.originalPrice != null ? Number(s.originalPrice) : undefined,
-        discountPrice: s.discountPrice != null ? Number(s.discountPrice) : undefined,
-        stock: Number(s.stock),
+        price: Number(s.price || 0),
+        originalPrice: s.originalPrice !== '' && s.originalPrice != null ? Number(s.originalPrice) : undefined,
+        discountPrice: s.discountPrice !== '' && s.discountPrice != null ? Number(s.discountPrice) : undefined,
+        stock: Number(s.stock || 0),
         isActive: s.isActive !== false,
       }));
 
@@ -489,10 +508,10 @@ export function ProductFormPage() {
                   <input
                     type="number"
                     min="0"
-                    required
-                    value={sizeItem.price || ''}
-                    placeholder="e.g. 500"
-                    onChange={(e) => handleSizeFieldChange(index, 'price', Number(e.target.value))}
+                    required={sizeItem.isActive}
+                    value={sizeItem.price ?? ''}
+                    placeholder="Enter Selling Price"
+                    onChange={(e) => handleSizeFieldChange(index, 'price', e.target.value)}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
@@ -504,8 +523,8 @@ export function ProductFormPage() {
                     type="number"
                     min="0"
                     value={sizeItem.originalPrice ?? ''}
-                    onChange={(e) => handleSizeFieldChange(index, 'originalPrice', e.target.value ? Number(e.target.value) : undefined)}
                     placeholder="MRP"
+                    onChange={(e) => handleSizeFieldChange(index, 'originalPrice', e.target.value)}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
@@ -517,8 +536,8 @@ export function ProductFormPage() {
                     type="number"
                     min="0"
                     value={sizeItem.discountPrice ?? ''}
-                    onChange={(e) => handleSizeFieldChange(index, 'discountPrice', e.target.value ? Number(e.target.value) : undefined)}
                     placeholder="Optional"
+                    onChange={(e) => handleSizeFieldChange(index, 'discountPrice', e.target.value)}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
@@ -529,10 +548,10 @@ export function ProductFormPage() {
                   <input
                     type="number"
                     min="0"
-                    required
-                    value={sizeItem.stock || ''}
-                    placeholder="e.g. 10"
-                    onChange={(e) => handleSizeFieldChange(index, 'stock', Number(e.target.value))}
+                    required={sizeItem.isActive}
+                    value={sizeItem.stock ?? ''}
+                    placeholder="Enter Stock"
+                    onChange={(e) => handleSizeFieldChange(index, 'stock', e.target.value)}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-amber-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>

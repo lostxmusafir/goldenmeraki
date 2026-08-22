@@ -26,6 +26,7 @@ export function ProductInfo({
   setQuantity,
 }: ProductInfoProps) {
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
+  const [sizeError, setSizeError] = useState<string | null>(null);
 
   const isPyrite =
     product.name?.toLowerCase().includes('pyrite') ||
@@ -106,6 +107,17 @@ export function ProductInfo({
   const activeSizeLabel = selectedSize || currentSizeObj?.size || '';
 
   const handleAddToCart = () => {
+    if (hasActiveSizes && !selectedSize) {
+      setSizeError(
+        isPyrite
+          ? 'Please select a weight option'
+          : isTree
+          ? 'Please select a bead count option'
+          : 'Please select a size option',
+      );
+      return;
+    }
+    setSizeError(null);
     onAddToCart(
       {
         ...product,
@@ -119,6 +131,17 @@ export function ProductInfo({
   };
 
   const handleBuyNow = () => {
+    if (hasActiveSizes && !selectedSize) {
+      setSizeError(
+        isPyrite
+          ? 'Please select a weight option'
+          : isTree
+          ? 'Please select a bead count option'
+          : 'Please select a size option',
+      );
+      return;
+    }
+    setSizeError(null);
     onBuyNow(
       {
         ...product,
@@ -186,6 +209,12 @@ export function ProductInfo({
             )}
           </div>
 
+          {sizeError && (
+            <p className="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 p-2 rounded-lg">
+              {sizeError}
+            </p>
+          )}
+
           <div className="flex flex-wrap gap-3">
             {displaySizeList.map((sizeItem) => {
               const isSelected = sizeItem.size === activeSizeLabel && sizeItem.isAvailable;
@@ -199,6 +228,7 @@ export function ProductInfo({
                   onClick={() => {
                     if (!isDisabled) {
                       setSelectedSize(sizeItem.size);
+                      setSizeError(null);
                     }
                   }}
                   disabled={isDisabled || sizeOutOfStock}
