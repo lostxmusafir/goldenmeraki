@@ -1,7 +1,15 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/sitemap.xml",
+      "destination": "https://goldenmeraki-mt.onrender.com/sitemap.xml"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "https://goldenmeraki-mt.onrender.com/robots.txt"
+    },
+    {
+      "source": "/((?!sitemap\\.xml|robots\\.txt|assets/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
